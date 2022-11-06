@@ -1,0 +1,26 @@
+# Use postgres/example user/password credentials
+version: '3.1'
+
+services:
+  postgres:
+    image: postgres:latest
+    # restart: always
+    environment:
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: caddie_app
+    ports:
+      - '5432:5432'
+
+  backend:
+    image: node:18
+    volumes:
+      - '.:/app'
+    ports:
+      - '3001:3001' # Nest
+    depends_on:
+      - postgres
+    working_dir: /app
+    command: ["npm", "start"]
+    environment:
+      # with docker we listen to the postgres network, but it is reachable at @localhost on our post
+      DATABASE_URL: postgresql://postgres:password@postgres:5432/caddie_app?schema=public
