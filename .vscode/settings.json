@@ -1,0 +1,13 @@
+{
+    "rest-client.environmentVariables": {
+        "$shared": {
+            "version": "v1"
+        },
+        "local": {
+            "BASE_URL": "http://localhost:3001"
+        },
+        "production": {
+
+        }
+    }
+}

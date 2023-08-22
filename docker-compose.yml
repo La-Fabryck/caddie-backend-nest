@@ -12,15 +12,18 @@ services:
       - '5432:5432'
 
   backend:
-    image: node:18
+    build:
+      context: ./
+      dockerfile: ./docker/app/local/Dockerfile
     volumes:
       - '.:/app'
     ports:
       - '3001:3001' # Nest
+      - '9229:9229' # Debug
     depends_on:
       - postgres
     working_dir: /app
-    command: ["npm", "start"]
-    environment:
-      # with docker we listen to the postgres network, but it is reachable at @localhost on our post
-      DATABASE_URL: postgresql://postgres:password@postgres:5432/caddie_app?schema=public
+    command: ['npm', 'run', 'start:dev']
+    user: 0:0
+    env_file:
+      - .env

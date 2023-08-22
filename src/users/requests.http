@@ -1,0 +1,16 @@
+GET {{BASE_URL}}/users HTTP/1.1
+
+###
+
+POST {{BASE_URL}}/users HTTP/1.1
+content-type: application/json
+
+{
+  "email": "string",
+  "name": "string",
+  "password": "string"
+}
+
+###
+
+GET {{BASE_URL}}/users/399c6350-4eab-4892-9c10-29368515dea2 HTTP/1.1
