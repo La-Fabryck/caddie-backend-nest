@@ -9,4 +9,5 @@
  *
  * RegExp cheatsheet : https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Regular_Expressions/Cheatsheet
  */
-export const PASSWORD_REGEX = /(?=.*[a-z])(?=.*[A-Z])(?=.*[\d])(?=.*[\W_])(?=^.{12,30}$)/;
+export const PASSWORD_REGEX =
+  /(?=.*[a-z])(?=.*[A-Z])(?=.*[\d])(?=.*[\W_])(?=^.{12,30}$)/;

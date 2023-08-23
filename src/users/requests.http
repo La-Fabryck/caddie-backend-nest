@@ -6,11 +6,11 @@ POST {{BASE_URL}}/users HTTP/1.1
 content-type: application/json
 
 {
-  "email": "string",
+  "email": "toto@toto.com",
   "name": "string",
-  "password": "string"
+  "password": "ALongPassw0rdOf30Characters_%/"
 }
 
 ###
 
-GET {{BASE_URL}}/users/399c6350-4eab-4892-9c10-29368515dea2 HTTP/1.1
+GET {{BASE_URL}}/users/c9a2553e-3d77-4c07-931a-b1b3a074aa61 HTTP/1.1
