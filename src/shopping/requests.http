@@ -1,11 +1,12 @@
 ### LIST ###
 
-GET {{BASE_URL}}/list?authorId=c9a2553e-3d77-4c07-931a-b1b3a074aa61 HTTP/1.1
+GET {{BASE_URL}}/list HTTP/1.1
+Cookie: {{$dotenv COOKIE}}
 
 ###
-
 POST {{BASE_URL}}/list HTTP/1.1
 content-type: application/json
+Cookie: {{$dotenv COOKIE}}
 
 {
   "authorId": "c9a2553e-3d77-4c07-931a-b1b3a074aa61",
@@ -15,22 +16,24 @@ content-type: application/json
 ###
 
 GET {{BASE_URL}}/list/a347a2d7-c40a-4c19-9c6c-f8c84144cd1c HTTP/1.1
-
+Cookie: {{$dotenv COOKIE}}
 
 ### ITEM ###
 
-GET {{BASE_URL}}/item?listId=e2a0798f-051b-405b-9ee2-161fbda39986 HTTP/1.1
+GET {{BASE_URL}}/item?listId=6c7ccdb6-5b28-4761-b185-a80863ce275c HTTP/1.1
+Cookie: {{$dotenv COOKIE}}
 
 ###
 
 POST {{BASE_URL}}/item HTTP/1.1
-content-type: application/json
+Content-Type: application/json
+Cookie: {{$dotenv COOKIE}}
 
 {
-  "listId": "e2a0798f-051b-405b-9ee2-161fbda39986",
+  "listId": "6c7ccdb6-5b28-4761-b185-a80863ce275c",
   "name": "string"
 }
 
 ###
 
-GET {{BASE_URL}}/item/2db40a46-9604-485c-b448-4f36a26cae51 HTTP/1.1
+GET {{BASE_URL}}/item/c672deea-c922-4fb4-b6ce-831980a8481a HTTP/1.1

@@ -1,9 +1,10 @@
+import { fastifyCookie } from '@fastify/cookie';
 import { NestFactory } from '@nestjs/core';
+import { ValidationPipe } from '@nestjs/common';
 import {
   FastifyAdapter,
   NestFastifyApplication,
 } from '@nestjs/platform-fastify';
-import { ValidationPipe } from '@nestjs/common';
 import { AppModule } from './app.module';
 
 async function bootstrap() {
@@ -12,8 +13,10 @@ async function bootstrap() {
     new FastifyAdapter(),
   );
 
+  app.register(fastifyCookie);
   app.useGlobalPipes(new ValidationPipe({ whitelist: true }));
 
   await app.listen(3001, '0.0.0.0');
 }
+
 bootstrap();

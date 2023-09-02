@@ -3,32 +3,51 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
-import { Item } from '@prisma/client';
+import { Item, User } from '@prisma/client';
 import { UpdateItemDto } from '../dto/update-item.dto';
 import { CreateItemDto } from '../dto/create-item.dto';
+import { ListService } from '../list/list.service';
 import { DatabaseService } from '@/database/database.service';
+
+type CreateItem = {
+  createItemDto: CreateItemDto;
+  user: User;
+};
+
+type FindItems = { listId: string; user: User };
 
 @Injectable()
 export class ItemService {
-  constructor(private database: DatabaseService) {}
+  constructor(
+    private database: DatabaseService,
+    private readonly listService: ListService,
+  ) {}
 
-  async create(createItemDto: CreateItemDto) {
-    const listExists = await this.database.item.count({
-      where: {
-        listId: createItemDto.listId,
-      },
+  async create(createItem: CreateItem) {
+    const list = await this.listService.findOneById({
+      id: createItem.createItemDto.listId,
+      authorId: createItem.user.id,
     });
 
-    if (!listExists) {
+    if (list == null) {
       throw new ForbiddenException();
     }
 
     return this.database.item.create({
-      data: createItemDto,
+      data: createItem.createItemDto,
     });
   }
 
-  findAll(listId: string) {
+  async findAllByListId({ listId, user }: FindItems) {
+    const list = await this.listService.findOneById({
+      id: listId,
+      authorId: user.id,
+    });
+
+    if (list == null) {
+      throw new ForbiddenException();
+    }
+
     return this.database.item.findMany({
       where: {
         listId,

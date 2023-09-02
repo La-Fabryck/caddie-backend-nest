@@ -1,6 +1,10 @@
+### USER
+
+### find users
+
 GET {{BASE_URL}}/users HTTP/1.1
 
-###
+### create a user
 
 POST {{BASE_URL}}/users HTTP/1.1
 content-type: application/json
@@ -11,6 +15,23 @@ content-type: application/json
   "password": "ALongPassw0rdOf30Characters_%/"
 }
 
-###
+### find a user by id
 
 GET {{BASE_URL}}/users/c9a2553e-3d77-4c07-931a-b1b3a074aa61 HTTP/1.1
+
+
+### AUTHENTICATION
+
+### login
+POST {{BASE_URL}}/authentication/login HTTP/1.1
+content-type: application/json
+
+{
+  "email": "Tierra2@yahoo.com",
+  "password": "ALongPassw0rdOf30Characters_%/"
+}
+
+
+### logout
+
+GET {{BASE_URL}}/authentication/logout HTTP/1.1
