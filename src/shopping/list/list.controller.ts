@@ -7,30 +7,46 @@ import {
   ParseUUIDPipe,
   Patch,
   Post,
-  Query,
+  UseGuards,
+  UseInterceptors,
 } from '@nestjs/common';
+import { User } from '@prisma/client';
 import { CreateListDto } from '../dto/create-list.dto';
 import { UpdateListDto } from '../dto/update-list.dto';
 import { ListService } from './list.service';
+import { AuthenticationGuard } from '@/users/guards/authentication.guard';
+import { AuthenticationInterceptor } from '@/users/interceptors/authentication.interceptor';
+import { CurrentUser } from '@/users/decorators/current-user';
 
 @Controller('list')
 export class ListController {
   constructor(private readonly listService: ListService) {}
 
+  @UseGuards(AuthenticationGuard)
+  @UseInterceptors(AuthenticationInterceptor)
   @Post()
-  create(@Body() createShoppingDto: CreateListDto) {
-    return this.listService.create(createShoppingDto);
+  create(@Body() createShoppingDto: CreateListDto, @CurrentUser() user: User) {
+    return this.listService.create({
+      authorId: user.id,
+      title: createShoppingDto.title,
+    });
   }
 
-  //TODO: Verify that the user is subscribed to the list
+  @UseGuards(AuthenticationGuard)
+  @UseInterceptors(AuthenticationInterceptor)
   @Get()
-  findAll(@Query('authorId', ParseUUIDPipe) authorId: string) {
-    return this.listService.findAll(authorId);
+  findAllByAuthor(@CurrentUser() user: User) {
+    return this.listService.findAllByAuthor(user.id);
   }
 
+  @UseGuards(AuthenticationGuard)
+  @UseInterceptors(AuthenticationInterceptor)
   @Get(':id')
-  findOne(@Param('id', ParseUUIDPipe) id: string) {
-    return this.listService.findOne(id);
+  findOneById(
+    @Param('id', ParseUUIDPipe) id: string,
+    @CurrentUser() user: User,
+  ) {
+    return this.listService.findOneById({ id, authorId: user.id });
   }
 
   @Patch(':id')
