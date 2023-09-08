@@ -10,7 +10,7 @@ import { ListService } from '../list/list.service';
 import { DatabaseService } from '@/database/database.service';
 
 type CreateItem = {
-  createItemDto: CreateItemDto;
+  createItemPayload: CreateItemDto & Pick<Item, 'listId'>;
   user: User;
 };
 
@@ -25,8 +25,7 @@ export class ItemService {
 
   async create(createItem: CreateItem) {
     const list = await this.listService.findOneById({
-      id: createItem.createItemDto.listId,
-      authorId: createItem.user.id,
+      id: createItem.createItemPayload.listId,
     });
 
     if (list == null) {
@@ -34,14 +33,13 @@ export class ItemService {
     }
 
     return this.database.item.create({
-      data: createItem.createItemDto,
+      data: createItem.createItemPayload,
     });
   }
 
-  async findAllByListId({ listId, user }: FindItems) {
+  async findAllByListId({ listId }: FindItems) {
     const list = await this.listService.findOneById({
       id: listId,
-      authorId: user.id,
     });
 
     if (list == null) {

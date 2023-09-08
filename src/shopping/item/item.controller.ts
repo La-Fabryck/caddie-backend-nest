@@ -7,7 +7,6 @@ import {
   ParseUUIDPipe,
   Patch,
   Post,
-  Query,
   UseGuards,
   UseInterceptors,
 } from '@nestjs/common';
@@ -19,40 +18,46 @@ import { AuthenticationGuard } from '@/users/guards/authentication.guard';
 import { AuthenticationInterceptor } from '@/users/interceptors/authentication.interceptor';
 import { CurrentUser } from '@/users/decorators/current-user';
 
-@Controller('item')
+@Controller()
 export class ItemController {
   constructor(private readonly itemService: ItemService) {}
 
   @UseGuards(AuthenticationGuard)
   @UseInterceptors(AuthenticationInterceptor)
-  @Post()
-  create(@Body() createItemDto: CreateItemDto, @CurrentUser() user: User) {
-    return this.itemService.create({ createItemDto, user });
+  @Post('/list/:listId/items')
+  create(
+    @Param('listId', ParseUUIDPipe) listId: string,
+    @Body() createItemDto: CreateItemDto,
+    @CurrentUser() user: User,
+  ) {
+    return this.itemService.create({
+      createItemPayload: { listId, name: createItemDto.name },
+      user,
+    });
   }
 
-  //URL imbriqué ? /list/:id/items
   @UseGuards(AuthenticationGuard)
   @UseInterceptors(AuthenticationInterceptor)
-  @Get()
+  @Get('/list/:listId/items')
   findAll(
-    @Query('listId', ParseUUIDPipe) listId: string,
+    @Param('listId', ParseUUIDPipe) listId: string,
     @CurrentUser() user: User,
   ) {
     return this.itemService.findAllByListId({ listId, user });
   }
 
   //TODO: protect
-  @Get(':id')
+  @Get('items/:id')
   findOne(@Param('id', ParseUUIDPipe) id: string) {
     return this.itemService.findOne(id);
   }
 
-  @Patch(':id')
+  @Patch('items/:id')
   update(@Param('id') id: string, @Body() updateShoppingDto: UpdateItemDto) {
     return this.itemService.update(+id, updateShoppingDto);
   }
 
-  @Delete(':id')
+  @Delete('items/:id')
   remove(@Param('id') id: string) {
     return this.itemService.remove(+id);
   }

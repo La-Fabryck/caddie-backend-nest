@@ -1,7 +1,4 @@
-FROM node:18
+FROM node:21-alpine
 
-# https://github.com/nestjs/nest-cli/issues/484
-RUN apt-get update \
-    && apt-get install --no-install-recommends -y procps \
-    && apt-get clean \
-    && rm -rf /var/lib/apt/lists/*
+RUN apk update \
+    && apk add --no-cache procps

@@ -6,4 +6,7 @@ type CreateListInterface = Omit<List, 'id' | 'authorId'>;
 export class CreateListDto implements CreateListInterface {
   @IsNotEmpty()
   title: string;
+
+  @IsNotEmpty()
+  pseudonym: string;
 }

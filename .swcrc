@@ -11,6 +11,7 @@
       "paths": {
         "@/database/*": ["src/database/*"],
         "@/shopping/*": ["src/shopping/*"],
+        "@/subscribers/*": ["src/subscribers/*"],
         "@/users/*": ["src/users/*"]
       }
     },

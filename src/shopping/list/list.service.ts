@@ -4,22 +4,32 @@ import { UpdateListDto } from '../dto/update-list.dto';
 import { DatabaseService } from '@/database/database.service';
 
 type CreateList = Omit<List, 'id'>;
-type FindListById = Pick<List, 'id' | 'authorId'>;
+type FindListById = Pick<List, 'id'>;
 
 @Injectable()
 export class ListService {
   constructor(private database: DatabaseService) {}
 
-  create(createListDto: CreateList): Promise<List> {
+  create(createList: CreateList): Promise<List> {
+    //TODO: with or without ?
+    // return this.database.list.create({
+    //   data: createList,
+    // });
+
     return this.database.list.create({
-      data: createListDto,
+      data: createList,
+      include: {
+        subscribers: true,
+      },
     });
   }
 
-  findAllByAuthor(authorId: string): Promise<List[]> {
+  findAllById(ids: string[]): Promise<List[]> {
     return this.database.list.findMany({
       where: {
-        authorId,
+        id: {
+          in: ids,
+        },
       },
     });
   }

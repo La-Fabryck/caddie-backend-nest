@@ -1,0 +1,15 @@
+- Restfull
+- Protect endpoints 403
+- Debugger
+- Finish / Fix seed / add Subs
+- README
+- Websocket
+- cluster mode start
+- handle jwt expired
+
+backend-1   | TokenExpiredError: jwt expired
+backend-1   |     at /app/node_modules/jsonwebtoken/verify.js:190:21
+backend-1   |     at getSecret (/app/node_modules/jsonwebtoken/verify.js:97:14)
+backend-1   |     at Object.module.exports [as verify] (/app/node_modules/jsonwebtoken/verify.js:101:10)
+backend-1   |     at /app/node_modules/@nestjs/jwt/dist/jwt.service.js:75:17
+backend-1   |     at processTicksAndRejections (node:internal/process/task_queues:95:5)

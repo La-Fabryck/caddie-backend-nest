@@ -17,7 +17,7 @@ content-type: application/json
 
 ### find a user by id
 
-GET {{BASE_URL}}/users/c9a2553e-3d77-4c07-931a-b1b3a074aa61 HTTP/1.1
+GET {{BASE_URL}}/users/d82a8316-f14e-41d0-9c37-62c4bdcb3168 HTTP/1.1
 
 
 ### AUTHENTICATION
@@ -27,7 +27,7 @@ POST {{BASE_URL}}/authentication/login HTTP/1.1
 content-type: application/json
 
 {
-  "email": "Tierra2@yahoo.com",
+  "email": "toto@toto.com",
   "password": "ALongPassw0rdOf30Characters_%/"
 }
 

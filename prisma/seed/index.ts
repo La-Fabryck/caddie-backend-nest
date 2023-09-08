@@ -18,6 +18,9 @@ async function main() {
   await prisma.item.deleteMany();
   console.log('Removed all items');
 
+  await prisma.subscriber.deleteMany();
+  console.log('Removed all subscribers');
+
   await prisma.list.deleteMany();
   console.log('Removed all lists');
 
@@ -30,10 +33,11 @@ async function main() {
 }
 main()
   .then(async () => {
-    await prisma.$disconnect();
+    console.log('Seed completed !');
   })
   .catch(async (e) => {
     console.error(e);
+  })
+  .finally(async () => {
     await prisma.$disconnect();
-    process.exit(1);
   });
