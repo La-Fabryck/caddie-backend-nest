@@ -11,3 +11,8 @@
  */
 export const PASSWORD_REGEX =
   /(?=.*[a-z])(?=.*[A-Z])(?=.*[\d])(?=.*[\W_])(?=^.{12,30}$)/;
+
+/**
+ * The name of the environment variable for the cookie session
+ */
+export const COOKIE_NAME = 'COOKIE_NAME';

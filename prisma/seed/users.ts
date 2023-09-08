@@ -14,5 +14,5 @@ export async function insertUsers(prisma: PrismaClient, uuids: string[]) {
     }),
   });
 
-  console.log(`Inserted users with IDs : ${uuids}`);
+  console.log(`Inserted users with IDs : ${uuids.join(', ')}.`);
 }

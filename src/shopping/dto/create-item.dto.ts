@@ -1,12 +1,9 @@
 import { Item } from '@prisma/client';
-import { IsNotEmpty, IsUUID } from 'class-validator';
+import { IsNotEmpty } from 'class-validator';
 
-type CreateItemInterface = Omit<Item, 'id'>;
+type CreateItemInterface = Omit<Item, 'id' | 'listId'>;
 
 export class CreateItemDto implements CreateItemInterface {
-  @IsUUID()
-  listId: string;
-
   @IsNotEmpty()
   name: string;
 }
