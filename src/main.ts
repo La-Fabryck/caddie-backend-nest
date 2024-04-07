@@ -1,11 +1,14 @@
 import { fastifyCookie } from '@fastify/cookie';
 import { NestFactory } from '@nestjs/core';
-import { ValidationPipe } from '@nestjs/common';
+import { BadRequestException, ValidationPipe } from '@nestjs/common';
 import {
   FastifyAdapter,
   NestFastifyApplication,
 } from '@nestjs/platform-fastify';
 import { AppModule } from './app.module';
+
+type ErrorInterfaceBody = { type: string; message: string };
+export type ErrorInterface = Record<string, ErrorInterfaceBody[]>;
 
 async function bootstrap() {
   const app = await NestFactory.create<NestFastifyApplication>(
@@ -14,7 +17,30 @@ async function bootstrap() {
   );
 
   app.register(fastifyCookie);
-  app.useGlobalPipes(new ValidationPipe({ whitelist: true }));
+  app.useGlobalPipes(
+    new ValidationPipe({
+      whitelist: true,
+      exceptionFactory: (errors) => {
+        const result: Record<string, ErrorInterfaceBody[]> = errors.reduce(
+          (accumulator, currentValue) => {
+            const formattedErrors: ErrorInterfaceBody[] = Object.entries(
+              currentValue.constraints ?? {},
+            ).map(([key, value]) => {
+              return {
+                type: key,
+                message: value,
+              };
+            });
+
+            accumulator[currentValue.property] = formattedErrors;
+            return accumulator;
+          },
+          {} as Record<string, ErrorInterfaceBody[]>,
+        );
+        return new BadRequestException(result);
+      },
+    }),
+  );
 
   await app.listen(3001, '0.0.0.0');
 }

@@ -45,7 +45,7 @@ export class UsersService {
   }
 
   findAll() {
-    return `This action returns all users`;
+    return { toto: 'tutu' };
   }
 
   async findOne(id: string) {
