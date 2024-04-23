@@ -34,6 +34,7 @@ export class AuthenticationController {
         httpOnly: true,
         sameSite: true,
         secure: true,
+        path: '/',
       })
       .send();
   }
