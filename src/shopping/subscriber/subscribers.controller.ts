@@ -1,22 +1,11 @@
-import {
-  Body,
-  Controller,
-  Delete,
-  Get,
-  Param,
-  ParseUUIDPipe,
-  Patch,
-  Post,
-  UseGuards,
-  UseInterceptors,
-} from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, ParseUUIDPipe, Patch, Post, UseGuards, UseInterceptors } from '@nestjs/common';
 import { User } from '@prisma/client';
+import { CurrentUser } from '@/users/decorators/current-user';
+import { AuthenticationGuard } from '@/users/guards/authentication.guard';
+import { AuthenticationInterceptor } from '@/users/interceptors/authentication.interceptor';
 import { CreateSubcriberDto } from '../dto/create-subcriber.dto';
 import { UpdateSubcriberDto } from '../dto/update-subcriber.dto';
 import { SubscribersService } from './subscribers.service';
-import { AuthenticationGuard } from '@/users/guards/authentication.guard';
-import { AuthenticationInterceptor } from '@/users/interceptors/authentication.interceptor';
-import { CurrentUser } from '@/users/decorators/current-user';
 
 @Controller('subscribers')
 export class SubscribersController {
@@ -25,10 +14,7 @@ export class SubscribersController {
   @UseGuards(AuthenticationGuard)
   @UseInterceptors(AuthenticationInterceptor)
   @Post()
-  create(
-    @Body() createSubcriberDto: CreateSubcriberDto,
-    @CurrentUser() user: User,
-  ) {
+  create(@Body() createSubcriberDto: CreateSubcriberDto, @CurrentUser() user: User) {
     return this.subscribersService.create({ ...createSubcriberDto, user });
   }
 
@@ -47,10 +33,7 @@ export class SubscribersController {
   }
 
   @Patch(':id')
-  update(
-    @Param('id') id: string,
-    @Body() updateSubcriberDto: UpdateSubcriberDto,
-  ) {
+  update(@Param('id') id: string, @Body() updateSubcriberDto: UpdateSubcriberDto) {
     return this.subscribersService.update(+id, updateSubcriberDto);
   }
 

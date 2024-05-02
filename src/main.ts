@@ -1,20 +1,14 @@
 import { fastifyCookie } from '@fastify/cookie';
-import { NestFactory } from '@nestjs/core';
 import { BadRequestException, ValidationPipe } from '@nestjs/common';
-import {
-  FastifyAdapter,
-  NestFastifyApplication,
-} from '@nestjs/platform-fastify';
+import { NestFactory } from '@nestjs/core';
+import { FastifyAdapter, NestFastifyApplication } from '@nestjs/platform-fastify';
 import { AppModule } from './app.module';
 
 type ErrorInterfaceBody = { type: string; message: string };
 export type ErrorInterface = Record<string, ErrorInterfaceBody[]>;
 
 async function bootstrap() {
-  const app = await NestFactory.create<NestFastifyApplication>(
-    AppModule,
-    new FastifyAdapter(),
-  );
+  const app = await NestFactory.create<NestFastifyApplication>(AppModule, new FastifyAdapter());
 
   app.register(fastifyCookie);
   app.useGlobalPipes(
@@ -23,9 +17,7 @@ async function bootstrap() {
       exceptionFactory: (errors) => {
         const result: Record<string, ErrorInterfaceBody[]> = errors.reduce(
           (accumulator, currentValue) => {
-            const formattedErrors: ErrorInterfaceBody[] = Object.entries(
-              currentValue.constraints ?? {},
-            ).map(([key, value]) => {
+            const formattedErrors: ErrorInterfaceBody[] = Object.entries(currentValue.constraints ?? {}).map(([key, value]) => {
               return {
                 type: key,
                 message: value,

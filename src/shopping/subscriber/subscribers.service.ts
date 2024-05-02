@@ -1,8 +1,8 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { Subscriber, User } from '@prisma/client';
+import { DatabaseService } from '@/database/database.service';
 import { CreateSubcriberDto } from '../dto/create-subcriber.dto';
 import { UpdateSubcriberDto } from '../dto/update-subcriber.dto';
-import { DatabaseService } from '@/database/database.service';
 
 type CreateSubcriber = CreateSubcriberDto & { user: User };
 

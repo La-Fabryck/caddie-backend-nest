@@ -1,9 +1,9 @@
 import { ForbiddenException, Injectable } from '@nestjs/common';
-import { compare } from 'bcrypt';
 import { JwtService } from '@nestjs/jwt';
+import { compare } from 'bcrypt';
+import { type ErrorInterface } from 'src/main';
 import { LoginDto } from '../dto/login.dto';
 import { UsersService } from '../users/users.service';
-import { type ErrorInterface } from 'src/main';
 
 export type JwtPayload = { sub: string };
 

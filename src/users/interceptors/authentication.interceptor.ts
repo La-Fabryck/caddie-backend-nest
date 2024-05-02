@@ -1,9 +1,4 @@
-import {
-  CallHandler,
-  ExecutionContext,
-  Injectable,
-  NestInterceptor,
-} from '@nestjs/common';
+import { CallHandler, ExecutionContext, Injectable, NestInterceptor } from '@nestjs/common';
 import { FastifyRequest } from 'fastify';
 import { Observable } from 'rxjs';
 import { UsersService } from '../users/users.service';
@@ -12,10 +7,7 @@ import { UsersService } from '../users/users.service';
 export class AuthenticationInterceptor implements NestInterceptor {
   constructor(private readonly usersService: UsersService) {}
 
-  async intercept(
-    context: ExecutionContext,
-    next: CallHandler,
-  ): Promise<Observable<any>> {
+  async intercept(context: ExecutionContext, next: CallHandler): Promise<Observable<any>> {
     const request: FastifyRequest = context.switchToHttp().getRequest();
     const { userId } = request || {};
 
