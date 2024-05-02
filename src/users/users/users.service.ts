@@ -1,13 +1,9 @@
-import {
-  ForbiddenException,
-  Injectable,
-  NotFoundException,
-} from '@nestjs/common';
-import { genSalt, hash } from 'bcrypt';
+import { ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
 import { User } from '@prisma/client';
+import { genSalt, hash } from 'bcrypt';
+import { DatabaseService } from '@/database/database.service';
 import { CreateUserDto } from '../dto/create-user.dto';
 import { UpdateUserDto } from '../dto/update-user.dto';
-import { DatabaseService } from '@/database/database.service';
 
 @Injectable()
 export class UsersService {

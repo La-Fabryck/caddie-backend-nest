@@ -1,8 +1,8 @@
 import { Injectable } from '@nestjs/common';
 import { List, Subscriber, User } from '@prisma/client';
-import { SubscribersService } from './subscriber/subscribers.service';
-import { ListService } from '@/shopping/list/list.service';
 import { CreateListDto } from '@/shopping/dto/create-list.dto';
+import { ListService } from '@/shopping/list/list.service';
+import { SubscribersService } from './subscriber/subscribers.service';
 
 export type ListWithSubs = List & { subscribers: Subscriber[] };
 type CreateList = CreateListDto & { user: User };
@@ -19,11 +19,7 @@ export class OrchestratorService {
     private readonly listService: ListService,
   ) {}
 
-  async createList({
-    user,
-    pseudonym,
-    title,
-  }: CreateList): Promise<ListWithSubs> {
+  async createList({ user, pseudonym, title }: CreateList): Promise<ListWithSubs> {
     const list: ListWithSubs = {
       ...(await this.listService.create({
         title,
@@ -44,21 +40,13 @@ export class OrchestratorService {
 
   async findListsBySubscriber({ user }: { user: User }): Promise<List[]> {
     const subscriptions = await this.subscribersService.findAllByUser({ user });
-    const lists = await this.listService.findAllById(
-      subscriptions.map((sub) => sub.listId),
-    );
+    const lists = await this.listService.findAllById(subscriptions.map((sub) => sub.listId));
 
     return lists;
   }
 
   //TODO: Add subs ?
-  async findOneListById({
-    id,
-    user,
-  }: {
-    id: string;
-    user: User;
-  }): Promise<List> {
+  async findOneListById({ id, user }: { id: string; user: User }): Promise<List> {
     //Check if the user is subscribed to the list, else throws a NotFoundException
     await this.subscribersService.findOne({
       listId: id,

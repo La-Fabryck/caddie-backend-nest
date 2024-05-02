@@ -1,13 +1,9 @@
-import {
-  ForbiddenException,
-  Injectable,
-  NotFoundException,
-} from '@nestjs/common';
+import { ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
 import { Item, User } from '@prisma/client';
-import { UpdateItemDto } from '../dto/update-item.dto';
-import { CreateItemDto } from '../dto/create-item.dto';
-import { ListService } from '../list/list.service';
 import { DatabaseService } from '@/database/database.service';
+import { CreateItemDto } from '../dto/create-item.dto';
+import { UpdateItemDto } from '../dto/update-item.dto';
+import { ListService } from '../list/list.service';
 
 type CreateItem = {
   createItemPayload: CreateItemDto & Pick<Item, 'listId'>;

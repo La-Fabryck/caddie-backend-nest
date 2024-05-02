@@ -2,14 +2,14 @@ module.exports = {
   parser: '@typescript-eslint/parser',
   parserOptions: {
     project: 'tsconfig.json',
-    tsconfigRootDir : __dirname, 
+    tsconfigRootDir: __dirname,
     sourceType: 'module',
   },
   plugins: ['@typescript-eslint/eslint-plugin', 'import'],
   extends: [
     'plugin:@typescript-eslint/recommended',
     'plugin:prettier/recommended',
-    'plugin:import/errors', 
+    'plugin:import/errors',
     'plugin:import/warnings'
   ],
   root: true,
@@ -24,19 +24,29 @@ module.exports = {
     '@typescript-eslint/explicit-module-boundary-types': 'off',
     '@typescript-eslint/no-explicit-any': 'off',
     'sort-imports': [
-      'error', 
+      'error',
       {
-        'ignoreCase': true, 
+        'ignoreCase': true,
         'ignoreDeclarationSort': true
       }
     ],
-    'import/order': 
-    [
-      'error', 
-      { 
-        'groups': ['builtin', 'external', 'parent', 'sibling', 'index']
-      } 
-    ] 
+    'import/order': [
+        'error',
+        {
+          'groups': ['builtin', 'external', 'internal', 'parent', 'sibling', 'index'],
+          'pathGroups': [
+            {
+              'pattern': '@/**',
+              'group': 'internal'
+            }
+          ],
+          'alphabetize': {
+            'order': 'asc',
+            'caseInsensitive': true,
+          }
+        }
+    ],
+    'yoda': ['error', 'never'],
   },
   'settings': {
     'import/parsers': {

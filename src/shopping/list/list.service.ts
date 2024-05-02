@@ -1,7 +1,7 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { List } from '@prisma/client';
-import { UpdateListDto } from '../dto/update-list.dto';
 import { DatabaseService } from '@/database/database.service';
+import { UpdateListDto } from '../dto/update-list.dto';
 
 type CreateList = Omit<List, 'id'>;
 type FindListById = Pick<List, 'id'>;

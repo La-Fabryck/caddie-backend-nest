@@ -1,9 +1,4 @@
-import {
-  CanActivate,
-  ExecutionContext,
-  Injectable,
-  UnauthorizedException,
-} from '@nestjs/common';
+import { CanActivate, ExecutionContext, Injectable, UnauthorizedException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 import { FastifyRequest } from 'fastify';
@@ -34,10 +29,7 @@ export class AuthenticationGuard implements CanActivate {
     return true;
   }
 
-  private extractFromCookie(
-    req: FastifyRequest,
-    cookieKey: string,
-  ): string | null {
+  private extractFromCookie(req: FastifyRequest, cookieKey: string): string | null {
     return req.cookies[cookieKey] ?? null;
   }
 }

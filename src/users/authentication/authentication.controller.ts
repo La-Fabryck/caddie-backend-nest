@@ -1,14 +1,6 @@
-import {
-  Body,
-  Controller,
-  Get,
-  HttpCode,
-  HttpStatus,
-  Post,
-  Res,
-} from '@nestjs/common';
-import { FastifyReply } from 'fastify';
+import { Body, Controller, Get, HttpCode, HttpStatus, Post, Res } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
+import { FastifyReply } from 'fastify';
 import { LoginDto } from '../dto/login.dto';
 import { addDays } from '../utils/add-days';
 import { COOKIE_NAME } from '../utils/constants';
@@ -24,8 +16,7 @@ export class AuthenticationController {
   @HttpCode(HttpStatus.OK)
   @Post('login')
   async login(@Body() loginDto: LoginDto, @Res() res: FastifyReply) {
-    const jwt: Awaited<Promise<string>> =
-      await this.authentificationService.login(loginDto);
+    const jwt: Awaited<Promise<string>> = await this.authentificationService.login(loginDto);
     const cookieKey = this.configService.get<string>(COOKIE_NAME)!;
 
     return res
