@@ -10,6 +10,9 @@ export type ErrorInterface = Record<string, ErrorInterfaceBody[]>;
 async function bootstrap() {
   const app = await NestFactory.create<NestFastifyApplication>(AppModule, new FastifyAdapter());
 
+  //  https://github.com/nestjs/nest/issues/11265
+  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+  //@ts-ignore issue with cookie type
   app.register(fastifyCookie);
   app.useGlobalPipes(
     new ValidationPipe({
