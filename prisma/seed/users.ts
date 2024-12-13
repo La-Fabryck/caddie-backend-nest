@@ -8,7 +8,7 @@ export async function insertUsers(prisma: PrismaClient, uuids: string[]) {
       return {
         id: uuid,
         email: faker.internet.email(),
-        name: faker.internet.userName(),
+        name: faker.internet.username(),
         password: hashSync('ALongPassw0rdOf30Characters_%/', genSaltSync()),
       };
     }),
