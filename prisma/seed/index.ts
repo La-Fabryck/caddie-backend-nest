@@ -1,8 +1,8 @@
-import { PrismaClient } from '@prisma/client';
 import { faker } from '@faker-js/faker';
-import { insertUsers } from './users';
-import { insertLists } from './lists';
+import { PrismaClient } from '@prisma/client';
 import { insertItems } from './items';
+import { insertLists } from './lists';
+import { insertUsers } from './users';
 
 const prisma = new PrismaClient();
 
