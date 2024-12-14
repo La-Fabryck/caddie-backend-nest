@@ -2,7 +2,6 @@ import { Body, Controller, Get, HttpCode, HttpStatus, Post, Res } from '@nestjs/
 import { ConfigService } from '@nestjs/config';
 import { FastifyReply } from 'fastify';
 import { LoginDto } from '../dto/login.dto';
-import { addDays } from '../utils/add-days';
 import { COOKIE_NAME } from '../utils/constants';
 import { AuthenticationService } from './authentication.service';
 
@@ -21,7 +20,6 @@ export class AuthenticationController {
 
     return res
       .cookie(cookieKey, jwt, {
-        expires: addDays(new Date(), 60),
         httpOnly: true,
         sameSite: true,
         secure: true,

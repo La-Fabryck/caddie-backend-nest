@@ -31,6 +31,6 @@ export class AuthenticationService {
     }
 
     const payload = { sub: user.id };
-    return this.jwtService.signAsync(payload, { expiresIn: '60d' });
+    return this.jwtService.signAsync(payload);
   }
 }
