@@ -64,6 +64,12 @@ docker compose stop \
 && docker system prune -a --volumes
 ```
 
+### Update Node alpine
+
+```bash
+docker compose build --pull --no-cache
+```
+
 ### NVM use the version's project
 
 ``` bash
