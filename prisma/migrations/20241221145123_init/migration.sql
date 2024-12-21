@@ -12,6 +12,8 @@ CREATE TABLE "User" (
 CREATE TABLE "List" (
     "id" TEXT NOT NULL,
     "title" VARCHAR(50) NOT NULL,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
 
     CONSTRAINT "List_pkey" PRIMARY KEY ("id")
 );

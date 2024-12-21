@@ -1,5 +1,5 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { Subscriber, User } from '@prisma/client';
+import { Prisma, Subscriber, User } from '@prisma/client';
 import { DatabaseService } from '@/database/database.service';
 import { CreateSubcriberDto } from '../dto/create-subcriber.dto';
 import { UpdateSubcriberDto } from '../dto/update-subcriber.dto';
@@ -10,7 +10,7 @@ type CreateSubcriber = CreateSubcriberDto & { user: User };
 export class SubscribersService {
   constructor(private database: DatabaseService) {}
 
-  async create({ listId, name, user }: CreateSubcriber) {
+  async create({ listId, name, user }: CreateSubcriber, tx: Prisma.TransactionClient) {
     //TODO: validate ?
     // try {
     //   await this.listService.findOneById({
@@ -22,7 +22,7 @@ export class SubscribersService {
     //   }
     // }
 
-    return this.database.subscriber.create({
+    return tx.subscriber.create({
       data: {
         name,
         listId,

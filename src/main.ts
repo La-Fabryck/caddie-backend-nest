@@ -34,7 +34,8 @@ async function bootstrap() {
     }),
   );
 
-  await app.listen({ port: 3001, host: '0.0.0.0' });
+  //TODO: Use injection not env var
+  await app.listen({ port: 3001, host: process.env.LISTEN_IP });
 }
 
 bootstrap();
