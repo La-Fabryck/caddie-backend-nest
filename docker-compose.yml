@@ -25,7 +25,7 @@ services:
     depends_on:
       - postgres
     working_dir: /app
-    command: ['npm', 'run', 'start:dev']
+    command: ['npm', 'run', 'start:debug']
     user: 0:0
     env_file:
       - .env
