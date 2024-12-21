@@ -5,21 +5,17 @@ import { AuthenticationGuard } from '@/users/guards/authentication.guard';
 import { AuthenticationInterceptor } from '@/users/interceptors/authentication.interceptor';
 import { CreateListDto } from '../dto/create-list.dto';
 import { UpdateListDto } from '../dto/update-list.dto';
-import { OrchestratorService } from '../orchestrator.service';
 import { ListService } from './list.service';
 
 @Controller('list')
 export class ListController {
-  constructor(
-    private readonly listService: ListService,
-    private readonly orchestratorService: OrchestratorService,
-  ) {}
+  constructor(private readonly listService: ListService) {}
 
   @UseGuards(AuthenticationGuard)
   @UseInterceptors(AuthenticationInterceptor)
   @Post()
   async create(@Body() createShoppingDto: CreateListDto, @CurrentUser() user: User) {
-    return this.orchestratorService.createList({
+    return this.listService.createList({
       ...createShoppingDto,
       user,
     });
@@ -29,14 +25,14 @@ export class ListController {
   @UseInterceptors(AuthenticationInterceptor)
   @Get()
   findAllByAuthor(@CurrentUser() user: User) {
-    return this.orchestratorService.findListsBySubscriber({ user });
+    return this.listService.findListsBySubscriber({ user });
   }
 
   @UseGuards(AuthenticationGuard)
   @UseInterceptors(AuthenticationInterceptor)
   @Get(':id')
   findOneById(@Param('id', ParseUUIDPipe) id: string, @CurrentUser() user: User) {
-    return this.orchestratorService.findOneListById({ id, user });
+    return this.listService.findOneListById({ id, user });
   }
 
   @Patch(':id')

@@ -1,0 +1,6 @@
+- Integration Tests
+- JWT Refresh
+
+Later :
+- Use Zod as validator ? [Zod Integration](https://docs.nestjs.com/pipes#object-schema-validation)
+- Migrate to Knex ?

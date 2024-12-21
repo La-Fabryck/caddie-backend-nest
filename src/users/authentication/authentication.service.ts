@@ -31,6 +31,7 @@ export class AuthenticationService {
     }
 
     const payload = { sub: user.id };
-    return this.jwtService.signAsync(payload);
+    //TODO: remove expires in, add refresh TOKEN
+    return this.jwtService.signAsync(payload, { expiresIn: '60d' });
   }
 }

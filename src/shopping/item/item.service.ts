@@ -19,17 +19,19 @@ export class ItemService {
     private readonly listService: ListService,
   ) {}
 
-  async create(createItem: CreateItem) {
+  async create({ createItemPayload }: CreateItem) {
     const list = await this.listService.findOneById({
-      id: createItem.createItemPayload.listId,
+      id: createItemPayload.listId,
     });
 
     if (list == null) {
       throw new ForbiddenException();
     }
 
+    await this.listService.updateDate(createItemPayload.listId);
+
     return this.database.item.create({
-      data: createItem.createItemPayload,
+      data: createItemPayload,
     });
   }
 

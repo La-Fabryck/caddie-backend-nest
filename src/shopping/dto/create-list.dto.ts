@@ -1,7 +1,7 @@
 import { List } from '@prisma/client';
 import { IsNotEmpty } from 'class-validator';
 
-type CreateListInterface = Omit<List, 'id' | 'authorId'>;
+type CreateListInterface = Pick<List, 'title'>;
 
 export class CreateListDto implements CreateListInterface {
   @IsNotEmpty()
