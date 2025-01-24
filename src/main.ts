@@ -1,16 +1,16 @@
 import { fastifyCookie } from '@fastify/cookie';
 import { BadRequestException, ValidationPipe } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
-import { FastifyAdapter, NestFastifyApplication } from '@nestjs/platform-fastify';
+import { FastifyAdapter, type NestFastifyApplication } from '@nestjs/platform-fastify';
 import { AppModule } from './app.module';
 
 type ErrorInterfaceBody = { type: string; message: string };
 export type ErrorInterface = Record<string, ErrorInterfaceBody[]>;
 
-async function bootstrap() {
+async function bootstrap(): Promise<void> {
   const app = await NestFactory.create<NestFastifyApplication>(AppModule, new FastifyAdapter());
 
-  app.register(fastifyCookie);
+  await app.register(fastifyCookie);
   app.useGlobalPipes(
     new ValidationPipe({
       whitelist: true,
@@ -35,7 +35,8 @@ async function bootstrap() {
   );
 
   //TODO: Use injection not env var
+  //@ts-expect-error use nest config
   await app.listen({ port: 3001, host: process.env.LISTEN_IP });
 }
 
-bootstrap();
+void bootstrap();

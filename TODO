@@ -1,8 +1,11 @@
+Tech :
 - Integration Tests
 - JWT Refresh
-- Use nest config
+- Use Nest config
 - Implement logger
-- Join URL
+
+Feat :
+- Join list URL
 
 Later :
 - Small cache for users

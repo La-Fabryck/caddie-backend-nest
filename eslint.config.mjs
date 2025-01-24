@@ -1,32 +1,21 @@
-import path from 'node:path';
-import { fileURLToPath } from 'node:url';
-import { fixupConfigRules, fixupPluginRules } from '@eslint/compat';
-import { FlatCompat } from '@eslint/eslintrc';
-import js from '@eslint/js';
-import typescriptEslintEslintPlugin from '@typescript-eslint/eslint-plugin';
+// @ts-check
+import eslint from '@eslint/js';
 import * as tsParser from '@typescript-eslint/parser';
-import _import from 'eslint-plugin-import';
+import * as importPlugin from 'eslint-plugin-import';
+import eslintPluginPrettierRecommended from 'eslint-plugin-prettier/recommended';
 import globals from 'globals';
+import tseslint, { configs } from 'typescript-eslint';
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-const compat = new FlatCompat({
-  baseDirectory: __dirname,
-  recommendedConfig: js.configs.recommended,
-  allConfig: js.configs.all,
-});
-
-export default [
+export default tseslint.config(
   {
-    ignores: [],
+    ignores: ['eslint.config.mjs'],
   },
-  ...fixupConfigRules(compat.extends('plugin:@typescript-eslint/recommended', 'plugin:prettier/recommended', 'plugin:import/errors')),
+  eslint.configs.recommended,
+  ...configs.recommendedTypeChecked,
+  // @ts-expect-error expect any due to not being a TS module
+  importPlugin.flatConfigs.recommended,
+  eslintPluginPrettierRecommended,
   {
-    plugins: {
-      '@typescript-eslint': fixupPluginRules(typescriptEslintEslintPlugin),
-      import: fixupPluginRules(_import),
-    },
-
     languageOptions: {
       globals: {
         ...globals.node,
@@ -39,7 +28,7 @@ export default [
 
       parserOptions: {
         project: 'tsconfig.json',
-        tsconfigRootDir: __dirname,
+        tsconfigRootDir: import.meta.dirname,
       },
     },
 
@@ -50,7 +39,7 @@ export default [
 
       'import/resolver': {
         node: {
-          extensions: ['.js', '.jsx', '.ts', '.tsx'],
+          extensions: ['.js', '.ts'],
         },
 
         typescript: {
@@ -67,7 +56,15 @@ export default [
       '@typescript-eslint/explicit-function-return-type': 'off',
       '@typescript-eslint/explicit-module-boundary-types': 'off',
       '@typescript-eslint/no-explicit-any': 'off',
-      eqeqeq: ['error', 'always', { null: 'ignore' }],
+
+      // https://typescript-eslint.io/blog/consistent-type-imports-and-exports-why-and-how/
+      // Consistently add inline type to imports
+      '@typescript-eslint/consistent-type-exports': 'error',
+      '@typescript-eslint/consistent-type-imports': 'error',
+      'import/consistent-type-specifier-style': ['error', 'prefer-inline'],
+      'import/no-duplicates': ['error', { 'prefer-inline': true }],
+
+      // Alphabetical order imports
       'import/order': [
         'error',
         {
@@ -93,7 +90,9 @@ export default [
           ignoreDeclarationSort: true,
         },
       ],
+
+      eqeqeq: ['error', 'always', { null: 'ignore' }],
       yoda: ['error', 'never'],
     },
   },
-];
+);
