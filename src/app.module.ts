@@ -1,6 +1,5 @@
 import { Module } from '@nestjs/common';
-import { ConfigModule, ConfigService } from '@nestjs/config';
-import { JwtModule } from '@nestjs/jwt';
+import { ConfigModule } from '@nestjs/config';
 import { User } from '@prisma/client';
 import { DatabaseModule } from './database/database.module';
 import { ShoppingModule } from './shopping/shopping.module';
@@ -25,19 +24,8 @@ declare module 'fastify' {
       isGlobal: true,
     }),
     DatabaseModule,
-    JwtModule.registerAsync({
-      useFactory: async (configService: ConfigService) => {
-        return {
-          global: true,
-          secret: configService.get<string>('SECRET'),
-          signOptions: { expiresIn: '3600s' },
-        };
-      },
-      inject: [ConfigService],
-    }),
     UsersModule,
     ShoppingModule,
   ],
-  exports: [JwtModule],
 })
 export class AppModule {}

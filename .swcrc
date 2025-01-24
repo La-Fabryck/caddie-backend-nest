@@ -1,5 +1,5 @@
 {
-    "$schema": "https://json.schemastore.org/swcrc",
+    "$schema": "https://swc.rs/schema.json",
     "sourceMaps": true,
     "jsc": {
       "parser": {
@@ -9,10 +9,7 @@
       },
       "baseUrl": "./",
       "paths": {
-        "@/database/*": ["src/database/*"],
-        "@/shopping/*": ["src/shopping/*"],
-        "@/subscribers/*": ["src/subscribers/*"],
-        "@/users/*": ["src/users/*"]
+        "@/*": ["src/*"]
       }
     },
     "minify": false
