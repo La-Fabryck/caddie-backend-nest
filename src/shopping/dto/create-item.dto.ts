@@ -5,5 +5,5 @@ type CreateItemInterface = Omit<Item, 'id' | 'listId'>;
 
 export class CreateItemDto implements CreateItemInterface {
   @IsNotEmpty()
-  name: string;
+  name!: string;
 }

@@ -3,11 +3,11 @@ import { PASSWORD_REGEX } from '../utils/constants';
 
 export class CreateUserDto {
   @IsEmail()
-  email: string;
+  email!: string;
 
   @IsString()
-  name: string;
+  name!: string;
 
   @Matches(PASSWORD_REGEX)
-  password: string;
+  password!: string;
 }
