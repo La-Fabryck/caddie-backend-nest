@@ -5,8 +5,8 @@ type CreateSubcriberInterface = Omit<Subscriber, 'id' | 'userId'>;
 
 export class CreateSubcriberDto implements CreateSubcriberInterface {
   @IsUUID()
-  listId: string;
+  listId!: string;
 
   @IsNotEmpty()
-  name: string;
+  name!: string;
 }

@@ -5,8 +5,8 @@ type CreateListInterface = Pick<List, 'title'>;
 
 export class CreateListDto implements CreateListInterface {
   @IsNotEmpty()
-  title: string;
+  title!: string;
 
   @IsNotEmpty()
-  pseudonym: string;
+  pseudonym!: string;
 }
