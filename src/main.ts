@@ -15,20 +15,17 @@ async function bootstrap(): Promise<void> {
     new ValidationPipe({
       whitelist: true,
       exceptionFactory: (errors) => {
-        const result: Record<string, ErrorInterfaceBody[]> = errors.reduce(
-          (accumulator, currentValue) => {
-            const formattedErrors: ErrorInterfaceBody[] = Object.entries(currentValue.constraints ?? {}).map(([key, value]) => {
-              return {
-                type: key,
-                message: value,
-              };
-            });
+        const result = errors.reduce<Record<string, ErrorInterfaceBody[]>>((accumulator, currentValue) => {
+          const formattedErrors: ErrorInterfaceBody[] = Object.entries(currentValue.constraints ?? {}).map(([key, value]) => {
+            return {
+              type: key,
+              message: value,
+            };
+          });
 
-            accumulator[currentValue.property] = formattedErrors;
-            return accumulator;
-          },
-          {} as Record<string, ErrorInterfaceBody[]>,
-        );
+          accumulator[currentValue.property] = formattedErrors;
+          return accumulator;
+        }, {});
         return new BadRequestException(result);
       },
     }),

@@ -40,6 +40,8 @@ export class UsersService {
     });
   }
 
+  //TODO: Implement
+  // eslint-disable-next-line @typescript-eslint/class-methods-use-this
   findAll() {
     return { toto: 'tutu' };
   }
@@ -58,11 +60,15 @@ export class UsersService {
     return user;
   }
 
-  update(id: number, updateUserDto: UpdateUserDto) {
+  //TODO: Implement
+  // eslint-disable-next-line @typescript-eslint/class-methods-use-this
+  update(id: string, updateUserDto: UpdateUserDto) {
     return `This action updates a #${id} user ${updateUserDto.email}`;
   }
 
-  remove(id: number) {
+  //TODO: Implement
+  // eslint-disable-next-line @typescript-eslint/class-methods-use-this
+  remove(id: string) {
     return `This action removes a #${id} user`;
   }
 }

@@ -14,10 +14,9 @@ export class AuthenticationGuard implements CanActivate {
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const request: FastifyRequest = context.switchToHttp().getRequest();
-    const cookieKey = this.configService.get<string>(COOKIE_NAME)!;
+    const cookieKey = this.configService.getOrThrow<string>(COOKIE_NAME);
 
-    const token = this.extractFromCookie(request, cookieKey);
-
+    const token = request.cookies[cookieKey] ?? null;
     if (token == null) {
       throw new UnauthorizedException();
     }
@@ -27,9 +26,5 @@ export class AuthenticationGuard implements CanActivate {
     request.userId = payload.sub;
 
     return true;
-  }
-
-  private extractFromCookie(req: FastifyRequest, cookieKey: string): string | null {
-    return req.cookies[cookieKey] ?? null;
   }
 }

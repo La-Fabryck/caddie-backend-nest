@@ -20,24 +20,24 @@ export class SubscribersController {
   @UseGuards(AuthenticationGuard)
   @UseInterceptors(AuthenticationInterceptor)
   @Get()
-  findAll(@CurrentUser() user: User) {
+  async findAll(@CurrentUser() user: User) {
     return this.subscribersService.findAllByUser({ user });
   }
 
   @UseGuards(AuthenticationGuard)
   @UseInterceptors(AuthenticationInterceptor)
   @Get(':id')
-  findOne(@Param('id', ParseUUIDPipe) id: string, @CurrentUser() user: User) {
+  async findOne(@Param('id', ParseUUIDPipe) id: string, @CurrentUser() user: User) {
     return this.subscribersService.findOneById({ id, user });
   }
 
   @Patch(':id')
   update(@Param('id') id: string, @Body() updateSubcriberDto: UpdateSubcriberDto) {
-    return this.subscribersService.update(+id, updateSubcriberDto);
+    return this.subscribersService.update(id, updateSubcriberDto);
   }
 
   @Delete(':id')
   remove(@Param('id') id: string) {
-    return this.subscribersService.remove(+id);
+    return this.subscribersService.remove(id);
   }
 }

@@ -1,19 +1,21 @@
 // @ts-check
 import eslint from '@eslint/js';
 import * as tsParser from '@typescript-eslint/parser';
-import * as importPlugin from 'eslint-plugin-import';
+import { createTypeScriptImportResolver } from 'eslint-import-resolver-typescript';
+import eslintPluginImportX from 'eslint-plugin-import-x';
 import eslintPluginPrettierRecommended from 'eslint-plugin-prettier/recommended';
+import unusedImports from 'eslint-plugin-unused-imports';
 import globals from 'globals';
-import tseslint, { configs } from 'typescript-eslint';
+import tseslint, { configs as tsconfigs } from 'typescript-eslint';
 
 export default tseslint.config(
   {
     ignores: ['eslint.config.mjs'],
   },
   eslint.configs.recommended,
-  ...configs.recommendedTypeChecked,
-  // @ts-expect-error expect any due to not being a TS module
-  importPlugin.flatConfigs.recommended,
+  ...tsconfigs.strictTypeChecked,
+  eslintPluginImportX.flatConfigs.recommended,
+  eslintPluginImportX.flatConfigs.typescript,
   eslintPluginPrettierRecommended,
   {
     languageOptions: {
@@ -23,7 +25,7 @@ export default tseslint.config(
       },
 
       parser: tsParser,
-      ecmaVersion: 5,
+      ecmaVersion: 'latest',
       sourceType: 'module',
 
       parserOptions: {
@@ -33,39 +35,152 @@ export default tseslint.config(
     },
 
     settings: {
-      'import/parsers': {
-        '@typescript-eslint/parser': ['.ts', '.tsx'],
-      },
-
-      'import/resolver': {
-        node: {
-          extensions: ['.js', '.ts'],
-        },
-
-        typescript: {
+      'import/resolver-next': [
+        createTypeScriptImportResolver({
           alwaysTryTypes: true,
           project: '<root>/tsconfig.json',
-        },
-      },
+          extensions: ['.js', '.ts'],
+        }),
+      ],
+    },
 
-      'import/internal-regex': '^@/',
+    plugins: {
+      'unused-imports': unusedImports,
     },
 
     rules: {
+      // @typescript-eslint rules -----> 
+
       '@typescript-eslint/interface-name-prefix': 'off',
       '@typescript-eslint/explicit-function-return-type': 'off',
       '@typescript-eslint/explicit-module-boundary-types': 'off',
-      '@typescript-eslint/no-explicit-any': 'off',
+      '@typescript-eslint/no-explicit-any': 'error',
+      '@typescript-eslint/no-deprecated': 'error',
+
+      // No magic numbers
+      'no-magic-numbers': 'off',
+      '@typescript-eslint/no-magic-numbers': 'error',
+
+      // Disallow empty functions
+      'no-empty-function': 'off',
+      '@typescript-eslint/no-empty-function': 'error',
+
+      // Enforce using a particular method signature syntax
+      '@typescript-eslint/method-signature-style': 'error',
+
+      // Enforce that class methods utilize `this`
+      'class-methods-use-this': 'off',
+      '@typescript-eslint/class-methods-use-this': 'error',
+
+      // Enforce default parameters to be last
+      'default-param-last': 'off',
+      '@typescript-eslint/default-param-last': 'error',
+
+      // Require the Record type 
+      '@typescript-eslint/consistent-indexed-object-style': 'error',
+
+      // Require each enum member value to be explicitly initialized
+      '@typescript-eslint/prefer-enum-initializers': 'error',
+
+      // Disallow the use of variables before they are defined
+      'no-use-before-define': 'off',
+      '@typescript-eslint/no-use-before-define': 'error',
+
+      // Require any function or method that returns a Promise to be marked async.
+      '@typescript-eslint/promise-function-async': 'error',
+
+      // Disallow certain types in boolean expressions
+      '@typescript-eslint/strict-boolean-expressions': 'error',
+
+      // Disallow classes used as namespaces.
+      // Override typescript-eslint strict to allow empty Module classes with decorators
+      '@typescript-eslint/no-extraneous-class': ['error', {
+        /** Whether to allow extraneous classes that include a decorator. */
+        allowWithDecorator: true,
+      }],
+
+      // Enforce template literal expressions to be of `string` type
+      // Override typescript-eslint strictTyped to remove this rule.
+      '@typescript-eslint/restrict-template-expressions': 'off',
+
+      // <----- @typescript-eslint rules 
+
+      // eslint rules ----->
+
+      eqeqeq: ['error', 'always', { null: 'ignore' }],
+      yoda: ['error', 'never'],
+
+      // Disallow await inside of loops
+      'no-await-in-loop': 'error',
+
+      // Disallow else blocks after return statements in if statements
+      'no-else-return': 'error',
+
+      // Enforce consistent function declarations as `function xyz()`
+      'func-style': ['error', 'declaration'],
+
+      // Require default cases in switch statements
+      'default-case': 'error',
+      'default-case-last': 'error',
+
+      // Disallow assignments that can lead to race conditions due to usage of `await` or `yield`
+      'require-atomic-updates': ['error', { 'allowProperties': true }],
+
+      // Enforce a maximum number of parameters in function definitions
+      'max-params': ['error', 3],
+
+      // Disallow `Array` constructors
+      'no-array-constructor': 'error',
+
+      // Disallow bitwise operators
+      'no-bitwise': 'error',
+
+      // Disallow the use of alert, confirm, and prompt
+      'no-alert': 'error',
+
+      // Disallow the use of `arguments.caller` or `arguments.callee`
+      'no-caller': 'error',
+
+      // Disallow extending native types such as Object.prototype.extra = 55;
+      'no-extend-native': 'error',
+
+      // Disallow the use of eval()
+      'no-eval': 'error',
+
+      // Disallow unnecessary calls to .bind()
+      'no-extra-bind': 'error',
+
+      // Disallow shorthand type conversions, use explicit functions
+      'no-implicit-coercion': 'error',
+
+      // Disallow nested ternary expressions
+      'no-nested-ternary': 'error',
+
+      // Disallow the unary operators ++ and --
+      'no-plusplus': 'error',
+
+      // Disallow javascript: URLs. ex: location.href = "javascript:void(0)";
+      'no-script-url': 'error',
+
+      // Disallow ternary operators when simpler alternatives exist
+      'no-unneeded-ternary': 'error',
+
+      // Disallow unnecessary calls to `.call()` and `.apply()`
+      'no-useless-call': 'error',
+
+      // <----- eslint rules 
+
+      // Style imports :
 
       // https://typescript-eslint.io/blog/consistent-type-imports-and-exports-why-and-how/
-      // Consistently add inline type to imports
-      '@typescript-eslint/consistent-type-exports': 'error',
+      // Consistently add inline `type` to imports & exports
+      '@typescript-eslint/consistent-type-exports': ['error', { fixMixedExportsWithInlineTypeSpecifier: true }],
       '@typescript-eslint/consistent-type-imports': 'error',
-      'import/consistent-type-specifier-style': ['error', 'prefer-inline'],
-      'import/no-duplicates': ['error', { 'prefer-inline': true }],
+      'import-x/consistent-type-specifier-style': ['error', 'prefer-inline'],
+      'import-x/no-duplicates': ['error', { 'prefer-inline': true }],
 
       // Alphabetical order imports
-      'import/order': [
+      'import-x/order': [
         'error',
         {
           groups: ['builtin', 'external', 'internal', 'parent', 'sibling', 'index'],
@@ -91,8 +206,8 @@ export default tseslint.config(
         },
       ],
 
-      eqeqeq: ['error', 'always', { null: 'ignore' }],
-      yoda: ['error', 'never'],
+      // Find and remove unused es6 module imports
+      'unused-imports/no-unused-imports': 'error',
     },
   },
 );

@@ -16,7 +16,7 @@ export class AuthenticationController {
   @Post('login')
   async login(@Body() loginDto: LoginDto, @Res() res: FastifyReply) {
     const jwt: Awaited<Promise<string>> = await this.authentificationService.login(loginDto);
-    const cookieKey = this.configService.get<string>(COOKIE_NAME)!;
+    const cookieKey = this.configService.getOrThrow<string>(COOKIE_NAME);
 
     return res
       .cookie(cookieKey, jwt, {
@@ -29,6 +29,9 @@ export class AuthenticationController {
   }
 
   @Get('logout')
+  // TODO: logging
+  // Cannot use injection with static methods
+  // eslint-disable-next-line @typescript-eslint/class-methods-use-this
   async logout(@Res({ passthrough: true }) res: FastifyReply) {
     return res.clearCookie(COOKIE_NAME).send();
   }

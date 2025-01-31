@@ -1,10 +1,10 @@
+import { HttpStatus } from '@nestjs/common';
 import { FastifyAdapter, type NestFastifyApplication } from '@nestjs/platform-fastify';
 import { Test } from '@nestjs/testing';
-import { type RawServerDefault } from 'fastify';
 import { AppModule } from 'src/app.module';
 
 describe('AppController (e2e)', () => {
-  let app: NestFastifyApplication<RawServerDefault>;
+  let app: NestFastifyApplication;
 
   beforeAll(async () => {
     const moduleRef = await Test.createTestingModule({
@@ -22,7 +22,7 @@ describe('AppController (e2e)', () => {
       method: 'GET',
       url: '/',
     });
-    expect(result.statusCode).toEqual(200);
+    expect(result.statusCode).toEqual(HttpStatus.OK);
     expect(result.payload).toEqual('Hello World!');
   });
 

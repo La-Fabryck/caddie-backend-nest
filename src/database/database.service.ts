@@ -15,7 +15,7 @@ export class DatabaseService extends PrismaClient<Prisma.PrismaClientOptions, Pr
     this.$on('query', ({ query, params, duration }) => {
       console.log('Query: ' + query);
       console.log('Params: ' + params);
-      console.log('Duration: ' + duration + 'ms');
+      console.log(`Duration: ${duration} ms`);
     });
   }
 }
