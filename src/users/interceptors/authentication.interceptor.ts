@@ -7,11 +7,11 @@ import { UsersService } from '../users/users.service';
 export class AuthenticationInterceptor implements NestInterceptor {
   constructor(private readonly usersService: UsersService) {}
 
-  async intercept(context: ExecutionContext, next: CallHandler): Promise<Observable<any>> {
+  async intercept(context: ExecutionContext, next: CallHandler): Promise<Observable<unknown>> {
     const request: FastifyRequest = context.switchToHttp().getRequest();
-    const { userId } = request || {};
+    const { userId } = request;
 
-    if (userId) {
+    if (typeof userId === 'string') {
       request.user = await this.usersService.findOne(userId);
     }
 

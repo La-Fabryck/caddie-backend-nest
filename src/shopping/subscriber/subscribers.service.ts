@@ -10,6 +10,7 @@ type CreateSubcriber = CreateSubcriberDto & { user: User };
 export class SubscribersService {
   constructor(private database: DatabaseService) {}
 
+  // eslint-disable-next-line @typescript-eslint/class-methods-use-this
   async create({ listId, name, user }: CreateSubcriber, tx: Prisma.TransactionClient) {
     //TODO: validate ?
     // try {
@@ -31,7 +32,7 @@ export class SubscribersService {
     });
   }
 
-  findAllByUser({ user }: { user: User }): Promise<Subscriber[]> {
+  async findAllByUser({ user }: { user: User }): Promise<Subscriber[]> {
     return this.database.subscriber.findMany({
       where: {
         userId: user.id,
@@ -69,12 +70,16 @@ export class SubscribersService {
     return subscription;
   }
 
-  update(id: number, updateSubcriberDto: UpdateSubcriberDto) {
+  //TODO: Implement
+  // eslint-disable-next-line @typescript-eslint/class-methods-use-this
+  update(id: string, updateSubcriberDto: UpdateSubcriberDto) {
     console.log(updateSubcriberDto.listId);
     return `This action updates a #${id} subcriber`;
   }
 
-  remove(id: number) {
+  //TODO: Implement
+  // eslint-disable-next-line @typescript-eslint/class-methods-use-this
+  remove(id: string) {
     return `This action removes a #${id} subcriber`;
   }
 }

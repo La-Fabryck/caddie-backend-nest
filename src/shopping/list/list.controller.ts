@@ -16,7 +16,8 @@ export class ListController {
   @Post()
   async create(@Body() createShoppingDto: CreateListDto, @CurrentUser() user: User) {
     return this.listService.createList({
-      ...createShoppingDto,
+      title: createShoppingDto.title,
+      pseudonym: createShoppingDto.pseudonym,
       user,
     });
   }
@@ -24,24 +25,24 @@ export class ListController {
   @UseGuards(AuthenticationGuard)
   @UseInterceptors(AuthenticationInterceptor)
   @Get()
-  findAllByAuthor(@CurrentUser() user: User) {
+  async findAllByAuthor(@CurrentUser() user: User) {
     return this.listService.findListsBySubscriber({ user });
   }
 
   @UseGuards(AuthenticationGuard)
   @UseInterceptors(AuthenticationInterceptor)
   @Get(':id')
-  findOneById(@Param('id', ParseUUIDPipe) id: string, @CurrentUser() user: User) {
+  async findOneById(@Param('id', ParseUUIDPipe) id: string, @CurrentUser() user: User) {
     return this.listService.findOneListById({ id, user });
   }
 
   @Patch(':id')
   update(@Param('id') id: string, @Body() updateShoppingDto: UpdateListDto) {
-    return this.listService.update(+id, updateShoppingDto);
+    return this.listService.update(id, updateShoppingDto);
   }
 
   @Delete(':id')
   remove(@Param('id') id: string) {
-    return this.listService.remove(+id);
+    return this.listService.remove(id);
   }
 }

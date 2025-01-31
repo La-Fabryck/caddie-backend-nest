@@ -6,13 +6,13 @@ import { ShoppingModule } from './shopping/shopping.module';
 import { UsersModule } from './users/users.module';
 
 /**
- * Module Augmentation
+ * Through Module Augmentation, we attach a user & userId props to the Request object
  * https://www.typescriptlang.org/docs/handbook/declaration-merging.html#module-augmentation
  */
 declare module 'fastify' {
   interface FastifyRequest {
-    userId: string;
-    user: User;
+    userId?: string;
+    user?: User;
   }
 }
 

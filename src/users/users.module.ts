@@ -13,7 +13,7 @@ import { UsersService } from './users/users.service';
       useFactory: (configService: ConfigService) => {
         return {
           global: true,
-          secret: configService.get<string>('SECRET')!,
+          secret: configService.getOrThrow<string>('SECRET'),
           signOptions: { expiresIn: '3600s' },
         };
       },

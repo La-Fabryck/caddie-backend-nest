@@ -1,4 +1,4 @@
-import { ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { Item, User } from '@prisma/client';
 import { DatabaseService } from '@/database/database.service';
 import { CreateItemDto } from '../dto/create-item.dto';
@@ -20,13 +20,10 @@ export class ItemService {
   ) {}
 
   async create({ createItemPayload }: CreateItem) {
-    const list = await this.listService.findOneById({
+    // verify that the list exist
+    await this.listService.findOneById({
       id: createItemPayload.listId,
     });
-
-    if (list == null) {
-      throw new ForbiddenException();
-    }
 
     await this.listService.updateDate(createItemPayload.listId);
 
@@ -36,13 +33,10 @@ export class ItemService {
   }
 
   async findAllByListId({ listId }: FindItems) {
-    const list = await this.listService.findOneById({
+    // verify that the list exist
+    await this.listService.findOneById({
       id: listId,
     });
-
-    if (list == null) {
-      throw new ForbiddenException();
-    }
 
     return this.database.item.findMany({
       where: {
@@ -65,12 +59,16 @@ export class ItemService {
     return item;
   }
 
-  update(id: number, _updateItemDto: UpdateItemDto) {
+  //TODO: Implement
+  // eslint-disable-next-line @typescript-eslint/class-methods-use-this
+  update(id: string, _updateItemDto: UpdateItemDto) {
     console.log(id, _updateItemDto);
     throw new Error('Method not implemented.');
   }
 
-  remove(id: number) {
+  //TODO: Implement
+  // eslint-disable-next-line @typescript-eslint/class-methods-use-this
+  remove(id: string) {
     console.log(id);
     throw new Error('Method not implemented.');
   }

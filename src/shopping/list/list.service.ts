@@ -35,7 +35,7 @@ export class ListService {
     });
   }
 
-  findAllById(ids: string[]): Promise<List[]> {
+  async findAllById(ids: string[]): Promise<List[]> {
     return this.database.list.findMany({
       where: {
         id: {
@@ -74,7 +74,7 @@ export class ListService {
     return this.findOneById({ id });
   }
 
-  updateDate(id: string) {
+  async updateDate(id: string) {
     return this.database.list.update({
       where: {
         id,
@@ -85,12 +85,16 @@ export class ListService {
     });
   }
 
-  update(id: number, updateListDto: UpdateListDto) {
+  //TODO: Implement
+  // eslint-disable-next-line @typescript-eslint/class-methods-use-this
+  update(id: string, updateListDto: UpdateListDto) {
     console.log(updateListDto.title);
     return `This action updates a #${id} shopping}`;
   }
 
-  remove(id: number) {
+  //TODO: Implement
+  // eslint-disable-next-line @typescript-eslint/class-methods-use-this
+  remove(id: string) {
     return `This action removes a #${id} shopping`;
   }
 }
