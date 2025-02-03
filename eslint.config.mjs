@@ -103,6 +103,21 @@ export default tseslint.config(
       // Override typescript-eslint strictTyped to remove this rule.
       '@typescript-eslint/restrict-template-expressions': 'off',
 
+      // Disallow unused variables.
+      // Override typescript-eslint recommended config to allow unused variables starting with _
+      "@typescript-eslint/no-unused-vars": [
+        "error",
+        {
+          "args": "all",
+          "argsIgnorePattern": "^_",
+          "caughtErrors": "all",
+          "caughtErrorsIgnorePattern": "^_",
+          "destructuredArrayIgnorePattern": "^_",
+          "varsIgnorePattern": "^_",
+          "ignoreRestSiblings": true
+        }
+      ],
+
       // <----- @typescript-eslint rules 
 
       // eslint rules ----->

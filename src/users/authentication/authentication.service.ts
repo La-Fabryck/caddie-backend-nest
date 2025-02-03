@@ -14,9 +14,9 @@ export class AuthenticationService {
     private readonly jwtService: JwtService,
   ) {}
 
-  //TODO: clean
+  //TODO: message key
   private defaultError: ErrorInterface = {
-    top: [{ message: 'email ou password invalide', type: 't' }],
+    root: [{ message: 'email ou password invalide' }],
   };
 
   async login(loginDto: LoginDto): Promise<string> {

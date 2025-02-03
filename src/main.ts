@@ -4,7 +4,7 @@ import { NestFactory } from '@nestjs/core';
 import { FastifyAdapter, type NestFastifyApplication } from '@nestjs/platform-fastify';
 import { AppModule } from './app.module';
 
-type ErrorInterfaceBody = { type: string; message: string };
+type ErrorInterfaceBody = { message: string };
 export type ErrorInterface = Record<string, ErrorInterfaceBody[]>;
 
 async function bootstrap(): Promise<void> {
@@ -16,9 +16,8 @@ async function bootstrap(): Promise<void> {
       whitelist: true,
       exceptionFactory: (errors) => {
         const result = errors.reduce<Record<string, ErrorInterfaceBody[]>>((accumulator, currentValue) => {
-          const formattedErrors: ErrorInterfaceBody[] = Object.entries(currentValue.constraints ?? {}).map(([key, value]) => {
+          const formattedErrors: ErrorInterfaceBody[] = Object.entries(currentValue.constraints ?? {}).map(([_key, value]) => {
             return {
-              type: key,
               message: value,
             };
           });
