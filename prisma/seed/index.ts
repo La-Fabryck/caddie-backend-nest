@@ -32,12 +32,14 @@ async function main() {
   await insertItems(prisma, listsIds);
 }
 main()
-  .then(async () => {
+  .then(() => {
     console.log('Seed completed !');
   })
-  .catch(async (e) => {
+  .catch((e: unknown) => {
     console.error(e);
   })
-  .finally(async () => {
-    await prisma.$disconnect();
+  .finally(() => {
+    void (async () => {
+      await prisma.$disconnect();
+    })();
   });

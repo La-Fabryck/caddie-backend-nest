@@ -172,7 +172,7 @@ export default tseslint.config(
       'no-nested-ternary': 'error',
 
       // Disallow the unary operators ++ and --
-      'no-plusplus': 'error',
+      'no-plusplus': ['error', { "allowForLoopAfterthoughts": true } ],
 
       // Disallow javascript: URLs. ex: location.href = "javascript:void(0)";
       'no-script-url': 'error',

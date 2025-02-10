@@ -1,5 +1,13 @@
 import { faker } from '@faker-js/faker';
-import { Item, PrismaClient } from '@prisma/client';
+import { type Item, type PrismaClient } from '@prisma/client';
+
+function createOneItem(listId: string): Item {
+  return {
+    id: faker.string.uuid(),
+    listId,
+    name: faker.lorem.word(),
+  };
+}
 
 export async function insertItems(prisma: PrismaClient, uuids: string[]) {
   const items: Item[] = [];
@@ -16,12 +24,4 @@ export async function insertItems(prisma: PrismaClient, uuids: string[]) {
   });
 
   console.log('Inserted items in lists');
-}
-
-function createOneItem(listId: string): Item {
-  return {
-    id: faker.string.uuid(),
-    listId,
-    name: faker.lorem.word(),
-  };
 }
