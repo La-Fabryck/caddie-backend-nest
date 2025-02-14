@@ -1,12 +1,12 @@
 import { List } from '@prisma/client';
-import { IsNotEmpty } from 'class-validator';
+import { IsNotBlank } from '@/lib/decorators/is-not-blank';
 
 type CreateListInterface = Pick<List, 'title'>;
 
 export class CreateListDto implements CreateListInterface {
-  @IsNotEmpty()
+  @IsNotBlank()
   title!: string;
 
-  @IsNotEmpty()
+  @IsNotBlank()
   pseudonym!: string;
 }

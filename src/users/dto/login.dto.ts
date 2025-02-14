@@ -1,9 +1,9 @@
-import { IsNotEmpty } from 'class-validator';
+import { IsNotBlank } from '@/lib/decorators/is-not-blank';
 
 export class LoginDto {
-  @IsNotEmpty()
+  @IsNotBlank()
   email!: string;
 
-  @IsNotEmpty()
+  @IsNotBlank()
   password!: string;
 }

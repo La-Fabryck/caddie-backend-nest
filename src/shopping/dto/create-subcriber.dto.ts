@@ -1,5 +1,6 @@
 import { Subscriber } from '@prisma/client';
-import { IsNotEmpty, IsUUID } from 'class-validator';
+import { IsUUID } from 'class-validator';
+import { IsNotBlank } from '@/lib/decorators/is-not-blank';
 
 type CreateSubcriberInterface = Omit<Subscriber, 'id' | 'userId'>;
 
@@ -7,6 +8,6 @@ export class CreateSubcriberDto implements CreateSubcriberInterface {
   @IsUUID()
   listId!: string;
 
-  @IsNotEmpty()
+  @IsNotBlank()
   name!: string;
 }
