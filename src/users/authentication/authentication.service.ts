@@ -3,6 +3,7 @@ import { JwtService } from '@nestjs/jwt';
 import { compare } from 'bcrypt';
 import { type ErrorInterface } from 'src/main';
 import { LoginDto } from '../dto/login.dto';
+import { INVALID_LOGIN } from '../messages/authentication';
 import { UsersService } from '../users/users.service';
 
 export type JwtPayload = { sub: string };
@@ -16,7 +17,7 @@ export class AuthenticationService {
 
   //TODO: message key
   private defaultError: ErrorInterface = {
-    root: [{ message: 'email ou password invalide' }],
+    root: [{ message: INVALID_LOGIN }],
   };
 
   async login(loginDto: LoginDto): Promise<string> {

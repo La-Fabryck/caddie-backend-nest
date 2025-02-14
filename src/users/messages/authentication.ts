@@ -1,0 +1,3 @@
+const INVALID_LOGIN = 'INVALID_LOGIN';
+
+export { INVALID_LOGIN };
