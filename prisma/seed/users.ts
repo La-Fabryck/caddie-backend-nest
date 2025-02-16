@@ -5,7 +5,7 @@ import { genSaltSync, hashSync } from 'bcrypt';
 export async function insertUsers(prisma: PrismaClient, uuids: string[]) {
   await prisma.user.createMany({
     data: uuids.map((uuid) => {
-      const email = faker.internet.email();
+      const email = faker.internet.email().toLowerCase();
       console.log('email: ', email);
 
       return {

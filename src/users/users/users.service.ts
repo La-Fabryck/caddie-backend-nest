@@ -17,25 +17,35 @@ export class UsersService {
     }
 
     const salt = await genSalt();
-    createUserDto.password = await hash(createUserDto.password, salt);
+    const password = await hash(createUserDto.password, salt);
 
     return this.database.user.create({
-      data: createUserDto,
+      data: {
+        name: createUserDto.name,
+        email: createUserDto.email.toLowerCase(),
+        password,
+      },
     });
   }
 
   async countOneByEmail(email: string): Promise<number> {
     return this.database.user.count({
       where: {
-        email,
+        email: {
+          equals: email,
+          mode: 'insensitive',
+        },
       },
     });
   }
 
   async findOneByEmail(email: string): Promise<User | null> {
-    return this.database.user.findUnique({
+    return this.database.user.findFirst({
       where: {
-        email,
+        email: {
+          equals: email,
+          mode: 'insensitive',
+        },
       },
     });
   }
