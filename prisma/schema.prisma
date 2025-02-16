@@ -32,6 +32,7 @@ model Item {
   id            String             @id @default(uuid())
   listId        String
   name          String             @db.VarChar(255)
+  isInCart      Boolean            @default(false)
   list          List               @relation(fields: [listId], references: [id])
 }
 

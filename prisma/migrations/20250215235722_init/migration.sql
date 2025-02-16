@@ -23,6 +23,7 @@ CREATE TABLE "Item" (
     "id" TEXT NOT NULL,
     "listId" TEXT NOT NULL,
     "name" VARCHAR(255) NOT NULL,
+    "isInCart" BOOLEAN NOT NULL DEFAULT false,
 
     CONSTRAINT "Item_pkey" PRIMARY KEY ("id")
 );

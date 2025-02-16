@@ -6,6 +6,7 @@ function createOneItem(listId: string): Item {
     id: faker.string.uuid(),
     listId,
     name: faker.lorem.word(),
+    isInCart: faker.datatype.boolean(),
   };
 }
 
