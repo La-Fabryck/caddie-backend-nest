@@ -34,9 +34,21 @@ export class ItemController {
     return this.itemService.findOne(id);
   }
 
-  @Patch('items/:id')
-  update(@Param('id') id: string, @Body() updateShoppingDto: UpdateItemDto) {
-    this.itemService.update(id, updateShoppingDto);
+  // eslint-disable-next-line max-params
+  @UseGuards(AuthenticationGuard)
+  @UseInterceptors(AuthenticationInterceptor)
+  @Patch('/list/:listId/items/:itemId')
+  async update(
+    @Param('listId') listId: string,
+    @Param('itemId') itemId: string,
+    @Body() updateShoppingDto: UpdateItemDto,
+    @CurrentUser() user: User,
+  ) {
+    return this.itemService.update({
+      // eslint-disable-next-line @typescript-eslint/no-misused-spread
+      updateItemPayload: { ...updateShoppingDto, listId, id: itemId },
+      user,
+    });
   }
 
   @Delete('items/:id')

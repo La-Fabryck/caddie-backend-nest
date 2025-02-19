@@ -33,7 +33,7 @@ export class ListController {
   @UseInterceptors(AuthenticationInterceptor)
   @Get(':id')
   async findOneById(@Param('id', ParseUUIDPipe) id: string, @CurrentUser() user: User) {
-    return this.listService.findOneListById({ id, user });
+    return this.listService.findOneById({ id, user });
   }
 
   @Patch(':id')

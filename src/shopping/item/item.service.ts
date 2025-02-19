@@ -10,6 +10,11 @@ type CreateItem = {
   user: User;
 };
 
+type UpdateItem = {
+  updateItemPayload: UpdateItemDto & Pick<Item, 'listId' | 'id'>;
+  user: User;
+};
+
 type FindItems = { listId: string; user: User };
 
 @Injectable()
@@ -19,10 +24,11 @@ export class ItemService {
     private readonly listService: ListService,
   ) {}
 
-  async create({ createItemPayload }: CreateItem) {
+  async create({ createItemPayload, user }: CreateItem) {
     // verify that the list exist
     await this.listService.findOneById({
       id: createItemPayload.listId,
+      user,
     });
 
     await this.listService.updateDate(createItemPayload.listId);
@@ -32,10 +38,11 @@ export class ItemService {
     });
   }
 
-  async findAllByListId({ listId }: FindItems) {
+  async findAllByListId({ listId, user }: FindItems) {
     // verify that the list exist
     await this.listService.findOneById({
       id: listId,
+      user,
     });
 
     return this.database.item.findMany({
@@ -59,11 +66,21 @@ export class ItemService {
     return item;
   }
 
-  //TODO: Implement
-  // eslint-disable-next-line @typescript-eslint/class-methods-use-this
-  update(id: string, _updateItemDto: UpdateItemDto) {
-    console.log(id, _updateItemDto);
-    throw new Error('Method not implemented.');
+  async update({ updateItemPayload, user }: UpdateItem): Promise<Item> {
+    await this.listService.findOneById({
+      id: updateItemPayload.listId,
+      user,
+    });
+
+    return this.database.item.update({
+      data: {
+        // eslint-disable-next-line @typescript-eslint/no-misused-spread
+        ...updateItemPayload,
+      },
+      where: {
+        id: updateItemPayload.id,
+      },
+    });
   }
 
   //TODO: Implement

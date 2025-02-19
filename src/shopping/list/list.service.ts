@@ -6,7 +6,6 @@ import { UpdateListDto } from '../dto/update-list.dto';
 import { SubscribersService } from '../subscriber/subscribers.service';
 
 type CreateList = CreateListDto & { user: User };
-type FindListById = Pick<List, 'id'>;
 export type ListWithSubs = List & { subscribers: Subscriber[] };
 
 @Injectable()
@@ -45,18 +44,6 @@ export class ListService {
     });
   }
 
-  async findOneById(findListById: FindListById): Promise<List> {
-    const list = await this.database.list.findUnique({
-      where: findListById,
-    });
-
-    if (list == null) {
-      throw new NotFoundException();
-    }
-
-    return list;
-  }
-
   async findListsBySubscriber({ user }: { user: User }): Promise<List[]> {
     const subscriptions = await this.subscribersService.findAllByUser({ user });
     const lists = await this.findAllById(subscriptions.map((sub) => sub.listId));
@@ -64,14 +51,28 @@ export class ListService {
     return lists;
   }
 
-  async findOneListById({ id, user }: { id: string; user: User }): Promise<List> {
+  /**
+   * This method checks that the user is subscribed to the list and that the lists exists
+   * If it exists, returns it
+   */
+  async findOneById({ id, user }: { id: string; user: User }): Promise<List> {
     //Check if the user is subscribed to the list, else throws a NotFoundException
     await this.subscribersService.findOne({
       listId: id,
       user,
     });
 
-    return this.findOneById({ id });
+    const list = await this.database.list.findUnique({
+      where: {
+        id,
+      },
+    });
+
+    if (list == null) {
+      throw new NotFoundException();
+    }
+
+    return list;
   }
 
   async updateDate(id: string) {

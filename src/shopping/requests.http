@@ -1,3 +1,8 @@
+### VARIABLES
+
+@listId = 1e26baaf-2981-44d3-b57d-24f62c93638d
+@itemId = 3904dac4-7e9d-47ed-b89f-876b36a086c6
+
 ### LIST ###
 
 GET {{BASE_URL}}/list HTTP/1.1
@@ -15,17 +20,17 @@ Cookie: {{$dotenv COOKIE}}
 
 ###
 
-GET {{BASE_URL}}/list/d0f42b12-9bda-413c-988e-f0753db899a7 HTTP/1.1
+GET {{BASE_URL}}/list/{{listId}} HTTP/1.1
 Cookie: {{$dotenv COOKIE}}
 
 ### ITEM ###
 
-GET {{BASE_URL}}/list/d0f42b12-9bda-413c-988e-f0753db899a7/items HTTP/1.1
+###
+GET {{BASE_URL}}/list/{{listId}}/items HTTP/1.1
 Cookie: {{$dotenv COOKIE}}
 
 ###
-
-POST {{BASE_URL}}/list/d0f42b12-9bda-413c-988e-f0753db899a7/items HTTP/1.1
+POST {{BASE_URL}}/list/{{listId}}/items HTTP/1.1
 Content-Type: application/json
 Cookie: {{$dotenv COOKIE}}
 
@@ -34,5 +39,15 @@ Cookie: {{$dotenv COOKIE}}
 }
 
 ###
+PATCH  {{BASE_URL}}/list/{{listId}}/items/{{itemId}} HTTP/1.1
+Content-Type: application/json
+Cookie: {{$dotenv COOKIE}}
 
-GET {{BASE_URL}}/items/cda5bd88-bd18-47b3-a183-54881f40eaf4 HTTP/1.1
+{
+  "isInCart": true
+}
+
+
+###
+
+GET {{BASE_URL}}/items/{{itemId}} HTTP/1.1

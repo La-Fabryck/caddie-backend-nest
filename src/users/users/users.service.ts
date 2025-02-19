@@ -1,4 +1,4 @@
-import { ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
+import { ForbiddenException, Injectable, UnauthorizedException } from '@nestjs/common';
 import { User } from '@prisma/client';
 import { genSalt, hash } from 'bcrypt';
 import { DatabaseService } from '@/database/database.service';
@@ -64,7 +64,7 @@ export class UsersService {
     });
 
     if (user == null) {
-      throw new NotFoundException();
+      throw new UnauthorizedException();
     }
 
     return user;
