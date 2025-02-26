@@ -3,7 +3,7 @@ Tech :
 - JWT Refresh
 - Use Nest config
 - Implement logger
-- [Helmet](https://docs.nestjs.com/security/helmet)
+- [Helmet](https://docs.nestjs.com/security/helmet) & accept only application/json
 
 Feat :
 - Join list URL
