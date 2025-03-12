@@ -47,6 +47,9 @@ Cookie: {{$dotenv COOKIE}}
   "isInCart": true
 }
 
+###
+DELETE  {{BASE_URL}}/list/{{listId}}/items/{{itemId}} HTTP/1.1
+Cookie: {{$dotenv COOKIE}}
 
 ###
 

@@ -10,7 +10,6 @@ type CreateSubcriber = CreateSubcriberDto & { user: User };
 export class SubscribersService {
   constructor(private database: DatabaseService) {}
 
-  // eslint-disable-next-line @typescript-eslint/class-methods-use-this
   async create({ listId, name, user }: CreateSubcriber, tx: Prisma.TransactionClient) {
     //TODO: validate ?
     // try {
@@ -71,14 +70,14 @@ export class SubscribersService {
   }
 
   //TODO: Implement
-  // eslint-disable-next-line @typescript-eslint/class-methods-use-this
+
   update(id: string, updateSubcriberDto: UpdateSubcriberDto) {
     console.log(updateSubcriberDto.listId);
     return `This action updates a #${id} subcriber`;
   }
 
   //TODO: Implement
-  // eslint-disable-next-line @typescript-eslint/class-methods-use-this
+
   remove(id: string) {
     return `This action removes a #${id} subcriber`;
   }

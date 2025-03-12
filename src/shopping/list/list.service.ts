@@ -1,5 +1,5 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { type List, type Subscriber, type User } from '@prisma/client';
+import { type List, Prisma, type Subscriber, type User } from '@prisma/client';
 import { DatabaseService } from '@/database/database.service';
 import { CreateListDto } from '../dto/create-list.dto';
 import { UpdateListDto } from '../dto/update-list.dto';
@@ -75,8 +75,8 @@ export class ListService {
     return list;
   }
 
-  async updateDate(id: string) {
-    return this.database.list.update({
+  async updateDate(id: string, tx: Prisma.TransactionClient) {
+    return tx.list.update({
       where: {
         id,
       },
@@ -87,14 +87,12 @@ export class ListService {
   }
 
   //TODO: Implement
-  // eslint-disable-next-line @typescript-eslint/class-methods-use-this
   update(id: string, updateListDto: UpdateListDto) {
     console.log(updateListDto.title);
     return `This action updates a #${id} shopping}`;
   }
 
   //TODO: Implement
-  // eslint-disable-next-line @typescript-eslint/class-methods-use-this
   remove(id: string) {
     return `This action removes a #${id} shopping`;
   }

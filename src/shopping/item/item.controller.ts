@@ -39,8 +39,8 @@ export class ItemController {
   @UseInterceptors(AuthenticationInterceptor)
   @Patch('/list/:listId/items/:itemId')
   async update(
-    @Param('listId') listId: string,
-    @Param('itemId') itemId: string,
+    @Param('listId', ParseUUIDPipe) listId: string,
+    @Param('itemId', ParseUUIDPipe) itemId: string,
     @Body() updateShoppingDto: UpdateItemDto,
     @CurrentUser() user: User,
   ) {
@@ -51,8 +51,10 @@ export class ItemController {
     });
   }
 
-  @Delete('items/:id')
-  remove(@Param('id') id: string) {
-    this.itemService.remove(id);
+  @UseGuards(AuthenticationGuard)
+  @UseInterceptors(AuthenticationInterceptor)
+  @Delete('/list/:listId/items/:itemId')
+  async remove(@Param('listId', ParseUUIDPipe) listId: string, @Param('itemId', ParseUUIDPipe) itemId: string, @CurrentUser() user: User) {
+    await this.itemService.remove(listId, itemId, user);
   }
 }

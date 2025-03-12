@@ -31,7 +31,6 @@ export class AuthenticationController {
   @Get('logout')
   // TODO: logging
   // Cannot use injection with static methods
-  // eslint-disable-next-line @typescript-eslint/class-methods-use-this
   async logout(@Res({ passthrough: true }) res: FastifyReply) {
     return res.clearCookie(COOKIE_NAME).send();
   }

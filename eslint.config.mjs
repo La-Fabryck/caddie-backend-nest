@@ -68,10 +68,6 @@ export default tseslint.config(
       // Enforce using a particular method signature syntax
       '@typescript-eslint/method-signature-style': 'error',
 
-      // Enforce that class methods utilize `this`
-      'class-methods-use-this': 'off',
-      '@typescript-eslint/class-methods-use-this': 'error',
-
       // Enforce default parameters to be last
       'default-param-last': 'off',
       '@typescript-eslint/default-param-last': 'error',
