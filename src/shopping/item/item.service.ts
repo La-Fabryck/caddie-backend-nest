@@ -15,6 +15,8 @@ type UpdateItem = {
   user: User;
 };
 
+type FindItem = { listId: string; itemId: string; user: User };
+
 type FindItems = { listId: string; user: User };
 
 @Injectable()
@@ -54,10 +56,16 @@ export class ItemService {
     });
   }
 
-  async findOne(id: string): Promise<Item> {
+  async findOne({ itemId, listId, user }: FindItem): Promise<Item> {
+    // verify that the list exist
+    await this.listService.findOneById({
+      id: listId,
+      user,
+    });
+
     const item = await this.database.item.findUnique({
       where: {
-        id,
+        id: itemId,
       },
     });
 

@@ -7,13 +7,13 @@ import { CreateItemDto } from '../dto/create-item.dto';
 import { UpdateItemDto } from '../dto/update-item.dto';
 import { ItemService } from './item.service';
 
-@Controller()
+@Controller('/list/:listId/items')
 export class ItemController {
   constructor(private readonly itemService: ItemService) {}
 
   @UseGuards(AuthenticationGuard)
   @UseInterceptors(AuthenticationInterceptor)
-  @Post('/list/:listId/items')
+  @Post()
   async create(@Param('listId', ParseUUIDPipe) listId: string, @Body() createItemDto: CreateItemDto, @CurrentUser() user: User) {
     return this.itemService.create({
       createItemPayload: { listId, name: createItemDto.name },
@@ -23,21 +23,22 @@ export class ItemController {
 
   @UseGuards(AuthenticationGuard)
   @UseInterceptors(AuthenticationInterceptor)
-  @Get('/list/:listId/items')
+  @Get()
   async findAll(@Param('listId', ParseUUIDPipe) listId: string, @CurrentUser() user: User) {
     return this.itemService.findAllByListId({ listId, user });
   }
 
-  //TODO: protect
-  @Get('items/:id')
-  async findOne(@Param('id', ParseUUIDPipe) id: string) {
-    return this.itemService.findOne(id);
+  @UseGuards(AuthenticationGuard)
+  @UseInterceptors(AuthenticationInterceptor)
+  @Get(':itemId')
+  async findOne(@Param('listId', ParseUUIDPipe) listId: string, @Param('itemId', ParseUUIDPipe) itemId: string, @CurrentUser() user: User) {
+    return this.itemService.findOne({ itemId, listId, user });
   }
 
   // eslint-disable-next-line max-params
   @UseGuards(AuthenticationGuard)
   @UseInterceptors(AuthenticationInterceptor)
-  @Patch('/list/:listId/items/:itemId')
+  @Patch(':itemId')
   async update(
     @Param('listId', ParseUUIDPipe) listId: string,
     @Param('itemId', ParseUUIDPipe) itemId: string,
@@ -53,7 +54,7 @@ export class ItemController {
 
   @UseGuards(AuthenticationGuard)
   @UseInterceptors(AuthenticationInterceptor)
-  @Delete('/list/:listId/items/:itemId')
+  @Delete(':itemId')
   async remove(@Param('listId', ParseUUIDPipe) listId: string, @Param('itemId', ParseUUIDPipe) itemId: string, @CurrentUser() user: User) {
     await this.itemService.remove(listId, itemId, user);
   }
