@@ -4,7 +4,7 @@ Tech :
 - Integration Tests
 - JWT Refresh
 - Set up Nest config correclty
-- Implement logger
+- Implement pino logger
 - [Helmet](https://docs.nestjs.com/security/helmet) & accept only application/json
 
 Feat :
