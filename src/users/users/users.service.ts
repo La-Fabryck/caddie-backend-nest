@@ -1,4 +1,4 @@
-import { ForbiddenException, Injectable, UnauthorizedException } from '@nestjs/common';
+import { ForbiddenException, Injectable, NotImplementedException, UnauthorizedException } from '@nestjs/common';
 import { User } from '@prisma/client';
 import { genSalt, hash } from 'bcrypt';
 import { DatabaseService } from '@/database/database.service';
@@ -10,7 +10,14 @@ export class UsersService {
   constructor(private database: DatabaseService) {}
 
   async create(createUserDto: CreateUserDto) {
-    const userExists = await this.countOneByEmail(createUserDto.email);
+    const userExists = await this.database.user.count({
+      where: {
+        email: {
+          equals: createUserDto.email,
+          mode: 'insensitive',
+        },
+      },
+    });
 
     if (userExists) {
       throw new ForbiddenException();
@@ -28,17 +35,6 @@ export class UsersService {
     });
   }
 
-  async countOneByEmail(email: string): Promise<number> {
-    return this.database.user.count({
-      where: {
-        email: {
-          equals: email,
-          mode: 'insensitive',
-        },
-      },
-    });
-  }
-
   async findOneByEmail(email: string): Promise<User | null> {
     return this.database.user.findFirst({
       where: {
@@ -48,12 +44,6 @@ export class UsersService {
         },
       },
     });
-  }
-
-  //TODO: Implement
-
-  findAll() {
-    return { toto: 'tutu' };
   }
 
   async findOne(id: string) {
@@ -71,14 +61,17 @@ export class UsersService {
   }
 
   //TODO: Implement
-
-  update(id: string, updateUserDto: UpdateUserDto) {
-    return `This action updates a #${id} user ${updateUserDto.email}`;
+  findAll() {
+    throw new NotImplementedException();
   }
 
   //TODO: Implement
+  update(_id: string, _updateUserDto: UpdateUserDto) {
+    throw new NotImplementedException();
+  }
 
-  remove(id: string) {
-    return `This action removes a #${id} user`;
+  //TODO: Implement
+  remove(_id: string) {
+    throw new NotImplementedException();
   }
 }
