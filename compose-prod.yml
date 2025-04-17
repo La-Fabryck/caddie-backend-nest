@@ -1,7 +1,14 @@
 services:
   postgres:
     image: postgres:alpine
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U postgres']
+      interval: 10s
+      timeout: 5s
+      retries: 5
     restart: unless-stopped
+    volumes:
+      - pgcaddie:/var/lib/postgresql/data
     environment:
       POSTGRES_PASSWORD: password
       POSTGRES_DB: caddie_app
@@ -13,17 +20,12 @@ services:
   backend:
     build:
       context: ./
-      dockerfile: ./docker/app/local/Dockerfile
-    volumes:
-      - '.:/app'
+      dockerfile: ./docker/app/prod/Dockerfile
     ports:
-      - '3001:3001' # Nest
-      - '9229:9229' # Debug
+      - '3001:3001'
     depends_on:
-      - postgres
-    working_dir: /app
-    command: ['npm', 'run', 'start:debug']
-    user: 0:0
+      postgres:
+        condition: service_healthy
     env_file:
       - .env
     networks:
@@ -34,3 +36,6 @@ networks:
   caddie_network:
     external: true
   backend:
+
+volumes:
+  pgcaddie:
