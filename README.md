@@ -28,7 +28,7 @@ docker compose run --rm backend npm ci \
 5. Run the migrations
 
 ```bash
-docker compose run --rm backend npx prisma migrate dev --name init
+docker compose run --rm backend npx prisma migrate dev
 ```
 
 6. Seed the database
@@ -45,7 +45,7 @@ docker compose up
 
 8. Check the node version
 
-``` bash
+```bash
 docker compose exec backend node -v
 ```
 
@@ -72,13 +72,13 @@ docker compose build --pull --no-cache
 
 ### NVM use the version's project
 
-``` bash
+```bash
 nvm install && nvm use
 ```
 
 ### Clean the packages and dist
 
-``` bash
+```bash
 sudo rm -rf ./node_modules && sudo rm -rf ./dist
 ```
 
@@ -96,10 +96,9 @@ caddie-backend-nest@0.0.1 /path/to/project/caddie-backend-nest
 
 Install one that's matching
 
-
 ### Fastify cookie compatibility
 
-Check in the `package-lock.json` the version of `fastify-plugin` in the dependencies of `@fastify/cookie`. 
+Check in the `package-lock.json` the version of `fastify-plugin` in the dependencies of `@fastify/cookie`.
 For example here it means it's compatible with fastify v4.
 
 ```
@@ -113,5 +112,3 @@ For example here it means it's compatible with fastify v4.
       }
     },
 ```
-
-
