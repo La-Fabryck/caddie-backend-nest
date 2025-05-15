@@ -4,10 +4,10 @@
     "module": "NodeNext",
     "lib": ["ES2024"],
 
-		"skipLibCheck": true,
-		"useDefineForClassFields": true,
-		"allowSyntheticDefaultImports": true,
-		"forceConsistentCasingInFileNames": true,
+    "skipLibCheck": true,
+    "useDefineForClassFields": true,
+    "allowSyntheticDefaultImports": true,
+    "forceConsistentCasingInFileNames": true,
 
     /* NestJS requirements */
     "emitDecoratorMetadata": true,
@@ -16,25 +16,25 @@
     /* Bundler mode */
     "sourceMap": true,
     "declaration": true,
-		"removeComments": true,
-		"incremental": true,
-    
+    "removeComments": true,
+    "incremental": true,
+
     /* Paths */
     "outDir": "./dist",
     "baseUrl": "./",
     "paths": {
       "@/*": ["src/*"]
     },
-		
+
     /* rules */
-		"strict": true,
-		"noFallthroughCasesInSwitch": true,
-		"exactOptionalPropertyTypes": true,
-		"noImplicitOverride": true,
+    "strict": true,
+    "noFallthroughCasesInSwitch": true,
+    "exactOptionalPropertyTypes": true,
+    "noImplicitOverride": true,
     "noImplicitReturns": true,
-		"noPropertyAccessFromIndexSignature": true,
-		"noUnusedLocals": true,
-		"noUnusedParameters": true,
-		"noUncheckedSideEffectImports": true
-  },
+    "noPropertyAccessFromIndexSignature": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "noUncheckedSideEffectImports": true
+  }
 }

@@ -1,10 +1,18 @@
 {
   "name": "caddie-backend-nest",
-  "version": "0.0.1",
-  "description": "",
-  "author": "",
-  "private": true,
-  "license": "UNLICENSED",
+  "version": "0.1.0",
+  "description": "Backend for shopping app built with NestJS, Prisma and Fastify",
+  "author": "Benjamin Fabry",
+  "private": false,
+  "license": "AGPL-3.0-only",
+  "keywords": [
+    "nestjs",
+    "fastify",
+    "prisma",
+    "shopping",
+    "nodejs",
+    "rest"
+  ],
   "scripts": {
     "build": "nest build",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
