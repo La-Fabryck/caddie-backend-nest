@@ -34,21 +34,19 @@ export class ListService {
     });
   }
 
-  async findAllById(ids: string[]): Promise<List[]> {
+  async findListsBySubscriber({ user }: { user: User }): Promise<List[]> {
+    const subscriptions = await this.subscribersService.findAllByUser({ user });
+
     return this.database.list.findMany({
       where: {
         id: {
-          in: ids,
+          in: subscriptions.map((sub) => sub.listId),
         },
       },
+      orderBy: {
+        updatedAt: 'desc',
+      },
     });
-  }
-
-  async findListsBySubscriber({ user }: { user: User }): Promise<List[]> {
-    const subscriptions = await this.subscribersService.findAllByUser({ user });
-    const lists = await this.findAllById(subscriptions.map((sub) => sub.listId));
-
-    return lists;
   }
 
   /**
