@@ -51,6 +51,20 @@ docker compose exec backend node -v
 
 ## Misceallenous
 
+### Create & Restore a dump from prod
+
+To create a dump :
+
+```bash
+docker exec -t $CONTAINER_NAME pg_dump -U $DB_USER $DB_NAME > $REMOTE_DIR/db-$TIMESTAMP.sql
+```
+
+To restore locally. The DB must be cleaned beforehand, use `docker compose down` or `docker compose down --rmi all` to reset your env. Follow the install steps until Step 4, then adapt and execute :
+
+```bash
+docker exec -i caddie-backend-nest-postgres-1 /bin/bash -c "PGPASSWORD=password psql --username postgres caddie_app" < /path/to/dump/file.sql
+```
+
 ### Clean everything docker related
 
 ```bash
