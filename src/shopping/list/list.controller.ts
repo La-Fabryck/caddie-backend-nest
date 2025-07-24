@@ -36,13 +36,21 @@ export class ListController {
     return this.listService.findOneById({ id, user });
   }
 
+  @UseGuards(AuthenticationGuard)
+  @UseInterceptors(AuthenticationInterceptor)
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateShoppingDto: UpdateListDto) {
-    return this.listService.update(id, updateShoppingDto);
+  async update(@Param('id', ParseUUIDPipe) id: string, @CurrentUser() user: User, @Body() updateShoppingDto: UpdateListDto) {
+    return this.listService.update({
+      // eslint-disable-next-line @typescript-eslint/no-misused-spread
+      payload: { ...updateShoppingDto, id },
+      user,
+    });
   }
 
+  @UseGuards(AuthenticationGuard)
+  @UseInterceptors(AuthenticationInterceptor)
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.listService.remove(id);
+  async remove(@Param('id', ParseUUIDPipe) id: string, @CurrentUser() user: User) {
+    return this.listService.remove({ id, user });
   }
 }
