@@ -23,6 +23,7 @@ services:
       dockerfile: ./docker/app/prod/Dockerfile
     ports:
       - '3001:3001'
+    restart: unless-stopped
     depends_on:
       postgres:
         condition: service_healthy
