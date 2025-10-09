@@ -14,5 +14,5 @@ Later :
 
 - Small cache for users
 - Use Zod as validator ? [Zod Integration](https://docs.nestjs.com/pipes#object-schema-validation)
-- Migrate to ~~Knex~~ [Kysely](https://kysely.dev/)
+- Migrate to ~~Knex~~ [Kysely](https://kysely.dev/), implement CQRS
 - Cluster mode ?
