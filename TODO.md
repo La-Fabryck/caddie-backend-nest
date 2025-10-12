@@ -2,7 +2,7 @@ Tech :
 
 - Integration Tests
 - JWT Refresh
-- Set up Nest config correclty
+- Set up [Nest config](https://docs.nestjs.com/techniques/configuration) correctly
 - Implement pino logger with [correlation ID](https://sagarvaghela.medium.com/nestjs-logging-pino-correlation-id-and-gcp-cloud-logging-90a7e6c13a8d) 
 - [Helmet](https://docs.nestjs.com/security/helmet) & accept only application/json
 
@@ -14,5 +14,5 @@ Later :
 
 - Small cache for users
 - Use Zod as validator ? [Zod Integration](https://docs.nestjs.com/pipes#object-schema-validation)
-- Migrate to ~~Knex~~ [Kysely](https://kysely.dev/)
+- Migrate to ~~Knex~~ [Kysely](https://kysely.dev/), implement CQRS
 - Cluster mode ?
