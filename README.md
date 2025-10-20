@@ -25,6 +25,12 @@ docker compose run --rm backend npm ci \
 && docker compose run --rm backend npx prisma generate
 ```
 
+or use the makefile
+
+```bash
+make install
+```
+
 5. Run the migrations
 
 ```bash
@@ -98,31 +104,48 @@ sudo rm -rf ./node_modules && sudo rm -rf ./dist
 
 ### Fastify version compatibilty
 
-`fastify`'s installed version must match the one installed in `@nestjs/platform-fastify`
+To ensure Fastify play nice with @nestjs/platform-fastify, we must ensure the version are deduped
+
 
 ```bash
-> npm ls fastify
-caddie-backend-nest@0.0.1 /path/to/project/caddie-backend-nest
-├─┬ @nestjs/platform-fastify@10.4.15
-│ └── fastify@4.28.1 deduped
-└── fastify@4.28.1
+caddie-backend-nest@0.2.0 /home/binbin/Documents/code/caddie/caddie-backend-nest
+├─┬ @nestjs/platform-fastify@11.1.6
+│ └── fastify@5.4.0 deduped
+└── fastify@5.4.0
 ```
 
-Install one that's matching
+Verify fastify compatibility with :
+
+```bash
+npm info @nestjs/platform-fastify dependencies.fastify
+```
+
+To update, use the following or the command in the makefile
+
+```bash
+npx npm-check-updates -u -i -x fastify --format group
+```
 
 ### Fastify cookie compatibility
 
-Check in the `package-lock.json` the version of `fastify-plugin` in the dependencies of `@fastify/cookie`.
-For example here it means it's compatible with fastify v4.
+To ensure `@fastify/cookie` uses a compatible `fastify-plugin` version verify compatibility with:
+```bash
+npm info @fastify/cookie dependencies.fastify-plugin
+```
+
+and 
 
 ```
-    "node_modules/@fastify/cookie": {
-      "version": "9.4.0",
-      "resolved": "https://registry.npmjs.org/@fastify/cookie/-/cookie-9.4.0.tgz",
-      "integrity": "sha512-Th+pt3kEkh4MQD/Q2q1bMuJIB5NX/D5SwSpOKu3G/tjoGbwfpurIMJsWSPS0SJJ4eyjtmQ8OipDQspf8RbUOlg==",
-      "dependencies": {
-        "cookie-signature": "^1.1.0",
-        "fastify-plugin": "^4.0.0" <------------
-      }
-    },
+❯ npm ls fastify-plugin
+├─┬ @fastify/cookie@11.0.2
+│ └── fastify-plugin@5.1.0
+└─┬ @nestjs/platform-fastify@11.1.6
+  ├─┬ @fastify/cors@11.1.0
+  │ └── fastify-plugin@5.1.0 deduped
+  ├─┬ @fastify/formbody@8.0.2
+  │ └── fastify-plugin@5.1.0 deduped
+  └─┬ @fastify/middie@9.0.3
+    └── fastify-plugin@5.1.0 deduped
 ```
+
+`@fastify/cookie` needs to match the version required

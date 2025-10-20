@@ -1,6 +1,6 @@
 services:
   postgres:
-    image: postgres:alpine
+    image: postgres:17-alpine
     restart: unless-stopped
     environment:
       POSTGRES_PASSWORD: password
@@ -23,7 +23,7 @@ services:
       - postgres
     working_dir: /app
     command: ['npm', 'run', 'start:debug']
-    user: 0:0
+    user: "${UID:-1000}:${GID:-1000}"
     env_file:
       - .env
     networks:
