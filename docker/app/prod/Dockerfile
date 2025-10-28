@@ -16,6 +16,8 @@ COPY --from=deps /app/node_modules ./node_modules
 COPY src ./src
 COPY package*.json tsconfig*.json nest-cli.json ./
 
+# TODO: test prune instead of ci
+# && npm prune --production \
 ENV NODE_ENV=production
 RUN npm run build \
     && npm ci --only=production \
