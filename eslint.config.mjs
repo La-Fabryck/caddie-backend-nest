@@ -8,6 +8,10 @@ import unusedImports from 'eslint-plugin-unused-imports';
 import globals from 'globals';
 import tseslint, { configs as tsconfigs } from 'typescript-eslint';
 
+
+// FIXME: incompatible with https://typescript-eslint.io/packages/typescript-eslint/#config-deprecated
+// Because : https://github.com/un-ts/eslint-plugin-import-x/issues/421
+// And : https://github.com/typescript-eslint/typescript-eslint/issues/11543
 export default tseslint.config(
   {
     ignores: ['eslint.config.mjs'],
@@ -52,6 +56,8 @@ export default tseslint.config(
       // @typescript-eslint rules -----> 
 
       '@typescript-eslint/interface-name-prefix': 'off',
+
+      // TODO: turn on
       '@typescript-eslint/explicit-function-return-type': 'off',
       '@typescript-eslint/explicit-module-boundary-types': 'off',
       '@typescript-eslint/no-explicit-any': 'error',
