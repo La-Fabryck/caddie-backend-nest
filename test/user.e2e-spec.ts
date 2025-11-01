@@ -1,7 +1,6 @@
 import { HttpStatus } from '@nestjs/common';
 import { type NestFastifyApplication } from '@nestjs/platform-fastify';
 import { type User } from '@prisma/client';
-import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import { type CreateUserDto } from '@/users/dto/create-user.dto';
 import { createAppE2E } from './create-app.e2e';
 import { createUser } from './factories/user';

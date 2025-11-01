@@ -1,5 +1,5 @@
 import { ForbiddenException, Injectable, NotImplementedException, UnauthorizedException } from '@nestjs/common';
-import { User } from '@prisma/client';
+import { type User } from '@prisma/client';
 import { genSalt, hash } from 'bcrypt';
 import { DatabaseService } from '@/database/database.service';
 import { CreateUserDto } from '../dto/create-user.dto';

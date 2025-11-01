@@ -1,11 +1,10 @@
 {
   "extends": "../tsconfig.json",
   "compilerOptions": {
-    "types": ["vitest", "node"],
+    "types": ["jest", "node"],
     "baseUrl": "..",
     "paths": {
-      "@/*": ["src/*"],
-      "@test/*": ["test/*"]
+      "@/*": ["src/*"]
     }
   }
 }
