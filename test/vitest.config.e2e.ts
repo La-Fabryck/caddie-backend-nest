@@ -10,6 +10,8 @@ export default defineConfig({
       '@test': './test',
     },
     root: './',
+    // Docker creates a node_modules diretory in the test directory
+    cache: { dir: '../node_modules/.vite/vitest' },
   },
   resolve: {
     alias: {
