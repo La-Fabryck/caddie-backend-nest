@@ -5,8 +5,8 @@ import { type NestFastifyApplication } from '@nestjs/platform-fastify';
 type ErrorInterfaceBody = { message: string };
 export type ErrorInterface = Record<string, ErrorInterfaceBody[]>;
 
-function configureApp(app: NestFastifyApplication): void {
-  app.register(fastifyCookie);
+async function configureApp(app: NestFastifyApplication): Promise<void> {
+  await app.register(fastifyCookie);
 
   app.useGlobalPipes(
     new ValidationPipe({

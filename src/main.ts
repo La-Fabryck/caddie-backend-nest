@@ -5,7 +5,7 @@ import { AppModule } from './app.module';
 
 async function bootstrap(): Promise<void> {
   const app = await NestFactory.create<NestFastifyApplication>(AppModule, new FastifyAdapter());
-  configureApp(app);
+  await configureApp(app);
 
   //TODO: Use injection not env var
   //@ts-expect-error use nest config

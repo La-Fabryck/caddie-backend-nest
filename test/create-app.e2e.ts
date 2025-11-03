@@ -9,7 +9,7 @@ async function createAppE2E(): Promise<NestFastifyApplication> {
   }).compile();
 
   const app: NestFastifyApplication = moduleRef.createNestApplication(new FastifyAdapter());
-  configureApp(app);
+  await configureApp(app);
 
   await app.init();
   return app;
