@@ -29,8 +29,6 @@ export class AuthenticationController {
   }
 
   @Get('logout')
-  // TODO: logging
-  // Cannot use injection with static methods
   async logout(@Res({ passthrough: true }) res: FastifyReply) {
     return res.clearCookie(COOKIE_NAME).send();
   }

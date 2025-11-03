@@ -7,7 +7,7 @@ export type ErrorInterface = Record<string, ErrorInterfaceBody[]>;
 
 function configureApp(app: NestFastifyApplication): void {
   app.register(fastifyCookie);
-  
+
   app.useGlobalPipes(
     new ValidationPipe({
       whitelist: true,

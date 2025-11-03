@@ -53,8 +53,11 @@ export default tseslint.config(
     },
 
     rules: {
-      // @typescript-eslint rules -----> 
+      // Turned off for eslint@9.39.0
+      // @see https://github.com/eslint/eslint/issues/20272
+      '@typescript-eslint/unified-signatures': 'off',
 
+      // @typescript-eslint rules -----> 
       '@typescript-eslint/interface-name-prefix': 'off',
 
       // TODO: turn on
@@ -174,7 +177,7 @@ export default tseslint.config(
       'no-nested-ternary': 'error',
 
       // Disallow the unary operators ++ and --
-      'no-plusplus': ['error', { "allowForLoopAfterthoughts": true } ],
+      'no-plusplus': ['error', { "allowForLoopAfterthoughts": true }],
 
       // Disallow javascript: URLs. ex: location.href = "javascript:void(0)";
       'no-script-url': 'error',

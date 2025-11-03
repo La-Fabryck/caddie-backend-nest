@@ -61,17 +61,15 @@ export class UsersService {
   }
 
   //TODO: Implement
-  findAll() {
-    throw new NotImplementedException();
-  }
-
-  //TODO: Implement
   update(_id: string, _updateUserDto: UpdateUserDto) {
     throw new NotImplementedException();
   }
 
-  //TODO: Implement
-  remove(_id: string) {
-    throw new NotImplementedException();
+  async remove(id: string) {
+    await this.database.user.delete({
+      where: {
+        id,
+      },
+    });
   }
 }

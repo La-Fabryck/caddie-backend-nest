@@ -1,8 +1,10 @@
 import { HttpStatus } from '@nestjs/common';
 import { type NestFastifyApplication } from '@nestjs/platform-fastify';
 import { type User } from '@prisma/client';
+import { type ErrorInterface } from '@/app.configurator';
 import { type CreateUserDto } from '@/users/dto/create-user.dto';
 import { createAppE2E } from './create-app.e2e';
+import { resourceCreator } from './creator/resource-creator';
 import { createUser } from './factories/user';
 
 describe('UserController (e2e)', () => {
@@ -40,7 +42,7 @@ describe('UserController (e2e)', () => {
 
     expect(result.statusCode).toEqual(HttpStatus.BAD_REQUEST);
 
-    const response = JSON.parse(result.payload) as unknown;
+    const response = JSON.parse(result.payload) as ErrorInterface;
     expect(response).toStrictEqual({
       email: [
         {
@@ -61,6 +63,18 @@ describe('UserController (e2e)', () => {
         },
       ],
     });
+  });
+
+  it('/users (POST) - KO - User already exists', async () => {
+    await using creator = await resourceCreator(app);
+
+    const result = await app.inject({
+      method: 'POST',
+      url: '/users',
+      body: creator.user,
+    });
+
+    expect(result.statusCode).toEqual(HttpStatus.FORBIDDEN);
   });
 
   afterAll(async () => {

@@ -1,7 +1,7 @@
 import { faker } from '@faker-js/faker';
 import { type User } from '@prisma/client';
 
-function createUser(overrides: Partial<User> = {}) {
+function createUser(overrides: Partial<User> = {}): User {
   return {
     id: faker.string.uuid(),
     name: faker.person.fullName(),
@@ -11,7 +11,7 @@ function createUser(overrides: Partial<User> = {}) {
   };
 }
 
-function createManyUsers(count: number) {
+function createManyUsers(count: number): User[] {
   return Array.from({ length: count }, () => createUser());
 }
 

@@ -1,10 +1,10 @@
 import { ForbiddenException, Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { compare } from 'bcrypt';
+import { ErrorInterface } from '@/app.configurator';
 import { LoginDto } from '../dto/login.dto';
 import { INVALID_LOGIN } from '../messages/authentication';
 import { UsersService } from '../users/users.service';
-import { ErrorInterface } from '@/app.configurator';
 
 export type JwtPayload = { sub: string };
 
