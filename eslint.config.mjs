@@ -3,11 +3,11 @@ import eslint from '@eslint/js';
 import * as tsParser from '@typescript-eslint/parser';
 import { createTypeScriptImportResolver } from 'eslint-import-resolver-typescript';
 import eslintPluginImportX from 'eslint-plugin-import-x';
+import eslintPluginUnicorn from 'eslint-plugin-unicorn';
 import eslintPluginPrettierRecommended from 'eslint-plugin-prettier/recommended';
 import unusedImports from 'eslint-plugin-unused-imports';
 import globals from 'globals';
 import tseslint, { configs as tsconfigs } from 'typescript-eslint';
-
 
 // FIXME: incompatible with https://typescript-eslint.io/packages/typescript-eslint/#config-deprecated
 // Because : https://github.com/un-ts/eslint-plugin-import-x/issues/421
@@ -21,6 +21,7 @@ export default tseslint.config(
   eslintPluginImportX.flatConfigs.recommended,
   eslintPluginImportX.flatConfigs.typescript,
   eslintPluginPrettierRecommended,
+  eslintPluginUnicorn.configs.recommended,
   {
     languageOptions: {
       globals: {
@@ -57,7 +58,7 @@ export default tseslint.config(
       // @see https://github.com/eslint/eslint/issues/20272
       '@typescript-eslint/unified-signatures': 'off',
 
-      // @typescript-eslint rules -----> 
+      // @typescript-eslint rules ----->
       '@typescript-eslint/interface-name-prefix': 'off',
 
       // TODO: turn on
@@ -81,7 +82,7 @@ export default tseslint.config(
       'default-param-last': 'off',
       '@typescript-eslint/default-param-last': 'error',
 
-      // Require the Record type 
+      // Require the Record type
       '@typescript-eslint/consistent-indexed-object-style': 'error',
 
       // Require each enum member value to be explicitly initialized
@@ -99,10 +100,13 @@ export default tseslint.config(
 
       // Disallow classes used as namespaces.
       // Override typescript-eslint strict to allow empty Module classes with decorators
-      '@typescript-eslint/no-extraneous-class': ['error', {
-        /** Whether to allow extraneous classes that include a decorator. */
-        allowWithDecorator: true,
-      }],
+      '@typescript-eslint/no-extraneous-class': [
+        'error',
+        {
+          /** Whether to allow extraneous classes that include a decorator. */
+          allowWithDecorator: true,
+        },
+      ],
 
       // Enforce template literal expressions to be of `string` type
       // Override typescript-eslint strictTyped to remove this rule.
@@ -110,20 +114,32 @@ export default tseslint.config(
 
       // Disallow unused variables.
       // Override typescript-eslint recommended config to allow unused variables starting with _
-      "@typescript-eslint/no-unused-vars": [
-        "error",
+      '@typescript-eslint/no-unused-vars': [
+        'error',
         {
-          "args": "all",
-          "argsIgnorePattern": "^_",
-          "caughtErrors": "all",
-          "caughtErrorsIgnorePattern": "^_",
-          "destructuredArrayIgnorePattern": "^_",
-          "varsIgnorePattern": "^_",
-          "ignoreRestSiblings": true
-        }
+          args: 'all',
+          argsIgnorePattern: '^_',
+          caughtErrors: 'all',
+          caughtErrorsIgnorePattern: '^_',
+          destructuredArrayIgnorePattern: '^_',
+          varsIgnorePattern: '^_',
+          ignoreRestSiblings: true,
+        },
       ],
 
-      // <----- @typescript-eslint rules 
+      // <----- @typescript-eslint rules
+
+      // unicorn rules ----->
+
+      'unicorn/no-null': 'off',
+      'unicorn/prevent-abbreviations': [
+        'error',
+        {
+          ignore: ['\\.e2e(-spec)?$'],
+        },
+      ],
+
+      // <----- unicorn rules
 
       // eslint rules ----->
 
@@ -144,7 +160,7 @@ export default tseslint.config(
       'default-case-last': 'error',
 
       // Disallow assignments that can lead to race conditions due to usage of `await` or `yield`
-      'require-atomic-updates': ['error', { 'allowProperties': true }],
+      'require-atomic-updates': ['error', { allowProperties: true }],
 
       // Enforce a maximum number of parameters in function definitions
       'max-params': ['error', 3],
@@ -177,7 +193,7 @@ export default tseslint.config(
       'no-nested-ternary': 'error',
 
       // Disallow the unary operators ++ and --
-      'no-plusplus': ['error', { "allowForLoopAfterthoughts": true }],
+      'no-plusplus': ['error', { allowForLoopAfterthoughts: true }],
 
       // Disallow javascript: URLs. ex: location.href = "javascript:void(0)";
       'no-script-url': 'error',
@@ -188,7 +204,7 @@ export default tseslint.config(
       // Disallow unnecessary calls to `.call()` and `.apply()`
       'no-useless-call': 'error',
 
-      // <----- eslint rules 
+      // <----- eslint rules
 
       // Style imports :
 

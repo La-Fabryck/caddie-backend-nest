@@ -12,4 +12,5 @@ async function bootstrap(): Promise<void> {
   await app.listen({ port: 3001, host: process.env.LISTEN_IP });
 }
 
+// eslint-disable-next-line unicorn/prefer-top-level-await
 void bootstrap();

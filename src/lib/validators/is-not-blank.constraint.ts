@@ -10,7 +10,7 @@ export class IsNotBlankConstraint implements ValidatorConstraintInterface {
     return typeof value === 'string' && value.trim() !== '';
   }
 
-  defaultMessage(args: ValidationArguments): string {
-    return `${args.property} must not be blank.`;
+  defaultMessage(arguments_: ValidationArguments): string {
+    return `${arguments_.property} must not be blank.`;
   }
 }

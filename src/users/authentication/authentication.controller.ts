@@ -14,11 +14,11 @@ export class AuthenticationController {
 
   @HttpCode(HttpStatus.OK)
   @Post('login')
-  async login(@Body() loginDto: LoginDto, @Res() res: FastifyReply) {
+  async login(@Body() loginDto: LoginDto, @Res() reply: FastifyReply) {
     const jwt: Awaited<Promise<string>> = await this.authentificationService.login(loginDto);
     const cookieKey = this.configService.getOrThrow<string>(COOKIE_NAME);
 
-    return res
+    return reply
       .cookie(cookieKey, jwt, {
         httpOnly: true,
         sameSite: true,
@@ -29,7 +29,7 @@ export class AuthenticationController {
   }
 
   @Get('logout')
-  async logout(@Res({ passthrough: true }) res: FastifyReply) {
-    return res.clearCookie(COOKIE_NAME).send();
+  async logout(@Res({ passthrough: true }) reply: FastifyReply) {
+    return reply.clearCookie(COOKIE_NAME).send();
   }
 }

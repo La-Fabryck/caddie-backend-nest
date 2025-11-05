@@ -4,11 +4,11 @@ import { configureApp } from '@/app.configurator';
 import { AppModule } from '@/app.module';
 
 async function createAppE2E(): Promise<NestFastifyApplication> {
-  const moduleRef = await Test.createTestingModule({
+  const moduleReference = await Test.createTestingModule({
     imports: [AppModule],
   }).compile();
 
-  const app: NestFastifyApplication = moduleRef.createNestApplication(new FastifyAdapter());
+  const app: NestFastifyApplication = moduleReference.createNestApplication(new FastifyAdapter());
   await configureApp(app);
 
   await app.init();

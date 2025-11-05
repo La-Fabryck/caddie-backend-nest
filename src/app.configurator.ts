@@ -12,20 +12,21 @@ async function configureApp(app: NestFastifyApplication): Promise<void> {
     new ValidationPipe({
       whitelist: true,
       exceptionFactory: (errors) => {
-        const result = errors.reduce<Record<string, ErrorInterfaceBody[]>>((accumulator, currentValue) => {
-          const formattedErrors: ErrorInterfaceBody[] = Object.entries(currentValue.constraints ?? {}).map(([_key, value]) => {
+        const result: Record<string, ErrorInterfaceBody[]> = {};
+
+        for (const error of errors) {
+          const formattedErrors: ErrorInterfaceBody[] = Object.entries(error.constraints ?? {}).map(([_key, value]) => {
             return {
               message: value,
             };
           });
 
-          accumulator[currentValue.property] = formattedErrors;
-          return accumulator;
-        }, {});
+          result[error.property] = formattedErrors;
+        }
+
         return new BadRequestException(result);
       },
     }),
   );
 }
-
 export { configureApp };
