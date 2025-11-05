@@ -5,7 +5,7 @@ NEST_FASTIFY_VERSION := $(shell npm info @nestjs/platform-fastify dependencies.f
 # Update all dependencies and sync fastify, with grouped formatting
 update:
 	@echo "Updating dependencies (except Fastify)..."
-	docker compose run --no-deps --rm backend npx npm-check-updates -u -i -x fastify --format group
+	docker compose run --no-deps --rm backend npx --yes npm-check-updates -u -i -x fastify --format group
 	@echo "Syncing Fastify version to match @nestjs/platform-fastify..."
 	docker compose run --no-deps --rm backend npm install fastify@$(NEST_FASTIFY_VERSION)
 	@echo "Update complete! Fastify synced to: $(NEST_FASTIFY_VERSION)"
