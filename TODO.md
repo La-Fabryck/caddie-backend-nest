@@ -12,6 +12,7 @@ Later'ish :
 - Small cache for users
 - Use Zod as validator ? [Zod Integration](https://docs.nestjs.com/pipes#object-schema-validation)
 - Migrate to ~~Knex~~ [Kysely](https://kysely.dev/), with CQRS architecture
+- Move Auth user from Fastify Request to [NestJS LocalStorage](https://docs.nestjs.com/recipes/async-local-storage)
 
 Later :
 
