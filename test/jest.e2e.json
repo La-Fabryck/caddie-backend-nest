@@ -6,6 +6,7 @@
     "^(\\.{1,2}/.*)\\.js$": "$1",
     "@/(.*)": "<rootDir>/src/$1"
   },
+  "setupFilesAfterEnv": ["./test/jest.setup.ts"],
   "testEnvironment": "node",
   "testRegex": ".e2e-spec.ts$",
   "transform": {
