@@ -52,6 +52,9 @@ else
 	docker compose run --rm backend npm run test:e2e
 endif
 
+e2e-watch:
+	docker compose run --rm backend npm run test:watch
+
 # Help target
 # Help target
 help:

@@ -24,10 +24,10 @@
     "lint:fix": "eslint --fix \"{src,apps,libs,test}/**/*.ts\"",
     "db:deploy": "npx prisma migrate deploy && npx prisma generate",
     "test": "jest",
-    "test:watch": "jest --watch",
+    "test:watch": "NODE_ENV=test node --experimental-vm-modules node_modules/jest/bin/jest.js --config ./test/jest.e2e.json --runInBand --watchAll",
     "test:cov": "jest --coverage",
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
-    "test:e2e": "node --experimental-vm-modules node_modules/jest/bin/jest.js --config ./test/jest-e2e.json"
+    "test:e2e": "NODE_ENV=test node --experimental-vm-modules node_modules/jest/bin/jest.js --config ./test/jest.e2e.json"
   },
   "dependencies": {
     "@fastify/cookie": "^11.0.2",
