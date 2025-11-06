@@ -3,6 +3,7 @@ import { JwtService } from '@nestjs/jwt';
 import { type NestFastifyApplication } from '@nestjs/platform-fastify';
 import { type ErrorInterface } from '@/app.configurator';
 import { type JwtPayload } from '@/users/authentication/authentication.service';
+import { type LoginDto } from '@/users/dto/login.dto';
 import { createAppE2E } from './create-app.e2e';
 import { resourceCreator } from './creator/resource-creator';
 import { createUser } from './factories/user';
@@ -16,12 +17,13 @@ describe('AuthenticationController (e2e)', () => {
   });
 
   it('/authentication/login (POST) - OK - Log in the user', async () => {
-    await using creator = await resourceCreator(app);
+    await using creator = await resourceCreator(app, { loginUser: false });
+    const login: LoginDto = creator.user;
 
     const result = await app.inject({
       method: 'POST',
       url: '/authentication/login',
-      body: creator.user,
+      body: login,
     });
 
     expect(result.statusCode).toEqual(HttpStatus.OK);

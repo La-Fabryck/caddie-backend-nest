@@ -66,7 +66,7 @@ describe('UserController (e2e)', () => {
   });
 
   it('/users (POST) - KO - User already exists', async () => {
-    await using creator = await resourceCreator(app);
+    await using creator = await resourceCreator(app, { loginUser: false });
 
     const result = await app.inject({
       method: 'POST',
