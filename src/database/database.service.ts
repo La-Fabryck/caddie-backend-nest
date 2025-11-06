@@ -5,7 +5,7 @@ import { type Prisma, PrismaClient } from '@prisma/client';
 export class DatabaseService extends PrismaClient<Prisma.PrismaClientOptions, Prisma.LogLevel> implements OnModuleInit {
   constructor() {
     super({
-      log: ['query', 'info', 'warn', 'error'],
+      log: process.env['NODE_ENV'] === 'test' ? ['error'] : ['query', 'info', 'warn', 'error'],
     });
   }
 
