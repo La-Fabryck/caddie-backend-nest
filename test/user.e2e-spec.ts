@@ -35,9 +35,7 @@ describe('UserController (e2e)', () => {
     const result = await app.inject({
       method: 'POST',
       url: '/users',
-      body: {
-        email: 'toto',
-      },
+      body: {},
     });
 
     expect(result.statusCode).toEqual(HttpStatus.BAD_REQUEST);
