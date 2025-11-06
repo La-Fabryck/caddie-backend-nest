@@ -15,7 +15,7 @@ export class ListController {
   @UseInterceptors(AuthenticationInterceptor)
   @Post()
   async create(@Body() createListDto: CreateListDto, @CurrentUser() user: User) {
-    return this.listService.createList({
+    return this.listService.create({
       title: createListDto.title,
       pseudonym: createListDto.pseudonym,
       user,

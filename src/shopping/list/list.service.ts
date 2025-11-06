@@ -4,7 +4,7 @@ import { DatabaseService } from '@/database/database.service';
 import { CreateListDto } from '../dto/create-list.dto';
 import { SubscribersService } from '../subscriber/subscribers.service';
 
-type CreateList = CreateListDto & { user: User };
+export type CreateList = CreateListDto & { user: User };
 
 type UpdateListPayload = Pick<List, 'id'> & Partial<Pick<List, 'title'>>;
 type UpdateList = { payload: UpdateListPayload; user: User };
@@ -20,7 +20,7 @@ export class ListService {
     private readonly subscribersService: SubscribersService,
   ) {}
 
-  async createList({ user, pseudonym, title }: CreateList): Promise<ListWithSubs> {
+  async create({ user, pseudonym, title }: CreateList): Promise<ListWithSubs> {
     return this.database.$transaction(async (transaction) => {
       const list: List = await transaction.list.create({
         data: { title },
