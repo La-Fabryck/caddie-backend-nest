@@ -3,9 +3,9 @@ import { type NestFastifyApplication } from '@nestjs/platform-fastify';
 import { type User } from '@prisma/client';
 import { type ErrorInterface } from '@/app.configurator';
 import { type CreateUserDto } from '@/users/dto/create-user.dto';
-import { createAppE2E } from './create-app.e2e';
-import { resourceCreator } from './creator/resource-creator';
-import { createUser } from './factories/user';
+import { resourceCreator } from 'test/creator/resource-creator';
+import { createUser } from 'test/factories/user';
+import { createAppE2E } from 'test/support/create-app.e2e';
 
 describe('UserController (e2e)', () => {
   let app: NestFastifyApplication;

@@ -3,7 +3,6 @@
   "modulePaths": ["<rootDir>"],
   "rootDir": "./..",
   "moduleNameMapper": {
-    "^(\\.{1,2}/.*)\\.js$": "$1",
     "@/(.*)": "<rootDir>/src/$1"
   },
   "setupFilesAfterEnv": ["./test/jest.setup.ts"],
@@ -17,10 +16,14 @@
           "transform": {
             "legacyDecorator": true,
             "decoratorMetadata": true
+          },
+          "paths": {
+            "@/*": ["src/*"],
+            "test/*": ["test/*"]
           }
         }
       }
     ]
   },
-  "extensionsToTreatAsEsm": [".ts", ".tsx"]
+  "extensionsToTreatAsEsm": [".ts"]
 }

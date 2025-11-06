@@ -6,8 +6,8 @@ import { type ErrorInterface } from '@/app.configurator';
 import { type CreateListDto } from '@/shopping/dto/create-list.dto';
 import { type UpdateListDto } from '@/shopping/dto/update-list.dto';
 import { ListService, type ListWithSubs } from '@/shopping/list/list.service';
-import { createAppE2E } from './create-app.e2e';
-import { resourceCreator } from './creator/resource-creator';
+import { resourceCreator } from 'test/creator/resource-creator';
+import { createAppE2E } from 'test/support/create-app.e2e';
 
 describe('ListController (e2e)', () => {
   let app: NestFastifyApplication;
