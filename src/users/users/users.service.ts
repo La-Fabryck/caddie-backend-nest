@@ -66,6 +66,12 @@ export class UsersService {
   }
 
   async remove(id: string) {
+    await this.database.subscriber.deleteMany({
+      where: {
+        userId: id,
+      },
+    });
+
     await this.database.user.delete({
       where: {
         id,
