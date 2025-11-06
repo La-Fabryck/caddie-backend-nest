@@ -14,10 +14,10 @@ export class ListController {
   @UseGuards(AuthenticationGuard)
   @UseInterceptors(AuthenticationInterceptor)
   @Post()
-  async create(@Body() createShoppingDto: CreateListDto, @CurrentUser() user: User) {
+  async create(@Body() createListDto: CreateListDto, @CurrentUser() user: User) {
     return this.listService.createList({
-      title: createShoppingDto.title,
-      pseudonym: createShoppingDto.pseudonym,
+      title: createListDto.title,
+      pseudonym: createListDto.pseudonym,
       user,
     });
   }
