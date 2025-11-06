@@ -138,6 +138,7 @@ export default tseslint.config(
           ignore: ['\\.e2e(-spec)?$'],
         },
       ],
+      'unicorn/explicit-length-check': 'off',
 
       // <----- unicorn rules
 
