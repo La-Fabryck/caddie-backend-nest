@@ -114,6 +114,8 @@ export default tseslint.config(
 
       // Disallow unused variables.
       // Override typescript-eslint recommended config to allow unused variables starting with _
+      // Note: you must disable the base rule as it can report incorrect errors
+      'no-unused-vars': 'off',
       '@typescript-eslint/no-unused-vars': [
         'error',
         {
