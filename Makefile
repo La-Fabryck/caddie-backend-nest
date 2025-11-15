@@ -1,4 +1,4 @@
-.PHONY: update sync-fastify install versions dedupe lint-fix lint-show e2e help 
+.PHONY: update sync-fastify install versions dedupe lint-fix lint e2e sloc sloc-details help 
 
 NEST_FASTIFY_VERSION := $(shell npm info @nestjs/platform-fastify dependencies.fastify)
 
@@ -41,8 +41,8 @@ dedupe:
 lint-fix:
 	docker compose run --no-deps --rm backend npm run lint:fix
 
-lint-show:
-	docker compose run --no-deps --rm backend npm run lint:show
+lint:
+	docker compose run --no-deps --rm backend npm run lint
 
 # e2e with optional pattern
 e2e:
@@ -55,6 +55,12 @@ endif
 e2e-watch:
 	docker compose run --rm backend npm run test:watch
 
+sloc:
+	npx sloc . --exclude node_modules --exclude "node_modules|dist"
+
+sloc-details:
+	npx sloc . --exclude node_modules --exclude "node_modules|dist" --details
+
 # Help target
 # Help target
 help:
@@ -63,9 +69,11 @@ help:
 	@echo "  update          - Update all dependencies and sync fastify"
 	@echo "  sync-fastify    - Just sync Fastify version without other updates"
 	@echo "  versions        - Show current Fastify package versions"
-	@echo "  lint-show       - Invoke lint:show command"
+	@echo "  lint            - Invoke lint:show command"
 	@echo "  lint-fix        - Invoke lint:fix command"
 	@echo "  dedupe          - Reduce duplication in the package tree"
 	@echo "  e2e             - Run all e2e tests"
 	@echo "  e2e p=<pattern> - Run e2e tests matching pattern (e.g.: make e2e p=user)"
+	@echo "  sloc            - Count lines of code"
+	@echo "  sloc-details    - Count lines of code with details"
 	
