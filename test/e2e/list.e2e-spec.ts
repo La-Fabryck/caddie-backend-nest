@@ -7,6 +7,7 @@ import { type CreateListDto } from '@/shopping/dto/create-list.dto';
 import { type UpdateListDto } from '@/shopping/dto/update-list.dto';
 import { ListService, type ListWithSubs } from '@/shopping/list/list.service';
 import { resourceCreator } from 'test/creator/resource-creator';
+import { SINGLE } from 'test/support/constants';
 import { createAppE2E } from 'test/support/create-app.e2e';
 
 describe('ListController (e2e)', () => {
@@ -15,6 +16,10 @@ describe('ListController (e2e)', () => {
   beforeAll(async () => {
     app = await createAppE2E();
     await app.getHttpAdapter().getInstance().ready();
+  });
+
+  afterAll(async () => {
+    await app.close();
   });
 
   describe('/list (POST)', () => {
@@ -70,7 +75,7 @@ describe('ListController (e2e)', () => {
 
   describe('/list (GET)', () => {
     it('OK - Finds list from a User', async () => {
-      await using creator = await resourceCreator(app, { listQuantity: faker.number.int({ min: 1, max: 3 }) });
+      await using creator = await resourceCreator(app, { list: { quantity: SINGLE } });
 
       const result = await app.inject({
         method: 'GET',
@@ -101,7 +106,7 @@ describe('ListController (e2e)', () => {
 
   describe('/list/:id (GET)', () => {
     it('OK - Finds a list by its id', async () => {
-      await using creator = await resourceCreator(app, { listQuantity: faker.number.int({ min: 1, max: 1 }) });
+      await using creator = await resourceCreator(app, { list: { quantity: SINGLE } });
       const [storedList] = creator.lists;
 
       const result = await app.inject({
@@ -126,7 +131,7 @@ describe('ListController (e2e)', () => {
     });
 
     it('KO - Returns Not Found for non-existent resource', async () => {
-      await using creator = await resourceCreator(app, { listQuantity: faker.number.int({ min: 1, max: 1 }) });
+      await using creator = await resourceCreator(app);
 
       const result = await app.inject({
         method: 'GET',
@@ -140,7 +145,7 @@ describe('ListController (e2e)', () => {
 
   describe('/list/:id (PATCH)', () => {
     it('OK - Update a list', async () => {
-      await using creator = await resourceCreator(app, { listQuantity: faker.number.int({ min: 1, max: 1 }) });
+      await using creator = await resourceCreator(app, { list: { quantity: SINGLE } });
       const [storedList] = creator.lists;
 
       const updatePayload: UpdateListDto = {
@@ -171,7 +176,7 @@ describe('ListController (e2e)', () => {
     });
 
     it('KO - Returns Not Found for non-existent resource', async () => {
-      await using creator = await resourceCreator(app, { listQuantity: faker.number.int({ min: 1, max: 1 }) });
+      await using creator = await resourceCreator(app);
 
       const result = await app.inject({
         method: 'PATCH',
@@ -184,8 +189,8 @@ describe('ListController (e2e)', () => {
   });
 
   describe('/list/:id (DELETE)', () => {
-    it('OK - Update a list', async () => {
-      await using creator = await resourceCreator(app, { listQuantity: faker.number.int({ min: 1, max: 1 }) });
+    it('OK - Delete a list', async () => {
+      await using creator = await resourceCreator(app, { list: { quantity: SINGLE, remove: false } });
       const [storedList] = creator.lists;
 
       const result = await app.inject({
@@ -211,7 +216,7 @@ describe('ListController (e2e)', () => {
     });
 
     it('KO - Returns Not Found for non-existent resource', async () => {
-      await using creator = await resourceCreator(app, { listQuantity: faker.number.int({ min: 1, max: 1 }) });
+      await using creator = await resourceCreator(app);
 
       const result = await app.inject({
         method: 'DELETE',
@@ -221,9 +226,5 @@ describe('ListController (e2e)', () => {
 
       expect(result.statusCode).toEqual(HttpStatus.NOT_FOUND);
     });
-  });
-
-  afterAll(async () => {
-    await app.close();
   });
 });

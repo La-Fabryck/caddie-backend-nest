@@ -16,6 +16,10 @@ describe('AuthenticationController (e2e)', () => {
     await app.getHttpAdapter().getInstance().ready();
   });
 
+  afterAll(async () => {
+    await app.close();
+  });
+
   it('/authentication/login (POST) - OK - Log in the user', async () => {
     await using creator = await resourceCreator(app, { loginUser: false });
     const login: LoginDto = creator.user;
@@ -66,9 +70,5 @@ describe('AuthenticationController (e2e)', () => {
 
     const response = JSON.parse(result.body) as ErrorInterface;
     expect(response).toStrictEqual({ root: [{ message: 'INVALID_LOGIN' }] });
-  });
-
-  afterAll(async () => {
-    await app.close();
   });
 });

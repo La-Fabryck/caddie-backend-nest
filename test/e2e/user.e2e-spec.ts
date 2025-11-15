@@ -15,6 +15,10 @@ describe('UserController (e2e)', () => {
     await app.getHttpAdapter().getInstance().ready();
   });
 
+  afterAll(async () => {
+    await app.close();
+  });
+
   it('/users (POST) - OK - Creates a user', async () => {
     const fakeUser: CreateUserDto = createUser();
 
@@ -73,9 +77,5 @@ describe('UserController (e2e)', () => {
     });
 
     expect(result.statusCode).toEqual(HttpStatus.FORBIDDEN);
-  });
-
-  afterAll(async () => {
-    await app.close();
   });
 });
