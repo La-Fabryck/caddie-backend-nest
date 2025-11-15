@@ -149,3 +149,9 @@ and
 ```
 
 `@fastify/cookie` needs to match the version required
+
+## Start the Test debugger with Docker
+
+1. Start the app with `docker compose up`
+2. Start the `Debug Jest E2E Tests` debugger
+3. Run the test with `docker compose exec backend npm run test:debug`
