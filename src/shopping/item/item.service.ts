@@ -5,7 +5,7 @@ import { CreateItemDto } from '../dto/create-item.dto';
 import { UpdateItemDto } from '../dto/update-item.dto';
 import { ListService } from '../list/list.service';
 
-type CreateItem = {
+export type CreateItem = {
   createItemPayload: CreateItemDto & Pick<Item, 'listId'>;
   user: User;
 };
@@ -77,10 +77,7 @@ export class ItemService {
   }
 
   async update({ updateItemPayload, user }: UpdateItem): Promise<Item> {
-    await this.listService.findOneById({
-      id: updateItemPayload.listId,
-      user,
-    });
+    await this.findOne({ itemId: updateItemPayload.id, listId: updateItemPayload.listId, user });
 
     return this.database.$transaction(async (transaction) => {
       await this.listService.updateDate(updateItemPayload.listId, transaction);
@@ -97,13 +94,8 @@ export class ItemService {
     });
   }
 
-  //TODO: Implement
-
   async remove(listId: string, itemId: string, user: User) {
-    await this.listService.findOneById({
-      id: listId,
-      user,
-    });
+    await this.findOne({ itemId, listId, user });
 
     await this.database.$transaction(async (transaction) => {
       await this.listService.updateDate(listId, transaction);
