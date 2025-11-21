@@ -1,6 +1,6 @@
 import { faker } from '@faker-js/faker';
-import { type CreateItemDto } from '@/shopping/dto/create-item.dto';
-import { type CreateItem } from '@/shopping/item/item.service';
+import type { CreateItemDto } from '@/shopping/dto/create-item.dto';
+import type { CreateItem } from '@/shopping/item/item.service';
 
 function createItem(listId: string, overrides: Partial<CreateItemDto> = {}): CreateItem['createItemPayload'] {
   return {

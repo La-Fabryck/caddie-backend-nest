@@ -1,6 +1,6 @@
-import { type NestFastifyApplication } from '@nestjs/platform-fastify';
-import { type Item, type User } from '@prisma/client';
-import { type InjectOptions, type Response } from 'light-my-request';
+import type { NestFastifyApplication } from '@nestjs/platform-fastify';
+import type { Item, User } from '@prisma/client';
+import type { InjectOptions, Response } from 'light-my-request';
 import { ItemService } from '@/shopping/item/item.service';
 import { ListService, type ListWithSubs } from '@/shopping/list/list.service';
 import { UsersService } from '@/users/users/users.service';

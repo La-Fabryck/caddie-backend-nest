@@ -1,10 +1,10 @@
 import { faker } from '@faker-js/faker';
 import { HttpStatus } from '@nestjs/common';
-import { type NestFastifyApplication } from '@nestjs/platform-fastify';
-import { type List } from '@prisma/client';
-import { type ErrorInterface } from '@/app.configurator';
-import { type CreateListDto } from '@/shopping/dto/create-list.dto';
-import { type UpdateListDto } from '@/shopping/dto/update-list.dto';
+import type { NestFastifyApplication } from '@nestjs/platform-fastify';
+import type { List } from '@prisma/client';
+import type { ErrorInterface } from '@/app.configurator';
+import type { CreateListDto } from '@/shopping/dto/create-list.dto';
+import type { UpdateListDto } from '@/shopping/dto/update-list.dto';
 import { ListService, type ListWithSubs } from '@/shopping/list/list.service';
 import { resourceCreator } from 'test/creator/resource-creator';
 import { SINGLE } from 'test/support/constants';

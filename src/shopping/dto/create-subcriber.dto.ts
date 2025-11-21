@@ -1,4 +1,4 @@
-import { type Subscriber } from '@prisma/client';
+import type { Subscriber } from '@prisma/client';
 import { IsUUID } from 'class-validator';
 import { IsNotBlank } from '@/lib/decorators/is-not-blank';
 import { SUBSCRIBER_NAME } from '../messages/subscriber';

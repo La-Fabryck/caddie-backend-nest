@@ -2,7 +2,7 @@ import { CanActivate, ExecutionContext, Injectable, UnauthorizedException } from
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 import { FastifyRequest } from 'fastify';
-import { type JwtPayload } from '../authentication/authentication.service';
+import type { JwtPayload } from '../authentication/authentication.service';
 import { COOKIE_NAME } from '../utils/constants';
 
 @Injectable()

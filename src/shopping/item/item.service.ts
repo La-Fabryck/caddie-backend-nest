@@ -1,11 +1,11 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { type Item, type User } from '@prisma/client';
+import type { Item, User } from '@prisma/client';
 import { DatabaseService } from '@/database/database.service';
 import { CreateItemDto } from '../dto/create-item.dto';
 import { UpdateItemDto } from '../dto/update-item.dto';
 import { ListService } from '../list/list.service';
 
-export type CreateItem = {
+type CreateItem = {
   createItemPayload: CreateItemDto & Pick<Item, 'listId'>;
   user: User;
 };
@@ -20,7 +20,7 @@ type FindItem = { listId: string; itemId: string; user: User };
 type FindItems = { listId: string; user: User };
 
 @Injectable()
-export class ItemService {
+class ItemService {
   constructor(
     private database: DatabaseService,
     private readonly listService: ListService,
@@ -108,3 +108,5 @@ export class ItemService {
     });
   }
 }
+
+export { ItemService, type CreateItem };

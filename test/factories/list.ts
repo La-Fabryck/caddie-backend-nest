@@ -1,6 +1,6 @@
 import { faker } from '@faker-js/faker';
-import { type User } from '@prisma/client';
-import { type CreateList } from '@/shopping/list/list.service';
+import type { User } from '@prisma/client';
+import type { CreateList } from '@/shopping/list/list.service';
 
 function createList(user: User, overrides: Partial<CreateList> = {}): CreateList {
   return {

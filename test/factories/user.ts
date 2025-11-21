@@ -1,5 +1,5 @@
 import { faker } from '@faker-js/faker';
-import { type User } from '@prisma/client';
+import type { User } from '@prisma/client';
 
 function createUser(overrides: Partial<User> = {}): User {
   return {

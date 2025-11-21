@@ -208,14 +208,20 @@ export default tseslint.config(
 
       // <----- eslint rules
 
-      // Style imports :
-
-      // https://typescript-eslint.io/blog/consistent-type-imports-and-exports-why-and-how/
-      // Consistently add inline `type` to imports & exports
-      '@typescript-eslint/consistent-type-exports': ['error', { fixMixedExportsWithInlineTypeSpecifier: true }],
-      '@typescript-eslint/consistent-type-imports': 'error',
-      'import-x/consistent-type-specifier-style': ['error', 'prefer-inline'],
-      'import-x/no-duplicates': ['error', { 'prefer-inline': true }],
+      // Force type imports :
+      "@typescript-eslint/consistent-type-imports": [
+        "error",
+        {
+          "prefer": "type-imports",
+          "fixStyle": "separate-type-imports"
+        }
+      ],
+      "@typescript-eslint/consistent-type-exports": [
+        "error",
+        { "fixMixedExportsWithInlineTypeSpecifier": true }
+      ],
+      "import-x/no-duplicates": "error", // Without prefer-inline
+      "@typescript-eslint/no-import-type-side-effects": "error",
 
       // Alphabetical order imports
       'import-x/order': [

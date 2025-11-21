@@ -1,9 +1,9 @@
 import { HttpStatus } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
-import { type NestFastifyApplication } from '@nestjs/platform-fastify';
-import { type ErrorInterface } from '@/app.configurator';
-import { type JwtPayload } from '@/users/authentication/authentication.service';
-import { type LoginDto } from '@/users/dto/login.dto';
+import type { NestFastifyApplication } from '@nestjs/platform-fastify';
+import type { ErrorInterface } from '@/app.configurator';
+import type { JwtPayload } from '@/users/authentication/authentication.service';
+import type { LoginDto } from '@/users/dto/login.dto';
 import { resourceCreator } from 'test/creator/resource-creator';
 import { createUser } from 'test/factories/user';
 import { createAppE2E } from 'test/support/create-app.e2e';

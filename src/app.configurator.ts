@@ -1,6 +1,6 @@
 import { fastifyCookie } from '@fastify/cookie';
 import { BadRequestException, ValidationPipe } from '@nestjs/common';
-import { type NestFastifyApplication } from '@nestjs/platform-fastify';
+import type { NestFastifyApplication } from '@nestjs/platform-fastify';
 
 type ErrorInterfaceBody = { message: string };
 export type ErrorInterface = Record<string, ErrorInterfaceBody[]>;

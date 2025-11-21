@@ -1,4 +1,4 @@
-import { type List } from '@prisma/client';
+import type { List } from '@prisma/client';
 import { IsNotBlank } from '@/lib/decorators/is-not-blank';
 import { LIST_PSEUDONYM, LIST_TITLE } from '../messages/list';
 

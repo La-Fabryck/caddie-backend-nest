@@ -1,6 +1,6 @@
 import { createParamDecorator, type ExecutionContext } from '@nestjs/common';
-import { type User } from '@prisma/client';
-import { type FastifyRequest } from 'fastify';
+import type { User } from '@prisma/client';
+import type { FastifyRequest } from 'fastify';
 
 export const CurrentUser = createParamDecorator((_data: null, context: ExecutionContext): User => {
   const request: FastifyRequest = context.switchToHttp().getRequest();

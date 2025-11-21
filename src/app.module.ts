@@ -1,6 +1,6 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
-import { type User } from '@prisma/client';
+import type { User } from '@prisma/client';
 import { DatabaseModule } from './database/database.module';
 import { ShoppingModule } from './shopping/shopping.module';
 import { UsersModule } from './users/users.module';

@@ -1,6 +1,6 @@
 import { Body, Controller, Get, HttpCode, HttpStatus, Post, Res } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { type FastifyReply } from 'fastify';
+import type { FastifyReply } from 'fastify';
 import { LoginDto } from '../dto/login.dto';
 import { COOKIE_NAME } from '../utils/constants';
 import { AuthenticationService } from './authentication.service';

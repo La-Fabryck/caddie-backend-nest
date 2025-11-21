@@ -1,8 +1,8 @@
 import { HttpStatus } from '@nestjs/common';
-import { type NestFastifyApplication } from '@nestjs/platform-fastify';
-import { type User } from '@prisma/client';
-import { type ErrorInterface } from '@/app.configurator';
-import { type CreateUserDto } from '@/users/dto/create-user.dto';
+import type { NestFastifyApplication } from '@nestjs/platform-fastify';
+import type { User } from '@prisma/client';
+import type { ErrorInterface } from '@/app.configurator';
+import type { CreateUserDto } from '@/users/dto/create-user.dto';
 import { resourceCreator } from 'test/creator/resource-creator';
 import { createUser } from 'test/factories/user';
 import { createAppE2E } from 'test/support/create-app.e2e';
