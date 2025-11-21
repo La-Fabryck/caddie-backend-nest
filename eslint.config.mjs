@@ -1,13 +1,12 @@
 // @ts-check
 import eslint from '@eslint/js';
-import * as tsParser from '@typescript-eslint/parser';
 import { createTypeScriptImportResolver } from 'eslint-import-resolver-typescript';
 import eslintPluginImportX from 'eslint-plugin-import-x';
 import eslintPluginUnicorn from 'eslint-plugin-unicorn';
 import eslintPluginPrettierRecommended from 'eslint-plugin-prettier/recommended';
 import unusedImports from 'eslint-plugin-unused-imports';
 import globals from 'globals';
-import tseslint, { configs as tsconfigs } from 'typescript-eslint';
+import tseslint from 'typescript-eslint';
 
 // FIXME: incompatible with https://typescript-eslint.io/packages/typescript-eslint/#config-deprecated
 // Because : https://github.com/un-ts/eslint-plugin-import-x/issues/421
@@ -17,7 +16,7 @@ export default tseslint.config(
     ignores: ['eslint.config.mjs'],
   },
   eslint.configs.recommended,
-  ...tsconfigs.strictTypeChecked,
+  ...tseslint.configs.strictTypeChecked,
   eslintPluginImportX.flatConfigs.recommended,
   eslintPluginImportX.flatConfigs.typescript,
   eslintPluginPrettierRecommended,
@@ -29,7 +28,7 @@ export default tseslint.config(
         ...globals.jest,
       },
 
-      parser: tsParser,
+      parser: tseslint.parser,
       ecmaVersion: 'latest',
       sourceType: 'module',
 
