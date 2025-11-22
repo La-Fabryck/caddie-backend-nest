@@ -56,10 +56,10 @@ e2e-watch:
 	docker compose run --rm backend npm run test:watch
 
 sloc:
-	npx sloc --format cli-table --format-option head --exclude "node_modules|dist|coverage" ./
+	docker compose run --no-deps --rm backend npx --yes sloc --format cli-table --format-option head --exclude "node_modules|dist|coverage" ./
 
 sloc-details:
-	npx sloc . --exclude node_modules --exclude "node_modules|dist|coverage" --details
+	docker compose run --no-deps --rm backend npx --yes sloc . --exclude node_modules --exclude "node_modules|dist|coverage" --details
 
 # Help target
 # Help target
