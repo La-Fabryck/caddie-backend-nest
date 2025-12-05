@@ -13,7 +13,7 @@ import tseslint from 'typescript-eslint';
 // And : https://github.com/typescript-eslint/typescript-eslint/issues/11543
 export default tseslint.config(
   {
-    ignores: ['eslint.config.mjs'],
+    ignores: ['eslint.config.mjs', './dist/*', './coverage/*'],
   },
   eslint.configs.recommended,
   ...tseslint.configs.strictTypeChecked,

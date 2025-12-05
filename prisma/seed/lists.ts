@@ -1,5 +1,5 @@
 import { faker } from '@faker-js/faker';
-import { type List, type PrismaClient } from '@prisma/client';
+import type { List, PrismaClient } from '@prisma/client';
 
 function createOneList(): List {
   return {
@@ -13,12 +13,12 @@ function createOneList(): List {
 export async function insertLists(prisma: PrismaClient, uuids: string[]) {
   const lists: List[] = [{ ...createOneList(), id: 'a347a2d7-c40a-4c19-9c6c-f8c84144cd1c' }];
 
-  uuids.forEach(() => {
+  for (const _uuid of uuids) {
     const listsToCreateForUser = faker.number.int({ min: 1, max: 10 });
-    for (let i = 0; i <= listsToCreateForUser; i++) {
+    for (let index = 0; index <= listsToCreateForUser; index++) {
       lists.push(createOneList());
     }
-  });
+  }
 
   await prisma.list.createMany({
     data: lists,

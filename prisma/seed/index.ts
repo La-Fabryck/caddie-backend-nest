@@ -35,9 +35,10 @@ main()
   .then(() => {
     console.log('Seed completed !');
   })
-  .catch((e: unknown) => {
-    console.error(e);
+  .catch((error: unknown) => {
+    console.error(error);
   })
+  // eslint-disable-next-line unicorn/prefer-top-level-await
   .finally(() => {
     void (async () => {
       await prisma.$disconnect();
