@@ -33,7 +33,7 @@
     "@nestjs/common": "^11.1.9",
     "@nestjs/config": "^4.0.2",
     "@nestjs/core": "^11.1.9",
-    "@nestjs/jwt": "^11.0.1",
+    "@nestjs/jwt": "^11.0.2",
     "@nestjs/mapped-types": "^2.1.0",
     "@nestjs/platform-fastify": "^11.1.9",
     "@prisma/client": "^6.19.0",
@@ -66,14 +66,14 @@
     "globals": "^16.5.0",
     "jest": "^30.2.0",
     "light-my-request": "^6.6.0",
-    "prettier": "^3.7.3",
+    "prettier": "^3.7.4",
     "prisma": "^6.19.0",
     "source-map-support": "^0.5.21",
     "ts-loader": "^9.5.4",
     "ts-node": "^10.9.2",
     "tsconfig-paths": "^4.2.0",
     "typescript": "^5.9.3",
-    "typescript-eslint": "^8.48.0"
+    "typescript-eslint": "^8.48.1"
   },
   "jest": {
     "moduleFileExtensions": [
