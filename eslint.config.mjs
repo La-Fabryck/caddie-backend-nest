@@ -1,5 +1,6 @@
 // @ts-check
 import eslint from '@eslint/js';
+import { defineConfig } from 'eslint/config';
 import eslintPluginPerfectionist from 'eslint-plugin-perfectionist';
 import eslintPluginUnicorn from 'eslint-plugin-unicorn';
 import eslintPluginPrettierRecommended from 'eslint-plugin-prettier/recommended';
@@ -7,7 +8,7 @@ import unusedImports from 'eslint-plugin-unused-imports';
 import globals from 'globals';
 import tseslint from 'typescript-eslint';
 
-export default tseslint.config(
+export default defineConfig(
   {
     ignores: ['eslint.config.mjs', './dist/*', './coverage/*'],
   },
