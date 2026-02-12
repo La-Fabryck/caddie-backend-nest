@@ -1,24 +1,18 @@
 // @ts-check
 import eslint from '@eslint/js';
-import { createTypeScriptImportResolver } from 'eslint-import-resolver-typescript';
-import eslintPluginImportX from 'eslint-plugin-import-x';
+import eslintPluginPerfectionist from 'eslint-plugin-perfectionist';
 import eslintPluginUnicorn from 'eslint-plugin-unicorn';
 import eslintPluginPrettierRecommended from 'eslint-plugin-prettier/recommended';
 import unusedImports from 'eslint-plugin-unused-imports';
 import globals from 'globals';
 import tseslint from 'typescript-eslint';
 
-// FIXME: incompatible with https://typescript-eslint.io/packages/typescript-eslint/#config-deprecated
-// Because : https://github.com/un-ts/eslint-plugin-import-x/issues/421
-// And : https://github.com/typescript-eslint/typescript-eslint/issues/11543
 export default tseslint.config(
   {
     ignores: ['eslint.config.mjs', './dist/*', './coverage/*'],
   },
   eslint.configs.recommended,
   ...tseslint.configs.strictTypeChecked,
-  eslintPluginImportX.flatConfigs.recommended,
-  eslintPluginImportX.flatConfigs.typescript,
   eslintPluginPrettierRecommended,
   eslintPluginUnicorn.configs.recommended,
   {
@@ -38,17 +32,8 @@ export default tseslint.config(
       },
     },
 
-    settings: {
-      'import-x/resolver-next': [
-        createTypeScriptImportResolver({
-          alwaysTryTypes: true,
-          project: '<root>/tsconfig.json',
-          extensions: ['.js', '.ts'],
-        }),
-      ],
-    },
-
     plugins: {
+      perfectionist: eslintPluginPerfectionist,
       'unused-imports': unusedImports,
     },
 
@@ -208,7 +193,7 @@ export default tseslint.config(
 
       // <----- eslint rules
 
-      // Force type imports :
+      // Force type imports:
       "@typescript-eslint/consistent-type-imports": [
         "error",
         {
@@ -220,33 +205,31 @@ export default tseslint.config(
         "error",
         { "fixMixedExportsWithInlineTypeSpecifier": true }
       ],
-      "import-x/no-duplicates": "error", // Without prefer-inline
+      "no-duplicate-imports": "error",
       "@typescript-eslint/no-import-type-side-effects": "error",
 
-      // Alphabetical order imports
-      'import-x/order': [
+      // Sort imports (perfectionist replaces import-x/order)
+      'perfectionist/sort-imports': [
         'error',
         {
-          groups: ['builtin', 'external', 'internal', 'parent', 'sibling', 'index'],
-
-          pathGroups: [
-            {
-              pattern: '@/**',
-              group: 'internal',
-            },
-          ],
-
-          alphabetize: {
-            order: 'asc',
-            caseInsensitive: true,
-          },
-        },
-      ],
-      'sort-imports': [
-        'error',
-        {
+          type: 'alphabetical',
+          order: 'asc',
           ignoreCase: true,
-          ignoreDeclarationSort: true,
+          internalPattern: ['^~/.+', '^@/.+'],
+          // Type and value together per category → alphabetical by path (e.g. @faker before @prisma)
+          groups: [
+            ['type-builtin', 'value-builtin'],
+            ['type-external', 'value-external'],
+            ['type-internal', 'value-internal'],
+            ['type-parent', 'type-sibling', 'type-index', 'value-parent', 'value-sibling', 'value-index'],
+            'ts-equals-import',
+            'unknown',
+          ],
+          newlinesBetween: 'ignore',
+          tsconfig: {
+            rootDir: import.meta.dirname,
+            filename: 'tsconfig.json',
+          },
         },
       ],
 
