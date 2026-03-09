@@ -1,8 +1,8 @@
 import { createParamDecorator, type ExecutionContext } from '@nestjs/common';
-import type { User } from '@prisma/client';
 import type { FastifyRequest } from 'fastify';
+import type { UserRow } from '@/database/database-types';
 
-export const CurrentUser = createParamDecorator((_data: null, context: ExecutionContext): User => {
+export const CurrentUser = createParamDecorator((_data: null, context: ExecutionContext): UserRow => {
   const request: FastifyRequest = context.switchToHttp().getRequest();
 
   if (request.user == null) {

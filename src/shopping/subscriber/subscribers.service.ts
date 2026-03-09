@@ -1,51 +1,42 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { Prisma, Subscriber, User } from '@prisma/client';
+import type { Kysely } from 'kysely';
+import type { DB, SubscriberRow, UserRow } from '@/database/database-types';
 import { DatabaseService } from '@/database/database.service';
 import { CreateSubcriberDto } from '../dto/create-subcriber.dto';
 import { UpdateSubcriberDto } from '../dto/update-subcriber.dto';
 
-type CreateSubcriber = CreateSubcriberDto & { user: User };
+type CreateSubcriber = CreateSubcriberDto & { user: UserRow };
 
 @Injectable()
 export class SubscribersService {
-  constructor(private database: DatabaseService) {}
+  constructor(private readonly database: DatabaseService) {}
 
-  async create({ listId, name, user }: CreateSubcriber, tx: Prisma.TransactionClient) {
-    //TODO: validate ?
-    // try {
-    //   await this.listService.findOneById({
-    //     id: listId,
-    //   });
-    // } catch (ex) {
-    //   if (ex instanceof NotFoundException) {
-    //     throw new ForbiddenException();
-    //   }
-    // }
-
-    return tx.subscriber.create({
-      data: {
-        name,
+  async create({ listId, name, user }: CreateSubcriber, tx: Kysely<DB>): Promise<SubscriberRow> {
+    //TODO: Check if the subscriber already exists. What validation should we do?
+    const row = await tx
+      .insertInto('Subscriber')
+      .values({
         listId,
         userId: user.id,
-      },
-    });
+        name,
+      })
+      .returningAll()
+      .executeTakeFirstOrThrow();
+
+    return row;
   }
 
-  async findAllByUser({ user }: { user: User }): Promise<Subscriber[]> {
-    return this.database.subscriber.findMany({
-      where: {
-        userId: user.id,
-      },
-    });
+  async findAllByUser({ user }: { user: UserRow }): Promise<SubscriberRow[]> {
+    return this.database.selectFrom('Subscriber').where('userId', '=', user.id).selectAll().execute();
   }
 
-  async findOneById({ id, user }: { id: string; user: User }) {
-    const subscription = await this.database.subscriber.findUnique({
-      where: {
-        id,
-        userId: user.id,
-      },
-    });
+  async findOneById({ id, user }: { id: string; user: UserRow }): Promise<SubscriberRow> {
+    const subscription = await this.database
+      .selectFrom('Subscriber')
+      .where('id', '=', id)
+      .where('userId', '=', user.id)
+      .selectAll()
+      .executeTakeFirst();
 
     if (subscription == null) {
       throw new NotFoundException();
@@ -54,13 +45,13 @@ export class SubscribersService {
     return subscription;
   }
 
-  async findOne({ listId, user }: { listId: string; user: User }) {
-    const subscription = await this.database.subscriber.findFirst({
-      where: {
-        listId,
-        userId: user.id,
-      },
-    });
+  async findOne({ listId, user }: { listId: string; user: UserRow }): Promise<SubscriberRow> {
+    const subscription = await this.database
+      .selectFrom('Subscriber')
+      .where('listId', '=', listId)
+      .where('userId', '=', user.id)
+      .selectAll()
+      .executeTakeFirst();
 
     if (subscription == null) {
       throw new NotFoundException();
@@ -70,15 +61,13 @@ export class SubscribersService {
   }
 
   //TODO: Implement
-
-  update(id: string, updateSubcriberDto: UpdateSubcriberDto) {
+  update(id: string, updateSubcriberDto: UpdateSubcriberDto): string {
     console.log(updateSubcriberDto.listId);
     return `This action updates a #${id} subcriber`;
   }
 
   //TODO: Implement
-
-  remove(id: string) {
+  remove(id: string): string {
     return `This action removes a #${id} subcriber`;
   }
 }

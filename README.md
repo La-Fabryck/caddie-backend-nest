@@ -18,11 +18,10 @@ docker compose pull
 docker compose build
 ```
 
-4. Install the dependencies and generate the prisma schemes
+4. Install the dependencies
 
 ```bash
-docker compose run --rm backend npm ci \
-&& docker compose run --rm backend npx prisma generate
+docker compose run --rm backend npm ci
 ```
 
 or use the makefile
@@ -34,22 +33,16 @@ make install
 5. Run the migrations
 
 ```bash
-docker compose run --rm backend npx prisma migrate dev
+docker compose run --rm backend npm run db:migrate:latest
 ```
 
-6. Seed the database
-
-```bash
-docker compose run --rm backend npx prisma db seed
-```
-
-7. Start the app
+6. Start the app
 
 ```bash
 docker compose up
 ```
 
-8. Check the node version
+7. Check the node version
 
 ```bash
 docker compose exec backend node -v
@@ -82,7 +75,47 @@ docker compose stop \
 && docker image prune -a \
 && docker container prune \
 && docker system prune -a --volumes
+
+docker compose -f docker/app/prod/compose.yml down -v
+docker compose -f docker/app/prod/compose.yml down -v --rmi all
+
+This stops all stacks, removes containers, images, build cache, and volumes (including the prod Postgres data volume).
+
+### Reset to dev environment
+
+To tear down prod and dev stacks (containers + volumes) and ensure the dev network is ready, without pruning all Docker images:
+
+```bash
+make reset-dev
 ```
+
+Then start dev with `docker compose up` (and run `npm ci` / migrations in the container if needed).
+
+### Simulate production startup
+
+From a clean slate (e.g. after the steps above):
+
+1. Create the external network (once):
+
+```bash
+docker network create caddie_network
+```
+
+2. Ensure `.env` has `DATABASE_URL` for the **compose** postgres service (backend runs inside Docker and talks to `postgres:5432`):
+
+```bash
+DATABASE_URL="postgresql://postgres:password@postgres:5432/caddie_app?schema=public"
+```
+
+3. Start the prod stack and run migrations:
+
+```bash
+./docker/app/prod/build.sh
+```
+
+The script builds, starts in detached mode, then runs migrations. Without the script (no .dockerignore): `docker compose -f docker/app/prod/compose.yml up --build`; run migrations separately with `docker compose -f docker/app/prod/compose.yml run --rm backend npm run db:migrate:kysely`.
+
+The backend container runs only `npm run start:prod`; migrations are not run on startup. Postgres data persists in the `pgcaddie` volume. To start completely fresh again, run the clean steps above (including `docker/app/prod/compose.yml ... down -v` to remove the volume).
 
 ### Update Node alpine
 

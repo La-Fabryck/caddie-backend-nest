@@ -1,5 +1,5 @@
 import { Body, Controller, Delete, Get, Param, ParseUUIDPipe, Patch, UseGuards, UseInterceptors } from '@nestjs/common';
-import type { User } from '@prisma/client';
+import type { UserRow } from '@/database/database-types';
 import { CurrentUser } from '@/users/decorators/current-user';
 import { AuthenticationGuard } from '@/users/guards/authentication.guard';
 import { AuthenticationInterceptor } from '@/users/interceptors/authentication.interceptor';
@@ -20,14 +20,14 @@ export class SubscribersController {
   @UseGuards(AuthenticationGuard)
   @UseInterceptors(AuthenticationInterceptor)
   @Get()
-  async findAll(@CurrentUser() user: User) {
+  async findAll(@CurrentUser() user: UserRow) {
     return this.subscribersService.findAllByUser({ user });
   }
 
   @UseGuards(AuthenticationGuard)
   @UseInterceptors(AuthenticationInterceptor)
   @Get(':id')
-  async findOne(@Param('id', ParseUUIDPipe) id: string, @CurrentUser() user: User) {
+  async findOne(@Param('id', ParseUUIDPipe) id: string, @CurrentUser() user: UserRow) {
     return this.subscribersService.findOneById({ id, user });
   }
 

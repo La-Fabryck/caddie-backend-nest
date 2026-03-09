@@ -217,7 +217,7 @@ export default defineConfig(
           order: 'asc',
           ignoreCase: true,
           internalPattern: ['^~/.+', '^@/.+'],
-          // Type and value together per category → alphabetical by path (e.g. @faker before @prisma)
+          // Type and value together per category → alphabetical by path (e.g. @faker before @nestjs)
           groups: [
             ['type-builtin', 'value-builtin'],
             ['type-external', 'value-external'],

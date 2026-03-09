@@ -1,5 +1,5 @@
 import { Body, Controller, Delete, Get, Param, ParseUUIDPipe, Patch, Post, UseGuards, UseInterceptors } from '@nestjs/common';
-import type { User } from '@prisma/client';
+import type { UserRow } from '@/database/database-types';
 import { CurrentUser } from '@/users/decorators/current-user';
 import { AuthenticationGuard } from '@/users/guards/authentication.guard';
 import { AuthenticationInterceptor } from '@/users/interceptors/authentication.interceptor';
@@ -14,7 +14,7 @@ export class ItemController {
   @UseGuards(AuthenticationGuard)
   @UseInterceptors(AuthenticationInterceptor)
   @Post()
-  async create(@Param('listId', ParseUUIDPipe) listId: string, @Body() createItemDto: CreateItemDto, @CurrentUser() user: User) {
+  async create(@Param('listId', ParseUUIDPipe) listId: string, @Body() createItemDto: CreateItemDto, @CurrentUser() user: UserRow) {
     return this.itemService.create({
       createItemPayload: { listId, name: createItemDto.name },
       user,
@@ -24,14 +24,18 @@ export class ItemController {
   @UseGuards(AuthenticationGuard)
   @UseInterceptors(AuthenticationInterceptor)
   @Get()
-  async findAll(@Param('listId', ParseUUIDPipe) listId: string, @CurrentUser() user: User) {
+  async findAll(@Param('listId', ParseUUIDPipe) listId: string, @CurrentUser() user: UserRow) {
     return this.itemService.findAllByListId({ listId, user });
   }
 
   @UseGuards(AuthenticationGuard)
   @UseInterceptors(AuthenticationInterceptor)
   @Get(':itemId')
-  async findOne(@Param('listId', ParseUUIDPipe) listId: string, @Param('itemId', ParseUUIDPipe) itemId: string, @CurrentUser() user: User) {
+  async findOne(
+    @Param('listId', ParseUUIDPipe) listId: string,
+    @Param('itemId', ParseUUIDPipe) itemId: string,
+    @CurrentUser() user: UserRow,
+  ) {
     return this.itemService.findOne({ itemId, listId, user });
   }
 
@@ -43,7 +47,7 @@ export class ItemController {
     @Param('listId', ParseUUIDPipe) listId: string,
     @Param('itemId', ParseUUIDPipe) itemId: string,
     @Body() updateShoppingDto: UpdateItemDto,
-    @CurrentUser() user: User,
+    @CurrentUser() user: UserRow,
   ) {
     return this.itemService.update({
       // eslint-disable-next-line @typescript-eslint/no-misused-spread
@@ -55,7 +59,11 @@ export class ItemController {
   @UseGuards(AuthenticationGuard)
   @UseInterceptors(AuthenticationInterceptor)
   @Delete(':itemId')
-  async remove(@Param('listId', ParseUUIDPipe) listId: string, @Param('itemId', ParseUUIDPipe) itemId: string, @CurrentUser() user: User) {
+  async remove(
+    @Param('listId', ParseUUIDPipe) listId: string,
+    @Param('itemId', ParseUUIDPipe) itemId: string,
+    @CurrentUser() user: UserRow,
+  ) {
     await this.itemService.remove(listId, itemId, user);
   }
 }

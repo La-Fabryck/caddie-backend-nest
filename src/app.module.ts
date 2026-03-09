@@ -1,6 +1,6 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
-import type { User } from '@prisma/client';
+import type { UserRow } from '@/database/database-types';
 import { DatabaseModule } from './database/database.module';
 import { ShoppingModule } from './shopping/shopping.module';
 import { UsersModule } from './users/users.module';
@@ -12,7 +12,7 @@ import { UsersModule } from './users/users.module';
 declare module 'fastify' {
   interface FastifyRequest {
     userId?: string;
-    user?: User;
+    user?: UserRow;
   }
 }
 

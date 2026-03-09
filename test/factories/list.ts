@@ -1,8 +1,8 @@
 import { faker } from '@faker-js/faker';
-import type { User } from '@prisma/client';
+import type { UserRow } from '@/database/database-types';
 import type { CreateList } from '@/shopping/list/list.service';
 
-function createList(user: User, overrides: Partial<CreateList> = {}): CreateList {
+function createList(user: UserRow, overrides: Partial<CreateList> = {}): CreateList {
   return {
     title: faker.food.dish(),
     pseudonym: faker.person.fullName(),
@@ -11,7 +11,7 @@ function createList(user: User, overrides: Partial<CreateList> = {}): CreateList
   };
 }
 
-function createManyLists(user: User, count: number): CreateList[] {
+function createManyLists(user: UserRow, count: number): CreateList[] {
   return Array.from({ length: count }, () => createList(user));
 }
 

@@ -2,6 +2,9 @@
 .en*
 !.env.sample
 
+# Prod Docker build copies docker/app/prod/.dockerignore here; don't commit it
+/.dockerignore
+
 # compiled output
 /dist
 /node_modules

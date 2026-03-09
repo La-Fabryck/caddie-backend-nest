@@ -1,7 +1,7 @@
 import { HttpStatus } from '@nestjs/common';
 import type { NestFastifyApplication } from '@nestjs/platform-fastify';
-import type { User } from '@prisma/client';
 import type { ErrorInterface } from '@/app.configurator';
+import type { UserRow } from '@/database/database-types';
 import type { CreateUserDto } from '@/users/dto/create-user.dto';
 import { resourceCreator } from 'test/creator/resource-creator';
 import { createUser } from 'test/factories/user';
@@ -30,7 +30,7 @@ describe('UserController (e2e)', () => {
 
     expect(result.statusCode).toEqual(HttpStatus.CREATED);
 
-    const response = JSON.parse(result.payload) as User;
+    const response = JSON.parse(result.payload) as UserRow;
     expect(response.email).toEqual(fakeUser.email);
     expect(response.name).toEqual(fakeUser.name);
   });

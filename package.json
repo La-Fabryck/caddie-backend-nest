@@ -1,14 +1,14 @@
 {
   "name": "caddie-backend-nest",
   "version": "0.2.0",
-  "description": "Backend for shopping app built with NestJS, Prisma and Fastify",
+  "description": "Backend for shopping app built with NestJS, Kysely and Fastify",
   "author": "Benjamin Fabry",
   "private": false,
   "license": "AGPL-3.0-only",
   "keywords": [
     "nestjs",
     "fastify",
-    "prisma",
+    "kysely",
     "shopping",
     "nodejs",
     "rest"
@@ -21,7 +21,8 @@
     "start:prod": "node dist/main",
     "lint": "eslint",
     "lint:fix": "eslint --fix",
-    "db:deploy": "npx prisma migrate deploy && npx prisma generate",
+    "db:migrate:latest": "kysely migrate latest",
+    "db:migrate:make": "kysely migrate make",
     "test": "jest",
     "test:watch": "node --experimental-vm-modules node_modules/jest/bin/jest.js --config ./test/jest.e2e.json --runInBand --watchAll",
     "test:cov": "node --experimental-vm-modules node_modules/jest/bin/jest.js --config ./test/jest.e2e.json --coverage",
@@ -36,11 +37,13 @@
     "@nestjs/jwt": "^11.0.2",
     "@nestjs/mapped-types": "^2.1.0",
     "@nestjs/platform-fastify": "^11.1.14",
-    "@prisma/client": "^6.19.0",
     "bcrypt": "^6.0.0",
     "class-transformer": "^0.5.1",
     "class-validator": "^0.14.3",
     "fastify": "^5.7.4",
+    "kysely": "^0.28.11",
+    "kysely-ctl": "^0.20.0",
+    "pg": "^8.18.0",
     "reflect-metadata": "^0.2.2",
     "rxjs": "^7.8.2"
   },
@@ -56,6 +59,7 @@
     "@types/bcrypt": "^6.0.0",
     "@types/jest": "30.0.0",
     "@types/node": "^24.10.1",
+    "@types/pg": "^8.16.0",
     "eslint": "^10.0.1",
     "eslint-config-prettier": "^10.1.8",
     "eslint-plugin-perfectionist": "^5.6.0",
@@ -64,9 +68,9 @@
     "eslint-plugin-unused-imports": "^4.4.1",
     "globals": "^17.3.0",
     "jest": "^30.2.0",
+    "kysely-codegen": "^0.20.0",
     "light-my-request": "^6.6.0",
     "prettier": "^3.8.1",
-    "prisma": "^6.19.0",
     "source-map-support": "^0.5.21",
     "ts-loader": "^9.5.4",
     "ts-node": "^10.9.2",
@@ -92,8 +96,5 @@
     ],
     "coverageDirectory": "../coverage",
     "testEnvironment": "node"
-  },
-  "prisma": {
-    "seed": "ts-node prisma/seed/index.ts"
   }
 }

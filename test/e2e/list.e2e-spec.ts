@@ -1,8 +1,8 @@
 import { faker } from '@faker-js/faker';
 import { HttpStatus } from '@nestjs/common';
 import type { NestFastifyApplication } from '@nestjs/platform-fastify';
-import type { List } from '@prisma/client';
 import type { ErrorInterface } from '@/app.configurator';
+import type { ListRow } from '@/database/database-types';
 import type { CreateListDto } from '@/shopping/dto/create-list.dto';
 import type { UpdateListDto } from '@/shopping/dto/update-list.dto';
 import { ListService, type ListWithSubs } from '@/shopping/list/list.service';
@@ -85,7 +85,7 @@ describe('ListController (e2e)', () => {
 
       expect(result.statusCode).toEqual(HttpStatus.OK);
 
-      const payload = JSON.parse(result.payload) as List[];
+      const payload = JSON.parse(result.payload) as ListRow[];
       expect(payload).not.toHaveLength(0);
       for (const expectedList of payload) {
         const storedList = creator.lists.find((storedList) => storedList.id === expectedList.id);
@@ -117,7 +117,7 @@ describe('ListController (e2e)', () => {
 
       expect(result.statusCode).toEqual(HttpStatus.OK);
 
-      const payload = JSON.parse(result.payload) as List;
+      const payload = JSON.parse(result.payload) as ListRow;
       expect(payload.title).toEqual(storedList.title);
     });
 
@@ -161,7 +161,7 @@ describe('ListController (e2e)', () => {
 
       expect(result.statusCode).toEqual(HttpStatus.OK);
 
-      const payload = JSON.parse(result.payload) as List;
+      const payload = JSON.parse(result.payload) as ListRow;
       expect(payload.title).toEqual(updatePayload.title);
     });
 

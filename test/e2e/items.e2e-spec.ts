@@ -1,8 +1,8 @@
 import { faker } from '@faker-js/faker';
 import { HttpStatus } from '@nestjs/common';
 import type { NestFastifyApplication } from '@nestjs/platform-fastify';
-import type { Item } from '@prisma/client';
 import type { ErrorInterface } from '@/app.configurator';
+import type { ItemRow } from '@/database/database-types';
 import type { CreateItemDto } from '@/shopping/dto/create-item.dto';
 import type { UpdateItemDto } from '@/shopping/dto/update-item.dto';
 import { ItemService } from '@/shopping/item/item.service';
@@ -39,7 +39,7 @@ describe('ItemController (e2e)', () => {
       });
       expect(result.statusCode).toEqual(HttpStatus.CREATED);
 
-      const payload = JSON.parse(result.payload) as Item;
+      const payload = JSON.parse(result.payload) as ItemRow;
       expect(payload.name).toEqual(item.name);
       expect(payload.isInCart).toEqual(false);
       expect(payload.listId).toEqual(storedList.id);
@@ -90,7 +90,7 @@ describe('ItemController (e2e)', () => {
 
       expect(result.statusCode).toEqual(HttpStatus.OK);
 
-      const payload = JSON.parse(result.payload) as Item[];
+      const payload = JSON.parse(result.payload) as ItemRow[];
       expect(payload).not.toHaveLength(0);
       for (const expectedItems of payload) {
         const storedItems = creator.items.find((storedList) => storedList.id === expectedItems.id);
@@ -123,7 +123,7 @@ describe('ItemController (e2e)', () => {
 
       expect(result.statusCode).toEqual(HttpStatus.OK);
 
-      const payload = JSON.parse(result.payload) as Item;
+      const payload = JSON.parse(result.payload) as ItemRow;
       expect(payload.listId).toEqual(storedItem.listId);
       expect(payload.id).toEqual(storedItem.id);
       expect(payload.name).toEqual(storedItem.name);
@@ -173,7 +173,7 @@ describe('ItemController (e2e)', () => {
 
       expect(result.statusCode).toEqual(HttpStatus.OK);
 
-      const payload = JSON.parse(result.payload) as Item;
+      const payload = JSON.parse(result.payload) as ItemRow;
       expect(payload.name).toEqual(updatePayload.name);
       expect(payload.isInCart).toEqual(updatePayload.isInCart);
     });
