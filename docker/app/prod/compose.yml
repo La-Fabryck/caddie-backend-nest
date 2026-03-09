@@ -9,6 +9,7 @@ services:
     restart: unless-stopped
     volumes:
       - pgcaddie:/var/lib/postgresql/data
+    # TODO: use env file
     environment:
       POSTGRES_PASSWORD: password
       POSTGRES_DB: caddie_app
@@ -19,8 +20,8 @@ services:
 
   backend:
     build:
-      context: ./
-      dockerfile: ./docker/app/prod/Dockerfile
+      context: ../../..
+      dockerfile: docker/app/prod/Dockerfile
     ports:
       - '3001:3001'
     restart: unless-stopped
@@ -28,7 +29,7 @@ services:
       postgres:
         condition: service_healthy
     env_file:
-      - .env
+      - ../../../.env
     networks:
       - caddie_network
       - backend

@@ -1,6 +1,6 @@
 import type { NestFastifyApplication } from '@nestjs/platform-fastify';
-import type { Item, User } from '@prisma/client';
 import type { InjectOptions, Response } from 'light-my-request';
+import type { ItemRow, UserRow } from '@/database/database-types';
 import { ItemService } from '@/shopping/item/item.service';
 import { ListService, type ListWithSubs } from '@/shopping/list/list.service';
 import { UsersService } from '@/users/users/users.service';
@@ -30,9 +30,9 @@ type Options = {
 };
 
 type ResourceCreator = {
-  user: User;
+  user: UserRow;
   lists: ListWithSubs[];
-  items: Item[];
+  items: ItemRow[];
   cookies: NonNullable<InjectOptions['cookies']>;
   [Symbol.asyncDispose]: () => Promise<void>;
 };
@@ -75,7 +75,7 @@ async function resourceCreator(
   }
 
   const itemService = app.get(ItemService);
-  const items: Item[] = [];
+  const items: ItemRow[] = [];
   if (itemsQuantity) {
     const itemCreationPayloads: ReturnType<typeof createManyItems> = lists.flatMap((list) => createManyItems(list.id, itemsQuantity));
 

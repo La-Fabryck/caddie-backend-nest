@@ -1,92 +1,73 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import type { List, Prisma, Subscriber, User } from '@prisma/client';
+import type { Kysely } from 'kysely';
+import type { DB, ListRow, SubscriberRow, UserRow } from '@/database/database-types';
 import { DatabaseService } from '@/database/database.service';
 import { CreateListDto } from '../dto/create-list.dto';
 import { SubscribersService } from '../subscriber/subscribers.service';
 
-export type CreateList = CreateListDto & { user: User };
+export type CreateList = CreateListDto & { user: UserRow };
 
-type UpdateListPayload = Pick<List, 'id'> & Partial<Pick<List, 'title'>>;
-type UpdateList = { payload: UpdateListPayload; user: User };
+type UpdateListPayload = Pick<ListRow, 'id'> & Partial<Pick<ListRow, 'title'>>;
+type UpdateList = { payload: UpdateListPayload; user: UserRow };
 
-type RemoveList = { id: string; user: User };
+type RemoveList = { id: string; user: UserRow };
 
-export type ListWithSubs = List & { subscribers: Subscriber[] };
+export type ListWithSubs = ListRow & { subscribers: SubscriberRow[] };
 
 @Injectable()
 export class ListService {
   constructor(
-    private database: DatabaseService,
+    private readonly database: DatabaseService,
     private readonly subscribersService: SubscribersService,
   ) {}
 
   async create({ user, pseudonym, title }: CreateList): Promise<ListWithSubs> {
-    return this.database.$transaction(async (transaction) => {
-      const list: List = await transaction.list.create({
-        data: { title },
-      });
+    return this.database.transaction().execute(async (trx) => {
+      const listRow = await trx
+        .insertInto('List')
+        .values({
+          title,
+          updatedAt: new Date(),
+        })
+        .returningAll()
+        .executeTakeFirstOrThrow();
 
       const subscriber = await this.subscribersService.create(
         {
-          listId: list.id,
+          listId: listRow.id,
           user,
           name: pseudonym,
         },
-        transaction,
+        trx,
       );
 
-      return { ...list, subscribers: [subscriber] };
+      return { ...listRow, subscribers: [subscriber] };
     });
   }
 
-  async update({ payload, user }: UpdateList): Promise<List> {
+  async update({ payload, user }: UpdateList): Promise<ListRow> {
     await this.findOneById({ id: payload.id, user });
-    return this.database.list.update({
-      data: payload,
-      where: {
-        id: payload.id,
-      },
-    });
+
+    return this.database.updateTable('List').set(payload).where('id', '=', payload.id).returningAll().executeTakeFirstOrThrow();
   }
 
-  async remove({ id, user }: RemoveList) {
+  async remove({ id, user }: RemoveList): Promise<void> {
     await this.findOneById({ id, user });
 
-    await this.database.$transaction(async (transaction) => {
-      await Promise.all([
-        transaction.item.deleteMany({
-          where: {
-            listId: id,
-          },
-        }),
-        transaction.subscriber.deleteMany({
-          where: {
-            listId: id,
-          },
-        }),
-      ]);
-
-      await transaction.list.delete({
-        where: {
-          id,
-        },
-      });
+    await this.database.transaction().execute(async (trx) => {
+      await trx.deleteFrom('Item').where('listId', '=', id).execute();
+      await trx.deleteFrom('Subscriber').where('listId', '=', id).execute();
+      await trx.deleteFrom('List').where('id', '=', id).execute();
     });
   }
 
-  async findListsBySubscriber({ user }: { user: User }): Promise<List[]> {
+  async findListsBySubscriber({ user }: { user: UserRow }): Promise<ListRow[]> {
     const subscriptions = await this.subscribersService.findAllByUser({ user });
 
-    return this.database.list.findMany({
-      where: {
-        id: {
-          in: subscriptions.map((sub) => sub.listId),
-        },
-      },
-      orderBy: {
-        updatedAt: 'desc',
-      },
-    });
+    const listIds = subscriptions.map((sub) => sub.listId);
+    if (listIds.length === 0) return [];
+
+    return this.database.selectFrom('List').where('id', 'in', listIds).orderBy('updatedAt', 'desc').selectAll().execute();
   }
 
   /**
@@ -94,18 +75,13 @@ export class ListService {
    * If it exists, returns it
    * If it doesn't, throw a NotFoundException
    */
-  async findOneById({ id, user }: { id: string; user: User }): Promise<List> {
-    //Check if the user is subscribed to the list, else throws a NotFoundException
+  async findOneById({ id, user }: { id: string; user: UserRow }): Promise<ListRow> {
     await this.subscribersService.findOne({
       listId: id,
       user,
     });
 
-    const list = await this.database.list.findUnique({
-      where: {
-        id,
-      },
-    });
+    const list = await this.database.selectFrom('List').where('id', '=', id).selectAll().executeTakeFirst();
 
     if (list == null) {
       throw new NotFoundException();
@@ -114,14 +90,7 @@ export class ListService {
     return list;
   }
 
-  async updateDate(id: string, tx: Prisma.TransactionClient) {
-    return tx.list.update({
-      where: {
-        id,
-      },
-      data: {
-        updatedAt: new Date(),
-      },
-    });
+  async updateDate(id: string, tx: Kysely<DB>): Promise<void> {
+    await tx.updateTable('List').set({ updatedAt: new Date() }).where('id', '=', id).execute();
   }
 }

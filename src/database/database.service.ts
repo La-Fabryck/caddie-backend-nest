@@ -1,21 +1,26 @@
-import { Injectable, OnModuleInit } from '@nestjs/common';
-import { type Prisma, PrismaClient } from '@prisma/client';
+import { Injectable, OnModuleDestroy } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
+import { Kysely, type LogConfig, PostgresDialect } from 'kysely';
+import { Pool } from 'pg';
+import type { DB } from './database-types';
 
 @Injectable()
-export class DatabaseService extends PrismaClient<Prisma.PrismaClientOptions, Prisma.LogLevel> implements OnModuleInit {
-  constructor() {
+export class DatabaseService extends Kysely<DB> implements OnModuleDestroy {
+  constructor(configService: ConfigService) {
+    const connectionString = configService.getOrThrow<string>('DATABASE_URL');
+    const pool = new Pool({
+      connectionString,
+      max: 10,
+    });
+    const log: LogConfig = configService.get<string>('NODE_ENV') === 'test' ? ['error'] : ['query', 'error'];
+
     super({
-      log: process.env['NODE_ENV'] === 'test' ? ['error'] : ['query', 'info', 'warn', 'error'],
+      dialect: new PostgresDialect({ pool }),
+      log,
     });
   }
 
-  //The onModuleInit is optional — if you leave it out, Prisma will connect lazily on its first call to the database.
-  async onModuleInit() {
-    await this.$connect();
-    this.$on('query', ({ query, params, duration }) => {
-      console.log('Query: ' + query);
-      console.log('Params: ' + params);
-      console.log(`Duration: ${duration} ms`);
-    });
+  async onModuleDestroy(): Promise<void> {
+    await this.destroy();
   }
 }

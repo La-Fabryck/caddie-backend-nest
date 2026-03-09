@@ -1,7 +1,7 @@
 import { faker } from '@faker-js/faker';
-import type { User } from '@prisma/client';
+import type { UserRow } from '@/database/database-types';
 
-function createUser(overrides: Partial<User> = {}): User {
+function createUser(overrides: Partial<UserRow> = {}): UserRow {
   return {
     id: faker.string.uuid(),
     name: faker.person.fullName(),
@@ -11,7 +11,7 @@ function createUser(overrides: Partial<User> = {}): User {
   };
 }
 
-function createManyUsers(count: number): User[] {
+function createManyUsers(count: number): UserRow[] {
   return Array.from({ length: count }, () => createUser());
 }
 

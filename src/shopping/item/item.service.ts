@@ -1,5 +1,5 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import type { Item, User } from '@prisma/client';
+import type { Item, ItemRow, UserRow } from '@/database/database-types';
 import { DatabaseService } from '@/database/database.service';
 import { CreateItemDto } from '../dto/create-item.dto';
 import { UpdateItemDto } from '../dto/update-item.dto';
@@ -7,67 +7,58 @@ import { ListService } from '../list/list.service';
 
 type CreateItem = {
   createItemPayload: CreateItemDto & Pick<Item, 'listId'>;
-  user: User;
+  user: UserRow;
 };
 
 type UpdateItem = {
-  updateItemPayload: UpdateItemDto & Pick<Item, 'listId' | 'id'>;
-  user: User;
+  updateItemPayload: UpdateItemDto & Pick<ItemRow, 'listId' | 'id'>;
+  user: UserRow;
 };
 
-type FindItem = { listId: string; itemId: string; user: User };
+type FindItem = { listId: string; itemId: string; user: UserRow };
 
-type FindItems = { listId: string; user: User };
+type FindItems = { listId: string; user: UserRow };
 
 @Injectable()
 class ItemService {
   constructor(
-    private database: DatabaseService,
+    private readonly database: DatabaseService,
     private readonly listService: ListService,
   ) {}
 
-  async create({ createItemPayload, user }: CreateItem): Promise<Item> {
-    // verify that the list exist
+  async create({ createItemPayload, user }: CreateItem): Promise<ItemRow> {
     await this.listService.findOneById({
       id: createItemPayload.listId,
       user,
     });
 
-    return this.database.$transaction(async (transaction) => {
-      await this.listService.updateDate(createItemPayload.listId, transaction);
+    return this.database.transaction().execute(async (trx) => {
+      await this.listService.updateDate(createItemPayload.listId, trx);
 
-      return transaction.item.create({
-        data: createItemPayload,
-      });
+      const row = await trx
+        .insertInto('Item')
+        .values({
+          listId: createItemPayload.listId,
+          name: createItemPayload.name,
+          isInCart: false,
+        })
+        .returningAll()
+        .executeTakeFirstOrThrow();
+
+      return row;
     });
   }
 
-  async findAllByListId({ listId, user }: FindItems) {
-    // verify that the list exist
-    await this.listService.findOneById({
-      id: listId,
-      user,
-    });
+  async findAllByListId({ listId, user }: FindItems): Promise<ItemRow[]> {
+    await this.listService.findOneById({ id: listId, user });
 
-    return this.database.item.findMany({
-      where: {
-        listId,
-      },
-    });
+    return this.database.selectFrom('Item').where('listId', '=', listId).selectAll().execute();
   }
 
-  async findOne({ itemId, listId, user }: FindItem): Promise<Item> {
-    // verify that the list exist
-    await this.listService.findOneById({
-      id: listId,
-      user,
-    });
+  async findOne({ itemId, listId, user }: FindItem): Promise<ItemRow> {
+    await this.listService.findOneById({ id: listId, user });
 
-    const item = await this.database.item.findUnique({
-      where: {
-        id: itemId,
-      },
-    });
+    const item = await this.database.selectFrom('Item').where('id', '=', itemId).selectAll().executeTakeFirst();
 
     if (item == null) {
       throw new NotFoundException();
@@ -76,35 +67,30 @@ class ItemService {
     return item;
   }
 
-  async update({ updateItemPayload, user }: UpdateItem): Promise<Item> {
-    await this.findOne({ itemId: updateItemPayload.id, listId: updateItemPayload.listId, user });
+  async update({ updateItemPayload, user }: UpdateItem): Promise<ItemRow> {
+    await this.findOne({
+      itemId: updateItemPayload.id,
+      listId: updateItemPayload.listId,
+      user,
+    });
 
-    return this.database.$transaction(async (transaction) => {
-      await this.listService.updateDate(updateItemPayload.listId, transaction);
+    const { id: _id, listId: _listId, ...toSet } = updateItemPayload;
 
-      return transaction.item.update({
-        data: {
-          // eslint-disable-next-line @typescript-eslint/no-misused-spread
-          ...updateItemPayload,
-        },
-        where: {
-          id: updateItemPayload.id,
-        },
-      });
+    return this.database.transaction().execute(async (trx) => {
+      await this.listService.updateDate(updateItemPayload.listId, trx);
+
+      const row = await trx.updateTable('Item').set(toSet).where('id', '=', updateItemPayload.id).returningAll().executeTakeFirstOrThrow();
+
+      return row;
     });
   }
 
-  async remove(listId: string, itemId: string, user: User) {
+  async remove(listId: string, itemId: string, user: UserRow): Promise<void> {
     await this.findOne({ itemId, listId, user });
 
-    await this.database.$transaction(async (transaction) => {
-      await this.listService.updateDate(listId, transaction);
-
-      await transaction.item.delete({
-        where: {
-          id: itemId,
-        },
-      });
+    await this.database.transaction().execute(async (trx) => {
+      await this.listService.updateDate(listId, trx);
+      await trx.deleteFrom('Item').where('id', '=', itemId).execute();
     });
   }
 }

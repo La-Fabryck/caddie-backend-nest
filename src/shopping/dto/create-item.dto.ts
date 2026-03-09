@@ -1,4 +1,4 @@
-import type { Item } from '@prisma/client';
+import type { Item } from '@/database/database-types';
 import { IsNotBlank } from '@/lib/decorators/is-not-blank';
 import { ITEM_NAME } from '../messages/items';
 

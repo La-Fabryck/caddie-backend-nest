@@ -1,4 +1,4 @@
-.PHONY: update sync-fastify install versions dedupe lint-fix lint e2e sloc sloc-details help 
+.PHONY: update sync-fastify install versions dedupe lint-fix lint e2e sloc sloc-details reset-dev help 
 
 NEST_FASTIFY_VERSION := $(shell npm info @nestjs/platform-fastify dependencies.fastify)
 
@@ -26,9 +26,8 @@ install:
 	@echo "Build the Nest image"
 	docker compose build
 	
-	@echo "Install the dependencies and generate the prisma schemes"
+	@echo "Install the dependencies"
 	docker compose run --no-deps --rm backend npm ci
-	docker compose run --no-deps --rm backend npx prisma generate
 
 # Check current versions
 versions:
@@ -55,6 +54,18 @@ endif
 e2e-watch:
 	docker compose run --rm backend npm run test:watch
 
+# Reset to clean dev: tear down prod and dev stacks, ensure network, remove root .dockerignore
+reset-dev:
+	@echo "Stopping and removing prod stack..."
+	docker compose -f docker/app/prod/compose.yml down -v
+	@echo "Stopping and removing dev stack..."
+	docker compose down -v
+	@echo "Ensuring dev network exists..."
+	docker network create caddie_network || true
+	@echo "Removing root .dockerignore (copied by prod build)..."
+	rm -f .dockerignore
+	@echo "Dev environment reset complete. Start dev with: docker compose up"
+
 sloc:
 	docker compose run --no-deps --rm backend npx --yes sloc --format cli-table --format-option head --exclude "node_modules|dist|coverage" ./
 
@@ -74,6 +85,7 @@ help:
 	@echo "  dedupe          - Reduce duplication in the package tree"
 	@echo "  e2e             - Run all e2e tests"
 	@echo "  e2e p=<pattern> - Run e2e tests matching pattern (e.g.: make e2e p=user)"
+	@echo "  reset-dev       - Tear down prod and dev stacks, ensure network, remove root .dockerignore"
 	@echo "  sloc            - Count lines of code"
 	@echo "  sloc-details    - Count lines of code with details"
 	
