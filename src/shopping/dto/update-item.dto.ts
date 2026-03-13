@@ -1,6 +1,6 @@
 import { PartialType } from '@nestjs/mapped-types';
-import type { Item } from '@/database/database-types';
 import { IsBoolean, IsOptional } from 'class-validator';
+import type { Item } from '@/database/database-types';
 import { CreateItemDto } from './create-item.dto';
 
 type UpdateItemInterface = Omit<Item, 'id' | 'listId'>;

@@ -1,5 +1,5 @@
-import type { Subscriber } from '@/database/database-types';
 import { IsUUID } from 'class-validator';
+import type { Subscriber } from '@/database/database-types';
 import { IsNotBlank } from '@/lib/decorators/is-not-blank';
 import { SUBSCRIBER_NAME } from '../messages/subscriber';
 
