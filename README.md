@@ -101,10 +101,14 @@ From a clean slate (e.g. after the steps above):
 docker network create caddie_network
 ```
 
-2. Ensure `.env` has `DATABASE_URL` for the **compose** postgres service (backend runs inside Docker and talks to `postgres:5432`):
+2. Ensure `.env` has `POSTGRES_*` vars set up:
 
 ```bash
-DATABASE_URL="postgresql://postgres:password@postgres:5432/caddie_app?schema=public"
+POSTGRES_HOST=postgres
+POSTGRES_PORT=5432
+POSTGRES_USER=postgres
+POSTGRES_PASSWORD=password
+POSTGRES_DB=caddie_app
 ```
 
 3. Start the prod stack and run migrations:

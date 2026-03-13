@@ -4,7 +4,7 @@ Migrations run in alphanumeric order. They match the schema produced by the Pris
 
 ## Run migrations
 
-Migrations are run via [kysely-ctl](https://github.com/kysely-org/kysely-ctl). From the project root with `DATABASE_URL` set (e.g. in `.env`):
+Migrations are run via [kysely-ctl](https://github.com/kysely-org/kysely-ctl). From the project root with `POSTGRES_HOST`, `POSTGRES_PORT`, `POSTGRES_USER`, `POSTGRES_PASSWORD`, `POSTGRES_DB` set (e.g. in `.env`):
 
 ```bash
 npm run db:migrate:latest
