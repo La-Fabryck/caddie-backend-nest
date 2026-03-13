@@ -10,13 +10,8 @@ export class UsersService {
   constructor(private readonly database: DatabaseService) {}
 
   async create(createUserDto: CreateUserDto): Promise<UserRow> {
-    const { count } = await this.database
-      .selectFrom('User')
-      .where((eb) => eb(eb.fn('lower', [eb.ref('email')]), '=', eb.fn('lower', [eb.val(createUserDto.email)])))
-      .select((eb) => eb.fn.count<number>('id').as('count'))
-      .executeTakeFirstOrThrow();
-
-    if (count) {
+    const existing = await this.findOneByEmail(createUserDto.email);
+    if (existing != null) {
       //FIXME: Should we return forbidden or bad request?
       throw new ForbiddenException();
     }
