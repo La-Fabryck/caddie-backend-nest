@@ -4,14 +4,13 @@ Mandatory :
 
 - ~~Set up [Nest config](https://docs.nestjs.com/techniques/configuration) correctly, rework env variables and prefix~~
 - [Helmet](https://docs.nestjs.com/security/helmet) & accept only application/json
-- Strip PW from User
 
 Later'ish :
 
 - JWT Refresh
 - ~~Integration Tests~~
 - Small cache for users
-- Use Zod as validator ? [Zod Integration](https://docs.nestjs.com/pipes#object-schema-validation)
+- Use Zod as validator ? [Zod Integration](https://docs.nestjs.com/pipes#object-schema-validation) - Waiting [NestJS 12 supports native scheman](https://github.com/nestjs/nest/pull/16391)
 - ~~Migrate to [Kysely](https://kysely.dev/)~~
 - CQRS architecture
 - Move Auth user from Fastify Request to [NestJS LocalStorage](https://docs.nestjs.com/recipes/async-local-storage
