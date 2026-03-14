@@ -17,7 +17,7 @@
     "build": "nest build",
     "start": "nest start",
     "start:dev": "nest start --watch",
-    "start:debug": "nest start --watch --debug ${LISTEN_IP}:${DEBUG_PORT}",
+    "start:debug": "nest start --watch --debug ${NEST_IP}:${DEBUG_PORT}",
     "start:prod": "node dist/main",
     "lint": "eslint",
     "lint:fix": "eslint --fix",

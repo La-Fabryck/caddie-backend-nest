@@ -2,7 +2,7 @@ Tech :
 
 Mandatory :
 
-- Set up [Nest config](https://docs.nestjs.com/techniques/configuration) correctly, rework env variables and prefix
+- ~~Set up [Nest config](https://docs.nestjs.com/techniques/configuration) correctly, rework env variables and prefix~~
 - [Helmet](https://docs.nestjs.com/security/helmet) & accept only application/json
 - Strip PW from User
 
