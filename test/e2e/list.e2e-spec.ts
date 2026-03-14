@@ -42,6 +42,8 @@ describe('ListController (e2e)', () => {
       const payload = JSON.parse(result.payload) as ListWithSubs;
       expect(payload.title).toEqual(list.title);
       expect(payload.subscribers.some((subscriber) => subscriber.name)).toBeTruthy();
+
+      await app.get(ListService).remove({ id: payload.id, user: creator.user });
     });
 
     it('KO - User not authenticated', async () => {

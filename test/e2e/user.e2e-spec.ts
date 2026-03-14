@@ -3,6 +3,7 @@ import type { NestFastifyApplication } from '@nestjs/platform-fastify';
 import type { ErrorInterface } from '@/app.configurator';
 import type { UserRow } from '@/database/database-types';
 import type { CreateUserDto } from '@/users/dto/create-user.dto';
+import { UsersService } from '@/users/users/users.service';
 import { resourceCreator } from 'test/creator/resource-creator';
 import { createUser } from 'test/factories/user';
 import { createAppE2E } from 'test/support/create-app.e2e';
@@ -33,6 +34,8 @@ describe('UserController (e2e)', () => {
     const response = JSON.parse(result.payload) as UserRow;
     expect(response.email).toEqual(fakeUser.email);
     expect(response.name).toEqual(fakeUser.name);
+
+    await app.get(UsersService).remove(response.id);
   });
 
   it('/users (POST) - KO - Fails validation', async () => {
