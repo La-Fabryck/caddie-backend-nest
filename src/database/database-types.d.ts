@@ -9,7 +9,7 @@ export type Timestamp = ColumnType<Date, Date | string, Date | string>;
 
 export interface Item {
   id: Generated<string>;
-  isInCart: boolean;
+  isInCart: Generated<boolean>;
   listId: string;
   name: string;
 }
@@ -18,7 +18,7 @@ export interface List {
   createdAt: Generated<Timestamp>;
   id: Generated<string>;
   title: string;
-  updatedAt: Timestamp;
+  updatedAt: Generated<Timestamp>;
 }
 
 export interface Subscriber {
