@@ -3,13 +3,16 @@
  * Please do not edit it manually.
  */
 
-import type { ColumnType, Selectable, Generated } from 'kysely';
+import type { Generated, Timestamp, Selectable } from 'kysely';
 
-export type Timestamp = ColumnType<Date, Date | string, Date | string>;
+export type ItemRow = Selectable<Item>;
+export type ListRow = Selectable<List>;
+export type SubscriberRow = Selectable<Subscriber>;
+export type UserRow = Selectable<User>;
 
 export interface Item {
   id: Generated<string>;
-  isInCart: boolean;
+  isInCart: Generated<boolean>;
   listId: string;
   name: string;
 }
@@ -18,7 +21,7 @@ export interface List {
   createdAt: Generated<Timestamp>;
   id: Generated<string>;
   title: string;
-  updatedAt: Timestamp;
+  updatedAt: Generated<Timestamp>;
 }
 
 export interface Subscriber {
@@ -41,9 +44,3 @@ export interface DB {
   Subscriber: Subscriber;
   User: User;
 }
-
-/** Row types (selected from DB); use these for return types and DTOs. */
-export type UserRow = Selectable<User>;
-export type ListRow = Selectable<List>;
-export type ItemRow = Selectable<Item>;
-export type SubscriberRow = Selectable<Subscriber>;
