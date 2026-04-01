@@ -1,0 +1,17 @@
+---
+description: Use English for all project text — code, comments, docs, logs
+alwaysApply: true
+---
+
+# English only (this project)
+
+Use **English** consistently for:
+
+- **Comments** and JSDoc/TSDoc on code.
+- **Swagger / OpenAPI** descriptions, examples, and `@Api*` strings.
+- **Logs** (`Logger`, `console` in app code) and **internal error messages** intended for operators and developers.
+- **Markdown** in this repo intended for contributors (README, ADRs, rule files, PR templates).
+
+**Identifiers** (names of classes, functions, variables, files) should already be English; keep them that way.
+
+If the product later adds **end-user i18n**, user-visible copy may live in translation catalogs; until then, default API and app strings to English.

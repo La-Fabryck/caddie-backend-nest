@@ -1,0 +1,43 @@
+---
+description: Prefer satisfies over type assertions; no unsafe `as` patterns
+globs: "**/*.ts"
+alwaysApply: false
+---
+
+# TypeScript: avoid `as`, prefer `satisfies`
+
+## Goals
+
+- Do not paper over type errors with assertions. Fix the types or narrow the value instead.
+- When you must relate a value to a type at compile time, prefer **`satisfies`** so inference stays precise and mistakes surface at the object literal.
+
+## Do not
+
+- `as any`, `as unknown`, or **`as unknown as T`** (double assertion).
+- Assertions to silence errors (`as Foo` on values you are not sure are `Foo`).
+- Wide assertions on API/JSON payloads without validation — use runtime validation (e.g. `class-validator`, schemas) and map to typed DTOs.
+
+## Prefer
+
+- **`satisfies SomeType`** on object/array literals when you need both: checked shape and preserved literal types.
+- **Generics** and **type parameters** so callers stay correctly typed without casting.
+- **Type guards** (`function isFoo(x): x is Foo`) and **narrowing** (`if`, `switch`, discriminated unions).
+- **`as const`** only when you need literal/tuple inference; it is not a substitute for `satisfies` on object shapes.
+
+## Examples
+
+```typescript
+// Bad: assertion hides mistakes
+const cfg = { port: 3000 } as ServerConfig;
+
+// Good: shape is checked, literals preserved where applicable
+const cfg = { port: 3000 } satisfies ServerConfig;
+
+// Bad
+return data as UserDto;
+
+// Good: validate or map explicitly
+return plainToInstance(UserDto, data);
+```
+
+If the compiler forces an `as` to compile, treat that as a signal to improve types or add a guard — do not stack assertions.

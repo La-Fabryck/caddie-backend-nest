@@ -1,0 +1,32 @@
+---
+description: NestJS structure — DI, layers, and OOP-friendly patterns
+globs: "src/**/*.ts"
+alwaysApply: false
+---
+
+# NestJS / OOP style
+
+## Architecture
+
+- **Controllers** stay thin: HTTP mapping, status codes, delegation. No business rules or direct DB access.
+- **Services** own use cases and orchestration. Inject repositories, other services, and `ConfigService` — do not import concrete DB drivers in controllers.
+- **Modules** declare providers and exports explicitly. Import only what a feature needs; prefer **feature modules** over a single god module.
+- Use **constructor injection** for every dependency. Avoid property injection except where the framework requires it.
+
+## Types and contracts
+
+- **DTOs** as `class`es with `class-validator` / `class-transformer` for input; separate **response DTOs** or serializers when the API shape differs from persistence.
+- Prefer **interfaces** (or abstract classes) for ports and **concrete classes** for Nest providers implementing them.
+
+## Cross-cutting behavior
+
+- **Guards** for authz/authn, **Pipes** for transformation/validation, **Interceptors** for logging/mapping — keep them focused and composable.
+- **Filters** for consistent error mapping; avoid ad-hoc `try/catch` in every controller method when a filter can handle it.
+
+## Style
+
+- Prefer **small, cohesive classes** over large “utils” files; if a function is domain-specific, put it on the service or a dedicated helper next to the feature.
+- **Async/await** in services; return `Promise<T>` types explicitly on public service methods when helpful.
+- Name providers after their role (`UsersService`, `AuthenticationGuard`), not after technologies alone.
+
+Align new code with existing modules under `src/` (e.g. `users/`, `shopping/`) — same folder layout and naming.
