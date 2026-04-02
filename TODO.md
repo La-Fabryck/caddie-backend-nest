@@ -7,6 +7,7 @@ Mandatory :
 
 Later'ish :
 
+- Validate unique item name per shopping list
 - JWT Refresh
 - ~~Integration Tests~~
 - Small cache for users
