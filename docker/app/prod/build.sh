@@ -16,5 +16,7 @@ cp "$SCRIPT_DIR/.dockerignore" "$ROOT_DIR/.dockerignore"
 docker network create caddie_network || true
 cd "$ROOT_DIR"
 
-docker compose -f docker/app/prod/compose.yml up -d --build
-docker compose -f docker/app/prod/compose.yml run --rm backend npm run db:migrate:latest
+# Compose interpolates ${POSTGRES_*} from an env file; default project dir is the compose file's
+# directory, so repo-root .env is ignored unless we pass it explicitly.
+docker compose --env-file "$ROOT_DIR/.env" -f docker/app/prod/compose.yml up -d --build
+docker compose --env-file "$ROOT_DIR/.env" -f docker/app/prod/compose.yml run --rm backend npm run db:migrate:latest

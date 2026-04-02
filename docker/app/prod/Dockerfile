@@ -12,7 +12,7 @@ WORKDIR /app
 
 COPY --from=deps /app/node_modules ./node_modules
 COPY src ./src
-COPY package*.json tsconfig*.json nest-cli.json ./
+COPY package*.json tsconfig*.json nest-cli.json .swcrc ./
 
 # TODO: consider --omit=peer when ready
 ENV NODE_ENV=production
