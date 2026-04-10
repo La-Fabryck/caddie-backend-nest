@@ -8,6 +8,7 @@ import unusedImports from 'eslint-plugin-unused-imports';
 import globals from 'globals';
 import tseslint from 'typescript-eslint';
 
+/** @type {import('eslint').Linter.Config[]} */
 export default defineConfig(
   {
     ignores: ['eslint.config.mjs', './dist/*', './coverage/*'],
@@ -216,7 +217,7 @@ export default defineConfig(
           type: 'alphabetical',
           order: 'asc',
           ignoreCase: true,
-          internalPattern: ['^~/.+', '^@/.+'],
+          internalPattern: ['^@/.+', '^test/.+'],
           // Type and value together per category → alphabetical by path (e.g. @faker before @nestjs)
           groups: [
             ['type-builtin', 'value-builtin'],
@@ -236,6 +237,15 @@ export default defineConfig(
 
       // Find and remove unused es6 module imports
       'unused-imports/no-unused-imports': 'error',
+    },
+  },
+  {
+    files: ['test/**/*.ts'],
+    languageOptions: {
+      parserOptions: {
+        project: 'test/tsconfig.json',
+        tsconfigRootDir: import.meta.dirname,
+      },
     },
   },
 );
