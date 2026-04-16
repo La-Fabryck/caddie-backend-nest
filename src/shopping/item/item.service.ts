@@ -52,7 +52,13 @@ class ItemService {
   async findAllByListId({ listId, user }: FindItems): Promise<ItemRow[]> {
     await this.listService.findOneById({ id: listId, user });
 
-    return this.database.selectFrom('Item').where('listId', '=', listId).orderBy('name', 'asc').selectAll().execute();
+    // Sort by lowercase name to keep ordering case-insensitive.
+    return this.database
+      .selectFrom('Item')
+      .where('listId', '=', listId)
+      .orderBy((eb) => eb.fn('lower', ['name']), 'asc')
+      .selectAll()
+      .execute();
   }
 
   async findOne({ itemId, listId, user }: FindItem): Promise<ItemRow> {
