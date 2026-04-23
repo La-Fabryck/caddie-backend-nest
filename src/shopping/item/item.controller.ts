@@ -5,7 +5,7 @@ import { AuthenticationGuard } from '@/users/guards/authentication.guard';
 import { AuthenticationInterceptor } from '@/users/interceptors/authentication.interceptor';
 import { CreateItemDto } from '../dto/create-item.dto';
 import { UpdateItemDto } from '../dto/update-item.dto';
-import { ItemService } from './item.service';
+import { CreateItem, ItemService } from './item.service';
 
 @Controller('/list/:listId/items')
 export class ItemController {
@@ -15,8 +15,17 @@ export class ItemController {
   @UseInterceptors(AuthenticationInterceptor)
   @Post()
   async create(@Param('listId', ParseUUIDPipe) listId: string, @Body() createItemDto: CreateItemDto, @CurrentUser() user: UserRow) {
+    const createItemPayload: CreateItem['createItemPayload'] = {
+      listId,
+      name: createItemDto.name,
+    };
+
+    if (createItemDto.quantity != null) {
+      createItemPayload.quantity = createItemDto.quantity;
+    }
+
     return this.itemService.create({
-      createItemPayload: { listId, name: createItemDto.name },
+      createItemPayload,
       user,
     });
   }

@@ -3,7 +3,7 @@
  * Please do not edit it manually.
  */
 
-import type { Generated, Timestamp, Selectable } from 'kysely';
+import type { Generated, Selectable, Timestamp } from 'kysely';
 
 export type ItemRow = Selectable<Item>;
 export type ListRow = Selectable<List>;
@@ -15,6 +15,7 @@ export interface Item {
   isInCart: Generated<boolean>;
   listId: string;
   name: string;
+  quantity: Generated<number>;
 }
 
 export interface List {

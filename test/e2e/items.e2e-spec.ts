@@ -44,6 +44,7 @@ describe('ItemController (e2e)', () => {
       expect(payload.isInCart).toEqual(false);
       expect(payload.listId).toEqual(storedList.id);
       expect(payload.id).toBeTruthy();
+      expect(payload.quantity).toEqual(SINGLE);
     });
 
     it('KO - User not authenticated', async () => {
@@ -72,6 +73,70 @@ describe('ItemController (e2e)', () => {
         name: [{ message: 'ITEM_NAME' }],
       });
     });
+
+    it('OK - Creates an item with explicit quantity', async () => {
+      await using creator = await resourceCreator(app, { list: { quantity: SINGLE } });
+      const [storedList] = creator.lists;
+      const quantity = faker.number.int({ min: 2, max: 10 });
+
+      const item: CreateItemDto = {
+        name: faker.food.ingredient(),
+        quantity,
+      };
+
+      const result = await app.inject({
+        method: 'POST',
+        url: `/list/${storedList.id}/items`,
+        body: item,
+        cookies: creator.cookies,
+      });
+      expect(result.statusCode).toEqual(HttpStatus.CREATED);
+
+      const payload = JSON.parse(result.payload) as ItemRow;
+      expect(payload.quantity).toEqual(quantity);
+      expect(payload.name).toEqual(item.name);
+      expect(payload.isInCart).toEqual(false);
+    });
+
+    it('KO - Fails validation for quantity - Zero', async () => {
+      await using creator = await resourceCreator(app);
+
+      const result = await app.inject({
+        method: 'POST',
+        url: `/list/${faker.string.uuid()}/items`,
+        body: {
+          name: faker.food.ingredient(),
+          quantity: 0,
+        },
+        cookies: creator.cookies,
+      });
+      expect(result.statusCode).toEqual(HttpStatus.BAD_REQUEST);
+
+      const payload = JSON.parse(result.payload) as ErrorInterface;
+      expect(payload).toStrictEqual({
+        quantity: [{ message: 'ITEM_QUANTITY' }],
+      });
+    });
+
+    it('KO - Fails validation for quantity - Float', async () => {
+      await using creator = await resourceCreator(app);
+
+      const result = await app.inject({
+        method: 'POST',
+        url: `/list/${faker.string.uuid()}/items`,
+        body: {
+          name: faker.food.ingredient(),
+          quantity: 1.5,
+        },
+        cookies: creator.cookies,
+      });
+      expect(result.statusCode).toEqual(HttpStatus.BAD_REQUEST);
+
+      const payload = JSON.parse(result.payload) as ErrorInterface;
+      expect(payload).toStrictEqual({
+        quantity: [{ message: 'ITEM_QUANTITY' }],
+      });
+    });
   });
 
   describe('/list/:listId/items (GET)', () => {
@@ -96,6 +161,7 @@ describe('ItemController (e2e)', () => {
         const storedItems = creator.items.find((storedList) => storedList.id === expectedItems.id);
         expect(storedItems).not.toBeNull();
         expect(expectedItems.name).toEqual(storedItems?.name);
+        expect(expectedItems.quantity).toEqual(storedItems?.quantity);
       }
     });
 
@@ -128,6 +194,7 @@ describe('ItemController (e2e)', () => {
       expect(payload.id).toEqual(storedItem.id);
       expect(payload.name).toEqual(storedItem.name);
       expect(payload.isInCart).toEqual(storedItem.isInCart);
+      expect(payload.quantity).toEqual(storedItem.quantity);
     });
 
     it('KO - Requires to be authenticated', async () => {
@@ -176,6 +243,7 @@ describe('ItemController (e2e)', () => {
       const payload = JSON.parse(result.payload) as ItemRow;
       expect(payload.name).toEqual(updatePayload.name);
       expect(payload.isInCart).toEqual(updatePayload.isInCart);
+      expect(payload.quantity).toEqual(storedItem.quantity);
     });
 
     it('KO - User not authenticated', async () => {
@@ -199,6 +267,29 @@ describe('ItemController (e2e)', () => {
       });
 
       expect(result.statusCode).toEqual(HttpStatus.NOT_FOUND);
+    });
+
+    it('OK - Update quantity', async () => {
+      await using creator = await resourceCreator(app, { list: { quantity: SINGLE }, items: { quantity: SINGLE } });
+      const [storedList] = creator.lists;
+      const [storedItem] = creator.items;
+      const quantity = faker.number.int({ min: 2, max: 10 });
+
+      const updatePayload: UpdateItemDto = {
+        quantity,
+      };
+
+      const result = await app.inject({
+        method: 'PATCH',
+        url: `/list/${storedList.id}/items/${storedItem.id}`,
+        body: updatePayload,
+        cookies: creator.cookies,
+      });
+
+      expect(result.statusCode).toEqual(HttpStatus.OK);
+
+      const payload = JSON.parse(result.payload) as ItemRow;
+      expect(payload.quantity).toEqual(quantity);
     });
   });
 

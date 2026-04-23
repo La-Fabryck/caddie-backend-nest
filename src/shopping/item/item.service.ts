@@ -1,4 +1,5 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
+import { Insertable, Updateable } from 'kysely';
 import type { Item, ItemRow, UserRow } from '@/database/database-types';
 import { DatabaseService } from '@/database/database.service';
 import { CreateItemDto } from '../dto/create-item.dto';
@@ -35,15 +36,13 @@ class ItemService {
     return this.database.transaction().execute(async (trx) => {
       await this.listService.updateDate(createItemPayload.listId, trx);
 
-      const row = await trx
-        .insertInto('Item')
-        .values({
-          listId: createItemPayload.listId,
-          name: createItemPayload.name,
-          isInCart: false,
-        })
-        .returningAll()
-        .executeTakeFirstOrThrow();
+      const item: Insertable<Item> = {
+        listId: createItemPayload.listId,
+        name: createItemPayload.name,
+        quantity: createItemPayload.quantity,
+      };
+
+      const row = await trx.insertInto('Item').values(item).returningAll().executeTakeFirstOrThrow();
 
       return row;
     });
@@ -74,18 +73,22 @@ class ItemService {
   }
 
   async update({ updateItemPayload, user }: UpdateItem): Promise<ItemRow> {
+    const { id: itemId, listId, ...payload } = updateItemPayload;
+
     await this.findOne({
-      itemId: updateItemPayload.id,
-      listId: updateItemPayload.listId,
+      itemId,
+      listId,
       user,
     });
-
-    const { id: _id, listId: _listId, ...toSet } = updateItemPayload;
 
     return this.database.transaction().execute(async (trx) => {
       await this.listService.updateDate(updateItemPayload.listId, trx);
 
-      const row = await trx.updateTable('Item').set(toSet).where('id', '=', updateItemPayload.id).returningAll().executeTakeFirstOrThrow();
+      const item: Updateable<Item> = {
+        ...payload,
+      };
+
+      const row = await trx.updateTable('Item').set(item).where('id', '=', itemId).returningAll().executeTakeFirstOrThrow();
 
       return row;
     });

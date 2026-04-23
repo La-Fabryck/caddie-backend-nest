@@ -1,3 +1,4 @@
 const ITEM_NAME = 'ITEM_NAME';
+const ITEM_QUANTITY = 'ITEM_QUANTITY';
 
-export { ITEM_NAME };
+export { ITEM_NAME, ITEM_QUANTITY };
