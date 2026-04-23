@@ -234,6 +234,14 @@ export default defineConfig(
           },
         },
       ],
+      'perfectionist/sort-named-imports': [
+        'error',
+        {
+          type: 'alphabetical',
+          order: 'asc',
+          ignoreCase: true,
+        },
+      ],
 
       // Find and remove unused es6 module imports
       'unused-imports/no-unused-imports': 'error',
