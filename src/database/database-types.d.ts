@@ -6,6 +6,7 @@
 import type { Generated, Selectable, Timestamp } from 'kysely';
 
 export type ItemRow = Selectable<Item>;
+export type ItemTypeRow = Selectable<ItemType>;
 export type ListRow = Selectable<List>;
 export type SubscriberRow = Selectable<Subscriber>;
 export type UserRow = Selectable<User>;
@@ -13,9 +14,16 @@ export type UserRow = Selectable<User>;
 export interface Item {
   id: Generated<string>;
   isInCart: Generated<boolean>;
+  itemTypeId: string | null;
   listId: string;
   name: string;
   quantity: Generated<number>;
+}
+
+export interface ItemType {
+  id: Generated<string>;
+  label: string;
+  userId: string;
 }
 
 export interface List {
@@ -41,6 +49,7 @@ export interface User {
 
 export interface DB {
   Item: Item;
+  ItemType: ItemType;
   List: List;
   Subscriber: Subscriber;
   User: User;
