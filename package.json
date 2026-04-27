@@ -20,7 +20,7 @@
     "start:debug": "nest start --watch --debug ${NEST_IP}:${DEBUG_PORT}",
     "start:prod": "node dist/main",
     "lint": "eslint",
-    "lint:fix": "eslint --fix",
+    "format": "eslint --fix",
     "db:migrate:latest": "kysely migrate latest",
     "db:migrate:make": "kysely migrate make",
     "test": "jest",
