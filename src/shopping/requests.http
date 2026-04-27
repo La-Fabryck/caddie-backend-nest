@@ -1,7 +1,8 @@
 ### VARIABLES
 
-@listId = 1e26baaf-2981-44d3-b57d-24f62c93638d
+@listId = 49aec3b4-e927-4362-8cd4-ce4931f751e0
 @itemId = 3904dac4-7e9d-47ed-b89f-876b36a086c6
+@itemTypeId = 2dcd13cf-fda3-44f5-a242-fefe3e65ac34
 
 ### LIST ###
 
@@ -29,13 +30,33 @@ Cookie: {{$dotenv COOKIE}}
 GET {{BASE_URL}}/list/{{listId}}/items HTTP/1.1
 Cookie: {{$dotenv COOKIE}}
 
-###
+### Base Item
 POST {{BASE_URL}}/list/{{listId}}/items HTTP/1.1
 Content-Type: application/json
 Cookie: {{$dotenv COOKIE}}
 
 {
   "name": "string"
+}
+
+### Item with quantity
+POST {{BASE_URL}}/list/{{listId}}/items HTTP/1.1
+Content-Type: application/json
+Cookie: {{$dotenv COOKIE}}
+
+{
+  "name": "string",
+  "quantity": 4
+}
+
+### Item with Type
+POST {{BASE_URL}}/list/{{listId}}/items HTTP/1.1
+Content-Type: application/json
+Cookie: {{$dotenv COOKIE}}
+
+{
+  "name": "string",
+  "itemTypeId": "{{itemTypeId}}"
 }
 
 ###
@@ -54,3 +75,18 @@ Cookie: {{$dotenv COOKIE}}
 ###
 
 GET {{BASE_URL}}/items/{{itemId}} HTTP/1.1
+
+### ITEM TYPE ###
+
+###
+GET {{BASE_URL}}/item-types HTTP/1.1
+Cookie: {{$dotenv COOKIE}}
+
+###
+POST {{BASE_URL}}/item-types HTTP/1.1
+Content-Type: application/json
+Cookie: {{$dotenv COOKIE}}
+
+{
+  "label": "fruits"
+}

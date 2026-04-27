@@ -2,13 +2,15 @@ import { faker } from '@faker-js/faker';
 import { HttpStatus } from '@nestjs/common';
 import type { NestFastifyApplication } from '@nestjs/platform-fastify';
 import type { ErrorInterface } from '@/app.configurator';
-import type { ItemRow } from '@/database/database-types';
+import type { ItemRow, ItemTypeRow } from '@/database/database-types';
 import type { CreateItemDto } from '@/shopping/dto/create-item.dto';
 import type { UpdateItemDto } from '@/shopping/dto/update-item.dto';
 import { ItemService } from '@/shopping/item/item.service';
 import { resourceCreator } from 'test/creator/resource-creator';
 import { SINGLE } from 'test/support/constants';
 import { createAppE2E } from 'test/support/create-app.e2e';
+
+type ItemResponse = ItemRow & { itemType: Omit<ItemTypeRow, 'userId'> | null };
 
 describe('ItemController (e2e)', () => {
   let app: NestFastifyApplication;
@@ -96,6 +98,64 @@ describe('ItemController (e2e)', () => {
       expect(payload.quantity).toEqual(quantity);
       expect(payload.name).toEqual(item.name);
       expect(payload.isInCart).toEqual(false);
+    });
+
+    it('OK - Creates an item with item type', async () => {
+      await using creator = await resourceCreator(app, { list: { quantity: SINGLE } });
+      const [storedList] = creator.lists;
+
+      const typeResult = await app.inject({
+        method: 'POST',
+        url: '/item-types',
+        body: { label: faker.commerce.department() },
+        cookies: creator.cookies,
+      });
+      expect(typeResult.statusCode).toEqual(HttpStatus.CREATED);
+
+      const itemType = JSON.parse(typeResult.payload) as ItemTypeRow;
+
+      const result = await app.inject({
+        method: 'POST',
+        url: `/list/${storedList.id}/items`,
+        body: {
+          name: faker.food.ingredient(),
+          itemTypeId: itemType.id,
+        } satisfies CreateItemDto,
+        cookies: creator.cookies,
+      });
+      expect(result.statusCode).toEqual(HttpStatus.CREATED);
+
+      const payload = JSON.parse(result.payload) as ItemResponse;
+      expect(payload.itemType?.id).toStrictEqual(itemType.id);
+      expect(payload.itemType?.label).toStrictEqual(itemType.label);
+    });
+
+    it('KO - Rejects item type from another user on create', async () => {
+      await using creator = await resourceCreator(app, { list: { quantity: SINGLE } });
+      await using outsider = await resourceCreator(app);
+      const [storedList] = creator.lists;
+
+      const typeResult = await app.inject({
+        method: 'POST',
+        url: '/item-types',
+        body: { label: faker.commerce.department() },
+        cookies: outsider.cookies,
+      });
+      expect(typeResult.statusCode).toEqual(HttpStatus.CREATED);
+
+      const outsiderType = JSON.parse(typeResult.payload) as ItemTypeRow;
+
+      const result = await app.inject({
+        method: 'POST',
+        url: `/list/${storedList.id}/items`,
+        body: {
+          name: faker.food.ingredient(),
+          itemTypeId: outsiderType.id,
+        } satisfies CreateItemDto,
+        cookies: creator.cookies,
+      });
+
+      expect(result.statusCode).toEqual(HttpStatus.NOT_FOUND);
     });
 
     it('KO - Fails validation for quantity - Zero', async () => {
@@ -291,6 +351,61 @@ describe('ItemController (e2e)', () => {
       const payload = JSON.parse(result.payload) as ItemRow;
       expect(payload.quantity).toEqual(quantity);
     });
+
+    it('OK - Update item type', async () => {
+      await using creator = await resourceCreator(app, { list: { quantity: SINGLE }, items: { quantity: SINGLE } });
+      const [storedList] = creator.lists;
+      const [storedItem] = creator.items;
+
+      const typeResult = await app.inject({
+        method: 'POST',
+        url: '/item-types',
+        body: { label: faker.commerce.department() },
+        cookies: creator.cookies,
+      });
+      expect(typeResult.statusCode).toEqual(HttpStatus.CREATED);
+
+      const itemType = JSON.parse(typeResult.payload) as ItemTypeRow;
+
+      const result = await app.inject({
+        method: 'PATCH',
+        url: `/list/${storedList.id}/items/${storedItem.id}`,
+        body: { itemTypeId: itemType.id } satisfies UpdateItemDto,
+        cookies: creator.cookies,
+      });
+
+      expect(result.statusCode).toEqual(HttpStatus.OK);
+
+      const payload = JSON.parse(result.payload) as ItemResponse;
+      expect(payload.itemType?.id).toStrictEqual(itemType.id);
+      expect(payload.itemType?.label).toStrictEqual(itemType.label);
+    });
+
+    it('KO - Rejects item type from another user', async () => {
+      await using creator = await resourceCreator(app, { list: { quantity: SINGLE }, items: { quantity: SINGLE } });
+      await using outsider = await resourceCreator(app);
+      const [targetList] = creator.lists;
+      const [storedItem] = creator.items;
+
+      const typeResult = await app.inject({
+        method: 'POST',
+        url: '/item-types',
+        body: { label: faker.commerce.department() },
+        cookies: outsider.cookies,
+      });
+      expect(typeResult.statusCode).toEqual(HttpStatus.CREATED);
+
+      const itemType = JSON.parse(typeResult.payload) as ItemTypeRow;
+
+      const result = await app.inject({
+        method: 'PATCH',
+        url: `/list/${targetList.id}/items/${storedItem.id}`,
+        body: { itemTypeId: itemType.id } satisfies UpdateItemDto,
+        cookies: creator.cookies,
+      });
+
+      expect(result.statusCode).toEqual(HttpStatus.NOT_FOUND);
+    });
   });
 
   describe('/list/:listId/items/:itemId (DELETE)', () => {
@@ -308,7 +423,7 @@ describe('ItemController (e2e)', () => {
       expect(result.statusCode).toEqual(HttpStatus.OK);
 
       const itemService = app.get(ItemService);
-      const remainingItems = await itemService.findAllByListId({ listId: storedList.id, user: creator.user });
+      const remainingItems = await itemService.findAllWithTypeByListId({ listId: storedList.id, user: creator.user });
       expect(remainingItems).toHaveLength(0);
     });
 

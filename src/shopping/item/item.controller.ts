@@ -24,6 +24,10 @@ export class ItemController {
       createItemPayload.quantity = createItemDto.quantity;
     }
 
+    if (createItemDto.itemTypeId != null) {
+      createItemPayload.itemTypeId = createItemDto.itemTypeId;
+    }
+
     return this.itemService.create({
       createItemPayload,
       user,
@@ -34,7 +38,7 @@ export class ItemController {
   @UseInterceptors(AuthenticationInterceptor)
   @Get()
   async findAll(@Param('listId', ParseUUIDPipe) listId: string, @CurrentUser() user: UserRow) {
-    return this.itemService.findAllByListId({ listId, user });
+    return this.itemService.findAllWithTypeByListId({ listId, user });
   }
 
   @UseGuards(AuthenticationGuard)

@@ -1,0 +1,3 @@
+const ITEM_TYPE_LABEL = 'ITEM_TYPE_LABEL';
+
+export { ITEM_TYPE_LABEL };
