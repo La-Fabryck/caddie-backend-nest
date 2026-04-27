@@ -8,7 +8,7 @@ import { createManyItems } from 'test/factories/item';
 import { createManyLists } from 'test/factories/list';
 import { createUser } from '../factories/user';
 
-function stringfyCookieArray(cookies: Response['cookies']): ResourceCreator['cookies'] {
+function stringifyCookieArray(cookies: Response['cookies']): ResourceCreator['cookies'] {
   const cookiesObject: Record<string, string> = {};
 
   for (const cookie of cookies) {
@@ -63,7 +63,7 @@ async function resourceCreator(
       body: userPayload,
     });
 
-    cookies = stringfyCookieArray(userAuth);
+    cookies = stringifyCookieArray(userAuth);
   }
 
   const listService = app.get(ListService);
