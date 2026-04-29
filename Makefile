@@ -57,14 +57,14 @@ e2e-watch:
 # Reset to clean dev: tear down prod and dev stacks, ensure network, remove root .dockerignore
 reset-dev:
 	@echo "Stopping and removing prod stack..."
-	docker compose -f docker/app/prod/compose.yml down -v
+	docker compose --env-file .env -f docker/app/prod/compose.yml down -vZ
 	@echo "Stopping and removing dev stack..."
 	docker compose down -v
 	@echo "Ensuring dev network exists..."
 	docker network create caddie_network || true
 	@echo "Removing root .dockerignore (copied by prod build)..."
 	rm -f .dockerignore
-	@echo "Dev environment reset complete. Start dev with: docker compose up"
+	@echo "Dev environment reset complete. Start dev with: docker compose -f compose.yml up"
 
 sloc:
 	docker compose run --no-deps --rm backend npx --yes sloc --format cli-table --format-option head --exclude "node_modules|dist|coverage" ./
