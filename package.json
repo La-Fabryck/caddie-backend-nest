@@ -18,7 +18,7 @@
     "start": "nest start",
     "start:dev": "nest start --watch",
     "start:debug": "nest start --watch --debug ${NEST_IP}:${DEBUG_PORT}",
-    "start:prod": "node dist/main",
+    "start:prod": "node dist/src/main.js",
     "lint": "eslint",
     "format": "eslint --fix",
     "db:migrate:latest": "kysely migrate latest",
