@@ -1,13 +1,14 @@
 services:
   postgres:
-    image: postgres:17-alpine
-    restart: unless-stopped
+    image: postgres:18-alpine
     environment:
       POSTGRES_USER: ${POSTGRES_USER}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
       POSTGRES_DB: ${POSTGRES_DB}
     ports:
       - '5432:5432'
+    volumes:
+      - pgcaddie:/var/lib/postgresql
     networks:
       - backend
 
@@ -36,3 +37,6 @@ networks:
   caddie_network:
     external: true
   backend:
+
+volumes:
+  pgcaddie:
