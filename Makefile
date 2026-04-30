@@ -54,12 +54,12 @@ endif
 e2e-watch:
 	docker compose run --rm backend npm run test:watch
 
-# Reset to clean dev: tear down prod and dev stacks, ensure network, remove root .dockerignore
+# Reset to clean dev: remove project resources for prod+dev, ensure network, remove root .dockerignore
 reset-dev:
-	@echo "Stopping and removing prod stack..."
-	docker compose --env-file .env -f docker/app/prod/compose.yml down -vZ
-	@echo "Stopping and removing dev stack..."
-	docker compose down -v
+	@echo "Stopping and removing prod stack resources (containers, images, volumes)..."
+	docker compose --env-file .env -f docker/app/prod/compose.yml down -v --rmi all --remove-orphans
+	@echo "Stopping and removing dev stack resources (containers, images, volumes)..."
+	docker compose down -v --rmi all --remove-orphans
 	@echo "Ensuring dev network exists..."
 	docker network create caddie_network || true
 	@echo "Removing root .dockerignore (copied by prod build)..."
@@ -84,7 +84,7 @@ help:
 	@echo "  dedupe          - Reduce duplication in the package tree"
 	@echo "  e2e             - Run all e2e tests"
 	@echo "  e2e p=<pattern> - Run e2e tests matching pattern (e.g.: make e2e p=user)"
-	@echo "  reset-dev       - Tear down prod and dev stacks, ensure network, remove root .dockerignore"
+	@echo "  reset-dev       - Remove dev+prod project Docker resources and reset dev network"
 	@echo "  sloc            - Count lines of code"
 	@echo "  sloc-details    - Count lines of code with details"
 	
