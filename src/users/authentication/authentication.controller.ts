@@ -1,8 +1,8 @@
-import { Body, Controller, Get, HttpCode, HttpStatus, Post, Res } from '@nestjs/common';
+import { Body, Controller, Get, HttpCode, HttpStatus, Post, Req, Res, UnauthorizedException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import type { FastifyReply } from 'fastify';
+import type { FastifyReply, FastifyRequest } from 'fastify';
 import { LoginDto } from '../dto/login.dto';
-import { COOKIE_NAME } from '../utils/constants';
+import { ACCESS_COOKIE_NAME, REFRESH_COOKIE_NAME } from '../utils/constants';
 import { AuthenticationService } from './authentication.service';
 
 @Controller('authentication')
@@ -15,11 +15,47 @@ export class AuthenticationController {
   @HttpCode(HttpStatus.OK)
   @Post('login')
   async login(@Body() loginDto: LoginDto, @Res() reply: FastifyReply) {
-    const jwt: Awaited<Promise<string>> = await this.authentificationService.login(loginDto);
-    const cookieKey = this.configService.getOrThrow<string>(COOKIE_NAME);
+    const { accessToken, refreshToken } = await this.authentificationService.login(loginDto);
+    const accessCookieKey = this.getAccessCookieKey();
+    const refreshCookieKey = this.getRefreshCookieKey();
 
     return reply
-      .cookie(cookieKey, jwt, {
+      .cookie(accessCookieKey, accessToken, {
+        httpOnly: true,
+        sameSite: true,
+        secure: true,
+        path: '/',
+      })
+      .cookie(refreshCookieKey, refreshToken, {
+        httpOnly: true,
+        sameSite: true,
+        secure: true,
+        path: '/',
+      })
+      .send();
+  }
+
+  @HttpCode(HttpStatus.OK)
+  @Post('refresh')
+  async refresh(@Req() request: FastifyRequest, @Res() reply: FastifyReply) {
+    const accessCookieKey = this.getAccessCookieKey();
+    const refreshCookieKey = this.getRefreshCookieKey();
+    const refreshToken = request.cookies[refreshCookieKey] ?? null;
+
+    if (refreshToken == null) {
+      throw new UnauthorizedException();
+    }
+
+    const tokens = await this.authentificationService.refresh(refreshToken);
+
+    return reply
+      .cookie(accessCookieKey, tokens.accessToken, {
+        httpOnly: true,
+        sameSite: true,
+        secure: true,
+        path: '/',
+      })
+      .cookie(refreshCookieKey, tokens.refreshToken, {
         httpOnly: true,
         sameSite: true,
         secure: true,
@@ -30,6 +66,18 @@ export class AuthenticationController {
 
   @Get('logout')
   async logout(@Res({ passthrough: true }) reply: FastifyReply) {
-    return reply.clearCookie(COOKIE_NAME).send();
+    const accessCookieKey = this.getAccessCookieKey();
+    const refreshCookieKey = this.getRefreshCookieKey();
+
+    return reply.clearCookie(accessCookieKey).clearCookie(refreshCookieKey).send();
+  }
+
+  // FIXME: Better env var handling
+  private getAccessCookieKey(): string {
+    return this.configService.getOrThrow<string>(ACCESS_COOKIE_NAME);
+  }
+
+  private getRefreshCookieKey(): string {
+    return this.configService.getOrThrow<string>(REFRESH_COOKIE_NAME);
   }
 }
