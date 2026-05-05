@@ -50,3 +50,4 @@ docker compose exec backend node -v
 - Production startup simulation: [`docs/operations/production-simulation.md`](docs/operations/production-simulation.md)
 - Dependency and Fastify compatibility: [`docs/development/dependencies.md`](docs/development/dependencies.md)
 - Testing and debugger usage: [`docs/development/testing.md`](docs/development/testing.md)
+- Authentication tokens (access + refresh cookies): [`docs/authentication-tokens.md`](docs/authentication-tokens.md)

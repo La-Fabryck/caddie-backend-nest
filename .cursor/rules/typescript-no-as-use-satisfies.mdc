@@ -23,6 +23,7 @@ alwaysApply: false
 - **Generics** and **type parameters** so callers stay correctly typed without casting.
 - **Type guards** (`function isFoo(x): x is Foo`) and **narrowing** (`if`, `switch`, discriminated unions).
 - **`as const`** only when you need literal/tuple inference; it is not a substitute for `satisfies` on object shapes.
+- In `catch` blocks, type the variable as `unknown` and narrow with `instanceof Error` (or a specific error class) instead of using `as`.
 
 ## Examples
 
@@ -38,6 +39,18 @@ return data as UserDto;
 
 // Good: validate or map explicitly
 return plainToInstance(UserDto, data);
+
+// Bad in catch blocks
+catch (error) {
+  const e = error as { name?: string };
+}
+
+// Good in catch blocks
+catch (error: unknown) {
+  if (error instanceof Error) {
+    logger.warn(error.name);
+  }
+}
 ```
 
 If the compiler forces an `as` to compile, treat that as a signal to improve types or add a guard — do not stack assertions.

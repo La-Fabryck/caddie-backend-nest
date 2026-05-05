@@ -12,6 +12,11 @@
 export const PASSWORD_REGEX = /(?=.*[a-z])(?=.*[A-Z])(?=.*[\d])(?=.*[\W_])(?=^.{12,30}$)/;
 
 /**
- * The name of the environment variable for the cookie session
+ * Environment variable names used by authentication.
  */
-export const COOKIE_NAME = 'COOKIE_NAME';
+export const ACCESS_COOKIE_NAME = 'ACCESS_COOKIE_NAME';
+export const REFRESH_COOKIE_NAME = 'REFRESH_COOKIE_NAME';
+export const ACCESS_TOKEN_SECRET = 'ACCESS_TOKEN_SECRET';
+export const ACCESS_TOKEN_TTL = 'ACCESS_TOKEN_TTL';
+export const REFRESH_TOKEN_SECRET = 'REFRESH_TOKEN_SECRET';
+export const REFRESH_TOKEN_TTL = 'REFRESH_TOKEN_TTL';

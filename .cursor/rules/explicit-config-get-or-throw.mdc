@@ -1,0 +1,33 @@
+---
+description: Require explicit Nest config env lookups
+globs: src/**/*.ts
+alwaysApply: false
+---
+
+# Explicit Configuration Access
+
+For required environment/config values in NestJS code, always use `configService.getOrThrow(...)`.
+
+- Use `getOrThrow(...)` for required runtime values (secrets, ports, URLs, cookie names, token TTLs, feature flags that must exist).
+- Do not use fallback chains like `get(...) ?? default` when the value is required for correct behavior.
+- Prefer explicit failure at startup/runtime over implicit fallback behavior.
+- Use `get(...)` only for truly optional values.
+- Do not read environment variables directly via `process.env` in app code; use `ConfigService` (`getOrThrow` or `get`) instead.
+
+Examples:
+
+```typescript
+// ✅ Good
+const dbUrl = configService.getOrThrow<string>('DATABASE_URL');
+const accessSecret = configService.getOrThrow<string>('ACCESS_TOKEN_SECRET');
+```
+
+```typescript
+// ❌ Avoid
+const dbUrl = configService.get<string>('DATABASE_URL') ?? 'postgres://localhost/dev';
+```
+
+```typescript
+// ❌ Avoid
+const isDevelopment = process.env.NODE_ENV === 'development';
+```

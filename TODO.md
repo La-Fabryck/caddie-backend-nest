@@ -1,5 +1,10 @@
 Tech :
 
+HTTP API errors (validation vs business rules):
+
+- **400 Bad Request** — Simple validation: malformed payload, missing fields, wrong types, format checks (email shape, etc.).
+- **422 Unprocessable Entity** — Business rules: syntactically valid request that conflicts with application state or policy (e.g. email already registered, unique name per list violated).
+
 Mandatory :
 
 - ~~Set up [Nest config](https://docs.nestjs.com/techniques/configuration) correctly, rework env variables and prefix~~
@@ -8,7 +13,7 @@ Mandatory :
 Later'ish :
 
 - Validate unique item name per shopping list
-- JWT Refresh
+- ~~JWT Refresh~~
 - ~~Integration Tests~~
 - Small cache for users
 - Use Zod as validator ? [Zod Integration](https://docs.nestjs.com/pipes#object-schema-validation) - Waiting [NestJS 12 supports native scheman](https://github.com/nestjs/nest/pull/16391)

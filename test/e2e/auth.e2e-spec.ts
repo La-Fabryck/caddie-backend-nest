@@ -34,16 +34,70 @@ describe('AuthenticationController (e2e)', () => {
 
     expect(result.payload).toBeFalsy();
 
-    const authCookie = result.cookies.find((cookie) => cookie.name === 'SESSION_ID');
-    expect(authCookie).not.toBeFalsy();
-    expect(authCookie?.httpOnly).toBe(true);
-    expect(authCookie?.sameSite).toBe('Strict');
-    expect(authCookie?.secure).toBe(true);
-    expect(authCookie?.['path']).toBe('/');
+    const accessCookie = result.cookies.find((cookie) => cookie.name === 'SESSION_ID');
+    expect(accessCookie).not.toBeFalsy();
+    expect(accessCookie?.httpOnly).toBe(true);
+    expect(accessCookie?.sameSite).toBe('Strict');
+    expect(accessCookie?.secure).toBe(true);
+    expect(accessCookie?.['path']).toBe('/');
+
+    const refreshCookie = result.cookies.find((cookie) => cookie.name === 'SESSION_REFRESH_ID');
+    expect(refreshCookie).not.toBeFalsy();
+    expect(refreshCookie?.httpOnly).toBe(true);
+    expect(refreshCookie?.sameSite).toBe('Strict');
+    expect(refreshCookie?.secure).toBe(true);
+    expect(refreshCookie?.['path']).toBe('/');
 
     const jwtService = app.get(JwtService);
-    const jwt = jwtService.verify<JwtPayload>(authCookie?.value ?? '');
+    const jwt = jwtService.verify<JwtPayload>(accessCookie?.value ?? '');
     expect(jwt.sub).toBe(creator.user.id);
+  });
+
+  it('/authentication/refresh (POST) - OK - refreshes access token', async () => {
+    await using creator = await resourceCreator(app, { loginUser: false });
+    const login: LoginDto = creator.user;
+
+    const loginResult = await app.inject({
+      method: 'POST',
+      url: '/authentication/login',
+      body: login,
+    });
+
+    const loginAccessCookie = loginResult.cookies.find((cookie) => cookie.name === 'SESSION_ID');
+    const refreshCookie = loginResult.cookies.find((cookie) => cookie.name === 'SESSION_REFRESH_ID');
+    expect(loginAccessCookie).not.toBeFalsy();
+    expect(refreshCookie).not.toBeFalsy();
+
+    const refreshTokenBefore = refreshCookie?.value ?? '';
+
+    const result = await app.inject({
+      method: 'POST',
+      url: '/authentication/refresh',
+      cookies: {
+        SESSION_REFRESH_ID: refreshTokenBefore,
+      },
+    });
+
+    expect(result.statusCode).toEqual(HttpStatus.OK);
+
+    const accessCookieAfter = result.cookies.find((cookie) => cookie.name === 'SESSION_ID');
+    const refreshCookieAfter = result.cookies.find((cookie) => cookie.name === 'SESSION_REFRESH_ID');
+    expect(accessCookieAfter).not.toBeFalsy();
+    expect(refreshCookieAfter).not.toBeFalsy();
+
+    // Stateless refresh echoes the same refresh token string.
+    expect(refreshCookieAfter?.value).toEqual(refreshTokenBefore);
+
+    const jwtService = app.get(JwtService);
+    const jwt = jwtService.verify<JwtPayload>(accessCookieAfter?.value ?? '');
+    expect(jwt.sub).toBe(creator.user.id);
+
+    // Access JWT strings can still match login when both are issued in the same Unix second (iat resolution).
+    const accessBefore = jwtService.decode<JwtPayload>(loginAccessCookie?.value ?? '');
+    const accessAfter = jwtService.decode<JwtPayload>(accessCookieAfter?.value ?? '');
+    expect(accessAfter.sub).toBe(creator.user.id);
+    // If `iat` is missing on the login token, fail instead of vacuously passing (`?? 0` would allow any non-negative iat).
+    expect(accessAfter.iat).toBeGreaterThanOrEqual(accessBefore.iat ?? Infinity);
   });
 
   it('/authentication/login (POST) - KO - Fails validation', async () => {
