@@ -1,4 +1,4 @@
-.PHONY: update sync-fastify install versions dedupe format lint e2e sloc sloc-details reset-dev help 
+.PHONY: update update-doctor sync-fastify install versions dedupe format lint e2e sloc sloc-details reset-dev help 
 
 NEST_FASTIFY_VERSION := $(shell npm info @nestjs/platform-fastify dependencies.fastify)
 
@@ -9,6 +9,19 @@ update:
 	@echo "Syncing Fastify version to match @nestjs/platform-fastify..."
 	docker compose run --no-deps --rm backend npm install fastify@$(NEST_FASTIFY_VERSION)
 	@echo "Update complete! Fastify synced to: $(NEST_FASTIFY_VERSION)"
+
+# Like update, but npm-check-updates doctor mode: upgrades that fail lint or e2e are reverted (Compose starts postgres for e2e).
+# doctorTest uses sh -c because ncu spawns the test without a shell, so bare "cmd && cmd" passes "&&" to eslint as a glob.
+update-doctor:
+	@echo "Doctor upgrade (lint + e2e gate, Fastify excluded)..."
+	@echo "Starting Compose stack for e2e (docker compose start)..."
+	docker compose start
+	docker compose run --rm backend npx --yes npm-check-updates --doctor -u -i -x fastify --doctorTest "sh -c 'npm run lint && npm run test:e2e'" --format group
+	@echo "Syncing Fastify version to match @nestjs/platform-fastify..."
+	docker compose run --no-deps --rm backend npm install fastify@$(NEST_FASTIFY_VERSION)
+	@echo "Update complete! Fastify synced to: $(NEST_FASTIFY_VERSION)"
+	@echo "Stopping Compose..."
+	docker compose stop
 
 # Just sync Fastify version without other updates
 sync-fastify:
@@ -77,6 +90,7 @@ help:
 	@echo "Available targets:"
 	@echo "  install         - Install dependencies"
 	@echo "  update          - Update all dependencies and sync fastify"
+	@echo "  update-doctor   - Doctor upgrade with lint + e2e gate; revert breaking bumps"
 	@echo "  sync-fastify    - Just sync Fastify version without other updates"
 	@echo "  versions        - Show current Fastify package versions"
 	@echo "  lint            - Invoke lint:show command"
