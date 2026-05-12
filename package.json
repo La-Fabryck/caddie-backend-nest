@@ -5,6 +5,9 @@
   "author": "Benjamin Fabry",
   "private": false,
   "license": "AGPL-3.0-only",
+  "engines": {
+    "node": ">=24.0.0"
+  },
   "keywords": [
     "nestjs",
     "fastify",
