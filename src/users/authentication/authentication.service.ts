@@ -4,10 +4,10 @@ import { JwtService, type JwtSignOptions, TokenExpiredError } from '@nestjs/jwt'
 import { compare } from 'bcrypt';
 import type { JwtPayload as JwtRegisteredClaims } from 'jsonwebtoken';
 import { ErrorInterface } from '@/app.configurator';
+import type { AuthConfig } from '@/config/auth.config';
 import { LoginDto } from '../dto/login.dto';
 import { INVALID_LOGIN } from '../messages/authentication';
 import { UsersService } from '../users/users.service';
-import { ACCESS_TOKEN_SECRET, ACCESS_TOKEN_TTL, REFRESH_TOKEN_SECRET, REFRESH_TOKEN_TTL } from '../utils/constants';
 
 /**
  * Application subject (`sub`) plus standard JWT registered claims (`iat`, `exp`, …) from `jsonwebtoken`.
@@ -20,12 +20,15 @@ export type AuthTokens = { accessToken: string; refreshToken: string };
 @Injectable()
 export class AuthenticationService {
   private readonly logger = new Logger(AuthenticationService.name);
+  private readonly auth: AuthConfig;
 
   constructor(
     private readonly usersService: UsersService,
     private readonly jwtService: JwtService,
-    private readonly configService: ConfigService,
-  ) {}
+    configService: ConfigService,
+  ) {
+    this.auth = configService.getOrThrow<AuthConfig>('auth');
+  }
 
   //TODO: message key
   private defaultError: ErrorInterface = {
@@ -53,7 +56,7 @@ export class AuthenticationService {
     let payload: JwtPayload;
     try {
       payload = await this.jwtService.verifyAsync<JwtPayload>(refreshToken, {
-        secret: this.getRefreshTokenSecret(),
+        secret: this.auth.refreshTokenSecret,
       });
     } catch (error: unknown) {
       if (error instanceof TokenExpiredError) {
@@ -76,8 +79,8 @@ export class AuthenticationService {
 
   private async signAccessToken(payload: JwtPayload): Promise<string> {
     const options: JwtSignOptions = {
-      secret: this.getAccessTokenSecret(),
-      expiresIn: this.getAccessTokenTtl(),
+      secret: this.auth.accessTokenSecret,
+      expiresIn: this.auth.accessTokenTtl,
     };
 
     return this.jwtService.signAsync<JwtPayload>(payload, options);
@@ -85,27 +88,10 @@ export class AuthenticationService {
 
   private async signRefreshToken(payload: JwtPayload): Promise<string> {
     const options: JwtSignOptions = {
-      secret: this.getRefreshTokenSecret(),
-      expiresIn: this.getRefreshTokenTtl(),
+      secret: this.auth.refreshTokenSecret,
+      expiresIn: this.auth.refreshTokenTtl,
     };
 
     return this.jwtService.signAsync<JwtPayload>(payload, options);
-  }
-
-  // FIXME: Better env var handling
-  private getAccessTokenSecret(): string {
-    return this.configService.getOrThrow<string>(ACCESS_TOKEN_SECRET);
-  }
-
-  private getRefreshTokenSecret(): string {
-    return this.configService.getOrThrow<string>(REFRESH_TOKEN_SECRET);
-  }
-
-  private getAccessTokenTtl(): NonNullable<JwtSignOptions['expiresIn']> {
-    return this.configService.getOrThrow<NonNullable<JwtSignOptions['expiresIn']>>(ACCESS_TOKEN_TTL);
-  }
-
-  private getRefreshTokenTtl(): NonNullable<JwtSignOptions['expiresIn']> {
-    return this.configService.getOrThrow<NonNullable<JwtSignOptions['expiresIn']>>(REFRESH_TOKEN_TTL);
   }
 }

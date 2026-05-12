@@ -2,21 +2,24 @@ import { CanActivate, ExecutionContext, Injectable, Logger, UnauthorizedExceptio
 import { ConfigService } from '@nestjs/config';
 import { JwtService, TokenExpiredError } from '@nestjs/jwt';
 import { FastifyRequest } from 'fastify';
+import type { AuthConfig } from '@/config/auth.config';
 import type { JwtPayload } from '../authentication/authentication.service';
-import { ACCESS_COOKIE_NAME, ACCESS_TOKEN_SECRET } from '../utils/constants';
 
 @Injectable()
 export class AuthenticationGuard implements CanActivate {
   private readonly logger = new Logger(AuthenticationGuard.name);
+  private readonly auth: AuthConfig;
 
   constructor(
     private readonly jwtService: JwtService,
-    private readonly configService: ConfigService,
-  ) {}
+    configService: ConfigService,
+  ) {
+    this.auth = configService.getOrThrow<AuthConfig>('auth');
+  }
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const request: FastifyRequest = context.switchToHttp().getRequest();
-    const cookieKey = this.configService.getOrThrow<string>(ACCESS_COOKIE_NAME);
+    const cookieKey = this.auth.accessCookieName;
 
     const token = request.cookies[cookieKey] ?? null;
     if (token == null) {
@@ -26,7 +29,7 @@ export class AuthenticationGuard implements CanActivate {
 
     try {
       const payload = await this.jwtService.verifyAsync<JwtPayload>(token, {
-        secret: this.configService.getOrThrow<string>(ACCESS_TOKEN_SECRET),
+        secret: this.auth.accessTokenSecret,
       });
 
       request.userId = payload.sub;

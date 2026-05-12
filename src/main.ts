@@ -1,6 +1,7 @@
 import { ConfigService } from '@nestjs/config';
 import { NestFactory } from '@nestjs/core';
 import { FastifyAdapter, type NestFastifyApplication } from '@nestjs/platform-fastify';
+import type { AppConfig } from '@/config/app.config';
 import { configureApp } from './app.configurator';
 import { AppModule } from './app.module';
 
@@ -9,11 +10,9 @@ async function bootstrap(): Promise<void> {
   await configureApp(app);
 
   const configService = app.get(ConfigService);
+  const appConfig = configService.getOrThrow<AppConfig>('app');
 
-  const port = configService.getOrThrow<string>('NEST_PORT');
-  const host = configService.getOrThrow<string>('NEST_IP');
-
-  await app.listen({ port: Number.parseInt(port), host });
+  await app.listen({ port: appConfig.listenPort, host: appConfig.listenHost });
 }
 
 // eslint-disable-next-line unicorn/prefer-top-level-await

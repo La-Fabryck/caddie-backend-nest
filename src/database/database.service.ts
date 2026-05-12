@@ -2,21 +2,25 @@ import { Injectable, OnModuleDestroy } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { Kysely, type LogConfig, PostgresDialect } from 'kysely';
 import { Pool } from 'pg';
+import type { AppConfig } from '@/config/app.config';
+import type { DatabaseConfig } from '@/config/database.config';
 import type { DB } from './database-types';
 
 @Injectable()
 export class DatabaseService extends Kysely<DB> implements OnModuleDestroy {
   constructor(configService: ConfigService) {
-    const port = configService.getOrThrow<string>('POSTGRES_PORT');
+    const database = configService.getOrThrow<DatabaseConfig>('database');
+    const { nodeEnv } = configService.getOrThrow<AppConfig>('app');
+
     const pool = new Pool({
-      host: configService.getOrThrow<string>('POSTGRES_HOST'),
-      port: Number.parseInt(port),
-      user: configService.getOrThrow<string>('POSTGRES_USER'),
-      password: configService.getOrThrow<string>('POSTGRES_PASSWORD'),
-      database: configService.getOrThrow<string>('POSTGRES_DB'),
+      host: database.host,
+      port: database.port,
+      user: database.user,
+      password: database.password,
+      database: database.database,
       max: 10,
     });
-    const log: LogConfig = configService.get<string>('NODE_ENV') === 'test' ? ['error'] : ['query', 'error'];
+    const log: LogConfig = nodeEnv === 'test' ? ['error'] : ['query', 'error'];
 
     super({
       dialect: new PostgresDialect({ pool }),
