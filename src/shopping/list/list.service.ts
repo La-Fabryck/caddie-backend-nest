@@ -1,6 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import type { Kysely } from 'kysely';
-import type { DB, ListRow, SubscriberRow, UserRow } from '@/database/database-types';
+import type { Insertable, Kysely } from 'kysely';
+import type { DB, List, ListRow, SubscriberRow, UserRow } from '@/database/database-types';
 import { DatabaseService } from '@/database/database.service';
 import { CreateListDto } from '../dto/create-list.dto';
 import { SubscribersService } from '../subscriber/subscribers.service';
@@ -23,14 +23,11 @@ export class ListService {
 
   async create({ user, pseudonym, title }: CreateList): Promise<ListWithSubs> {
     return this.database.transaction().execute(async (trx) => {
-      const listRow = await trx
-        .insertInto('List')
-        .values({
-          title,
-          updatedAt: new Date(),
-        })
-        .returningAll()
-        .executeTakeFirstOrThrow();
+      const list: Insertable<List> = {
+        title,
+      };
+
+      const listRow = await trx.insertInto('List').values(list).returningAll().executeTakeFirstOrThrow();
 
       const subscriber = await this.subscribersService.create(
         {
