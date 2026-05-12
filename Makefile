@@ -5,7 +5,7 @@ NEST_FASTIFY_VERSION := $(shell npm info @nestjs/platform-fastify dependencies.f
 # Update all dependencies and sync fastify, with grouped formatting
 update:
 	@echo "Updating dependencies (except Fastify)..."
-	docker compose run --no-deps --rm backend npx --yes npm-check-updates -u -i -x fastify --format group
+	docker compose run --no-deps --rm backend npx --yes npm-check-updates --upgrade --interactive --reject fastify --format group
 	@echo "Syncing Fastify version to match @nestjs/platform-fastify..."
 	docker compose run --no-deps --rm backend npm install fastify@$(NEST_FASTIFY_VERSION)
 	@echo "Update complete! Fastify synced to: $(NEST_FASTIFY_VERSION)"
@@ -16,7 +16,7 @@ update-doctor:
 	@echo "Doctor upgrade (lint + e2e gate, Fastify excluded)..."
 	@echo "Starting Compose stack for e2e (docker compose start)..."
 	docker compose start
-	docker compose run --rm backend npx --yes npm-check-updates --doctor -u -i -x fastify --doctorTest "sh -c 'npm run lint && npm run test:e2e'" --format group
+	docker compose run --rm backend npx --yes npm-check-updates --upgrade --interactive --reject fastify --doctor --doctorTest "sh -c 'npm run lint && npm run test:e2e'" --format group
 	@echo "Syncing Fastify version to match @nestjs/platform-fastify..."
 	docker compose run --no-deps --rm backend npm install fastify@$(NEST_FASTIFY_VERSION)
 	@echo "Update complete! Fastify synced to: $(NEST_FASTIFY_VERSION)"

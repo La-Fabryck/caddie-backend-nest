@@ -2,7 +2,7 @@
 FROM node:24-alpine AS deps
 WORKDIR /app
 
-COPY package*.json ./
+COPY package*.json .npmrc ./
 
 RUN npm ci
 
@@ -12,7 +12,7 @@ WORKDIR /app
 
 COPY --from=deps /app/node_modules ./node_modules
 COPY src ./src
-COPY package*.json tsconfig*.json nest-cli.json .swcrc ./
+COPY package*.json tsconfig*.json nest-cli.json .swcrc .npmrc ./
 
 # TODO: consider --omit=peer when ready
 ENV NODE_ENV=production
