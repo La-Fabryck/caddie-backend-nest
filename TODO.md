@@ -12,6 +12,7 @@ Mandatory :
 
 Later'ish :
 
+- **Config / prod env** — In `ConfigModule.forRoot`, consider `skipEnvFile` when `NODE_ENV === 'production'` (or a dedicated flag such as `LOAD_DOTENV`) so production relies only on injected `process.env` (e.g. Docker Compose `env_file` / platform secrets) and does not look for `.env` on disk. Today the prod image does not ship `.env`, and compose injects vars; this would make that contract explicit in code.
 - Validate unique item name per shopping list
 - ~~JWT Refresh~~
 - ~~Integration Tests~~
