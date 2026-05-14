@@ -1,9 +1,9 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import type { Kysely } from 'kysely';
 import type { DB, SubscriberRow, UserRow } from '@/database/database-types';
-import { DatabaseService } from '@/database/database.service';
-import { CreateSubcriberDto } from '../dto/create-subcriber.dto';
-import { UpdateSubcriberDto } from '../dto/update-subcriber.dto';
+import type { DatabaseService } from '@/database/database.service';
+import type { CreateSubcriberDto } from '../dto/create-subcriber.dto';
+import type { UpdateSubcriberDto } from '../dto/update-subcriber.dto';
 
 type CreateSubcriber = CreateSubcriberDto & { user: UserRow };
 
@@ -11,7 +11,10 @@ type CreateSubcriber = CreateSubcriberDto & { user: UserRow };
 export class SubscribersService {
   constructor(private readonly database: DatabaseService) {}
 
-  async create({ listId, name, user }: CreateSubcriber, tx: Kysely<DB>): Promise<SubscriberRow> {
+  async create(
+    { listId, name, user }: CreateSubcriber,
+    tx: Kysely<DB>,
+  ): Promise<SubscriberRow> {
     //TODO: Check if the subscriber already exists. What validation should we do?
     const row = await tx
       .insertInto('Subscriber')
@@ -27,10 +30,20 @@ export class SubscribersService {
   }
 
   async findAllByUser({ user }: { user: UserRow }): Promise<SubscriberRow[]> {
-    return this.database.selectFrom('Subscriber').where('userId', '=', user.id).selectAll().execute();
+    return this.database
+      .selectFrom('Subscriber')
+      .where('userId', '=', user.id)
+      .selectAll()
+      .execute();
   }
 
-  async findOneById({ id, user }: { id: string; user: UserRow }): Promise<SubscriberRow> {
+  async findOneById({
+    id,
+    user,
+  }: {
+    id: string;
+    user: UserRow;
+  }): Promise<SubscriberRow> {
     const subscription = await this.database
       .selectFrom('Subscriber')
       .where('id', '=', id)
@@ -45,7 +58,13 @@ export class SubscribersService {
     return subscription;
   }
 
-  async findOne({ listId, user }: { listId: string; user: UserRow }): Promise<SubscriberRow> {
+  async findOne({
+    listId,
+    user,
+  }: {
+    listId: string;
+    user: UserRow;
+  }): Promise<SubscriberRow> {
     const subscription = await this.database
       .selectFrom('Subscriber')
       .where('listId', '=', listId)

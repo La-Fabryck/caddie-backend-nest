@@ -1,11 +1,17 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { Insertable, type Kysely, Updateable } from 'kysely';
-import type { DB, Item, ItemRow, ItemTypeRow, UserRow } from '@/database/database-types';
-import { DatabaseService } from '@/database/database.service';
-import { CreateItemDto } from '../dto/create-item.dto';
-import { UpdateItemDto } from '../dto/update-item.dto';
-import { ItemTypeService } from '../item-type/item-type.service';
-import { ListService } from '../list/list.service';
+import type { Insertable, Kysely, Updateable } from 'kysely';
+import type {
+  DB,
+  Item,
+  ItemRow,
+  ItemTypeRow,
+  UserRow,
+} from '@/database/database-types';
+import type { DatabaseService } from '@/database/database.service';
+import type { CreateItemDto } from '../dto/create-item.dto';
+import type { UpdateItemDto } from '../dto/update-item.dto';
+import type { ItemTypeService } from '../item-type/item-type.service';
+import type { ListService } from '../list/list.service';
 
 type CreateItem = {
   createItemPayload: CreateItemDto & Pick<Item, 'listId'>;
@@ -20,7 +26,9 @@ type UpdateItem = {
 type FindItem = { listId: string; itemId: string; user: UserRow };
 
 type FindItems = { listId: string; user: UserRow };
-type ItemWithTypeRow = ItemRow & { itemType: Omit<ItemTypeRow, 'userId'> | null };
+type ItemWithTypeRow = ItemRow & {
+  itemType: Omit<ItemTypeRow, 'userId'> | null;
+};
 
 @Injectable()
 class ItemService {
@@ -41,7 +49,10 @@ class ItemService {
       isInCart: row.isInCart,
       quantity: row.quantity,
       itemTypeId: row.itemTypeId,
-      itemType: row.itemType_id == null ? null : { id: row.itemType_id, label: row.itemType_label ?? '' },
+      itemType:
+        row.itemType_id == null
+          ? null
+          : { id: row.itemType_id, label: row.itemType_label ?? '' },
     };
   }
 
@@ -66,7 +77,10 @@ class ItemService {
       .where('Item.id', '=', itemId)
       .where('Item.listId', '=', listId)
       .selectAll('Item')
-      .select(['ItemType.id as itemType_id', 'ItemType.label as itemType_label'])
+      .select([
+        'ItemType.id as itemType_id',
+        'ItemType.label as itemType_label',
+      ])
       .executeTakeFirst();
 
     if (row == null) {
@@ -76,7 +90,10 @@ class ItemService {
     return this.toItemWithTypeRow(row);
   }
 
-  async create({ createItemPayload, user }: CreateItem): Promise<ItemWithTypeRow> {
+  async create({
+    createItemPayload,
+    user,
+  }: CreateItem): Promise<ItemWithTypeRow> {
     // verify that the lists is accessible by the user
     await this.listService.findOneById({
       id: createItemPayload.listId,
@@ -104,18 +121,26 @@ class ItemService {
       // Use a CTE (Common Table Expression) so insert + type enrichment happen in one SQL statement.
       // `RETURNING` alone can only return columns from `Item`, not joined `ItemType` fields.
       const row = await trx
-        .with('createdItem', (database) => database.insertInto('Item').values(item).returningAll())
+        .with('createdItem', (database) =>
+          database.insertInto('Item').values(item).returningAll(),
+        )
         .selectFrom('createdItem')
         .leftJoin('ItemType', 'ItemType.id', 'createdItem.itemTypeId')
         .selectAll('createdItem')
-        .select(['ItemType.id as itemType_id', 'ItemType.label as itemType_label'])
+        .select([
+          'ItemType.id as itemType_id',
+          'ItemType.label as itemType_label',
+        ])
         .executeTakeFirstOrThrow();
 
       return this.toItemWithTypeRow(row);
     });
   }
 
-  async findAllWithTypeByListId({ listId, user }: FindItems): Promise<ItemWithTypeRow[]> {
+  async findAllWithTypeByListId({
+    listId,
+    user,
+  }: FindItems): Promise<ItemWithTypeRow[]> {
     await this.listService.findOneById({ id: listId, user });
 
     const rows = await this.database
@@ -124,7 +149,10 @@ class ItemService {
       .where('listId', '=', listId)
       .orderBy((eb) => eb.fn('lower', ['name']), 'asc')
       .selectAll('Item')
-      .select(['ItemType.id as itemType_id', 'ItemType.label as itemType_label'])
+      .select([
+        'ItemType.id as itemType_id',
+        'ItemType.label as itemType_label',
+      ])
       .execute();
 
     return rows.map((row) => this.toItemWithTypeRow(row));
@@ -136,7 +164,10 @@ class ItemService {
     return this.findOneWithType({ itemId, listId });
   }
 
-  async update({ updateItemPayload, user }: UpdateItem): Promise<ItemWithTypeRow> {
+  async update({
+    updateItemPayload,
+    user,
+  }: UpdateItem): Promise<ItemWithTypeRow> {
     const { id: itemId, listId, ...payload } = updateItemPayload;
 
     await this.findOne({
@@ -164,12 +195,20 @@ class ItemService {
       // We keep listId in the WHERE clause so route list and item stay consistent.
       const row = await trx
         .with('updatedItem', (database) =>
-          database.updateTable('Item').set(item).where('id', '=', itemId).where('listId', '=', listId).returningAll(),
+          database
+            .updateTable('Item')
+            .set(item)
+            .where('id', '=', itemId)
+            .where('listId', '=', listId)
+            .returningAll(),
         )
         .selectFrom('updatedItem')
         .leftJoin('ItemType', 'ItemType.id', 'updatedItem.itemTypeId')
         .selectAll('updatedItem')
-        .select(['ItemType.id as itemType_id', 'ItemType.label as itemType_label'])
+        .select([
+          'ItemType.id as itemType_id',
+          'ItemType.label as itemType_label',
+        ])
         .executeTakeFirstOrThrow();
 
       return this.toItemWithTypeRow(row);

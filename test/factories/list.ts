@@ -2,7 +2,10 @@ import { faker } from '@faker-js/faker';
 import type { UserRow } from '@/database/database-types';
 import type { CreateList } from '@/shopping/list/list.service';
 
-function createList(user: UserRow, overrides: Partial<CreateList> = {}): CreateList {
+function createList(
+  user: UserRow,
+  overrides: Partial<CreateList> = {},
+): CreateList {
   return {
     title: faker.food.dish(),
     pseudonym: faker.person.fullName(),

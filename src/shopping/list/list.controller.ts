@@ -1,11 +1,22 @@
-import { Body, Controller, Delete, Get, Param, ParseUUIDPipe, Patch, Post, UseGuards, UseInterceptors } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  ParseUUIDPipe,
+  Patch,
+  Post,
+  UseGuards,
+  UseInterceptors,
+} from '@nestjs/common';
 import type { UserRow } from '@/database/database-types';
 import { CurrentUser } from '@/users/decorators/current-user';
 import { AuthenticationGuard } from '@/users/guards/authentication.guard';
 import { AuthenticationInterceptor } from '@/users/interceptors/authentication.interceptor';
-import { CreateListDto } from '../dto/create-list.dto';
-import { UpdateListDto } from '../dto/update-list.dto';
-import { ListService } from './list.service';
+import type { CreateListDto } from '../dto/create-list.dto';
+import type { UpdateListDto } from '../dto/update-list.dto';
+import type { ListService } from './list.service';
 
 @Controller('list')
 export class ListController {
@@ -14,7 +25,10 @@ export class ListController {
   @UseGuards(AuthenticationGuard)
   @UseInterceptors(AuthenticationInterceptor)
   @Post()
-  async create(@Body() createListDto: CreateListDto, @CurrentUser() user: UserRow) {
+  async create(
+    @Body() createListDto: CreateListDto,
+    @CurrentUser() user: UserRow,
+  ) {
     return this.listService.create({
       title: createListDto.title,
       pseudonym: createListDto.pseudonym,
@@ -32,16 +46,22 @@ export class ListController {
   @UseGuards(AuthenticationGuard)
   @UseInterceptors(AuthenticationInterceptor)
   @Get(':id')
-  async findOneById(@Param('id', ParseUUIDPipe) id: string, @CurrentUser() user: UserRow) {
+  async findOneById(
+    @Param('id', ParseUUIDPipe) id: string,
+    @CurrentUser() user: UserRow,
+  ) {
     return this.listService.findOneById({ id, user });
   }
 
   @UseGuards(AuthenticationGuard)
   @UseInterceptors(AuthenticationInterceptor)
   @Patch(':id')
-  async update(@Param('id', ParseUUIDPipe) id: string, @CurrentUser() user: UserRow, @Body() updateShoppingDto: UpdateListDto) {
+  async update(
+    @Param('id', ParseUUIDPipe) id: string,
+    @CurrentUser() user: UserRow,
+    @Body() updateShoppingDto: UpdateListDto,
+  ) {
     return this.listService.update({
-      // eslint-disable-next-line @typescript-eslint/no-misused-spread
       payload: { ...updateShoppingDto, id },
       user,
     });
@@ -50,7 +70,10 @@ export class ListController {
   @UseGuards(AuthenticationGuard)
   @UseInterceptors(AuthenticationInterceptor)
   @Delete(':id')
-  async remove(@Param('id', ParseUUIDPipe) id: string, @CurrentUser() user: UserRow) {
+  async remove(
+    @Param('id', ParseUUIDPipe) id: string,
+    @CurrentUser() user: UserRow,
+  ) {
     return this.listService.remove({ id, user });
   }
 }

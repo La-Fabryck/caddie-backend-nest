@@ -1,16 +1,25 @@
 {
-    "rest-client.environmentVariables": {
-        "$shared": {
-            "version": "v1"
-        },
-        "local": {
-            "BASE_URL": "http://localhost:3001"
-        },
-        "production": {
-            "BASE_URL": "http://localhost:3001"
-        }
+  "editor.codeActionsOnSave": {
+    "source.fixAll.oxc": "always"
+  },
+  "[typescript]": {
+    "editor.defaultFormatter": "oxc.oxc-vscode"
+  },
+  "[javascript]": {
+    "editor.defaultFormatter": "oxc.oxc-vscode"
+  },
+  "rest-client.environmentVariables": {
+    "$shared": {
+      "version": "v1"
     },
-    "rest-client.enableTelemetry": false,
-    "rest-client.rememberCookiesForSubsequentRequests": false,
-    "rest-client.previewOption": "exchange"
+    "local": {
+      "BASE_URL": "http://localhost:3001"
+    },
+    "production": {
+      "BASE_URL": "http://localhost:3001"
+    }
+  },
+  "rest-client.enableTelemetry": false,
+  "rest-client.rememberCookiesForSubsequentRequests": false,
+  "rest-client.previewOption": "exchange"
 }

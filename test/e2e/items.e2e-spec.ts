@@ -26,7 +26,9 @@ describe('ItemController (e2e)', () => {
 
   describe('/list/:listId/items (POST)', () => {
     it('OK - Creates a list', async () => {
-      await using creator = await resourceCreator(app, { list: { quantity: SINGLE } });
+      await using creator = await resourceCreator(app, {
+        list: { quantity: SINGLE },
+      });
       const [storedList] = creator.lists;
 
       const item: CreateItemDto = {
@@ -77,7 +79,9 @@ describe('ItemController (e2e)', () => {
     });
 
     it('OK - Creates an item with explicit quantity', async () => {
-      await using creator = await resourceCreator(app, { list: { quantity: SINGLE } });
+      await using creator = await resourceCreator(app, {
+        list: { quantity: SINGLE },
+      });
       const [storedList] = creator.lists;
       const quantity = faker.number.int({ min: 2, max: 10 });
 
@@ -101,7 +105,9 @@ describe('ItemController (e2e)', () => {
     });
 
     it('OK - Creates an item with item type', async () => {
-      await using creator = await resourceCreator(app, { list: { quantity: SINGLE } });
+      await using creator = await resourceCreator(app, {
+        list: { quantity: SINGLE },
+      });
       const [storedList] = creator.lists;
 
       const typeResult = await app.inject({
@@ -131,7 +137,9 @@ describe('ItemController (e2e)', () => {
     });
 
     it('KO - Rejects item type from another user on create', async () => {
-      await using creator = await resourceCreator(app, { list: { quantity: SINGLE } });
+      await using creator = await resourceCreator(app, {
+        list: { quantity: SINGLE },
+      });
       await using outsider = await resourceCreator(app);
       const [storedList] = creator.lists;
 
@@ -218,7 +226,9 @@ describe('ItemController (e2e)', () => {
       const payload = JSON.parse(result.payload) as ItemRow[];
       expect(payload).not.toHaveLength(0);
       for (const expectedItems of payload) {
-        const storedItems = creator.items.find((storedList) => storedList.id === expectedItems.id);
+        const storedItems = creator.items.find(
+          (item) => item.id === expectedItems.id,
+        );
         expect(storedItems).not.toBeNull();
         expect(expectedItems.name).toEqual(storedItems?.name);
         expect(expectedItems.quantity).toEqual(storedItems?.quantity);
@@ -237,7 +247,10 @@ describe('ItemController (e2e)', () => {
 
   describe('/list/:listId/items/:itemId (GET)', () => {
     it('OK - Finds an item by its id', async () => {
-      await using creator = await resourceCreator(app, { list: { quantity: SINGLE }, items: { quantity: SINGLE } });
+      await using creator = await resourceCreator(app, {
+        list: { quantity: SINGLE },
+        items: { quantity: SINGLE },
+      });
       const [storedList] = creator.lists;
       const [storedItem] = creator.items;
 
@@ -267,7 +280,9 @@ describe('ItemController (e2e)', () => {
     });
 
     it('KO - Returns Not Found for non-existent resource', async () => {
-      await using creator = await resourceCreator(app, { list: { quantity: SINGLE } });
+      await using creator = await resourceCreator(app, {
+        list: { quantity: SINGLE },
+      });
       const [storedList] = creator.lists;
 
       const result = await app.inject({
@@ -282,7 +297,10 @@ describe('ItemController (e2e)', () => {
 
   describe('/list/:listId/items/:itemId (PATCH)', () => {
     it('OK - Update an item', async () => {
-      await using creator = await resourceCreator(app, { list: { quantity: SINGLE }, items: { quantity: SINGLE } });
+      await using creator = await resourceCreator(app, {
+        list: { quantity: SINGLE },
+        items: { quantity: SINGLE },
+      });
       const [storedList] = creator.lists;
       const [storedItem] = creator.items;
 
@@ -317,7 +335,9 @@ describe('ItemController (e2e)', () => {
     });
 
     it('KO - Returns Not Found for non-existent resource', async () => {
-      await using creator = await resourceCreator(app, { list: { quantity: SINGLE } });
+      await using creator = await resourceCreator(app, {
+        list: { quantity: SINGLE },
+      });
       const [storedList] = creator.lists;
 
       const result = await app.inject({
@@ -330,7 +350,10 @@ describe('ItemController (e2e)', () => {
     });
 
     it('OK - Update quantity', async () => {
-      await using creator = await resourceCreator(app, { list: { quantity: SINGLE }, items: { quantity: SINGLE } });
+      await using creator = await resourceCreator(app, {
+        list: { quantity: SINGLE },
+        items: { quantity: SINGLE },
+      });
       const [storedList] = creator.lists;
       const [storedItem] = creator.items;
       const quantity = faker.number.int({ min: 2, max: 10 });
@@ -353,7 +376,10 @@ describe('ItemController (e2e)', () => {
     });
 
     it('OK - Update item type', async () => {
-      await using creator = await resourceCreator(app, { list: { quantity: SINGLE }, items: { quantity: SINGLE } });
+      await using creator = await resourceCreator(app, {
+        list: { quantity: SINGLE },
+        items: { quantity: SINGLE },
+      });
       const [storedList] = creator.lists;
       const [storedItem] = creator.items;
 
@@ -382,7 +408,10 @@ describe('ItemController (e2e)', () => {
     });
 
     it('KO - Rejects item type from another user', async () => {
-      await using creator = await resourceCreator(app, { list: { quantity: SINGLE }, items: { quantity: SINGLE } });
+      await using creator = await resourceCreator(app, {
+        list: { quantity: SINGLE },
+        items: { quantity: SINGLE },
+      });
       await using outsider = await resourceCreator(app);
       const [targetList] = creator.lists;
       const [storedItem] = creator.items;
@@ -410,7 +439,10 @@ describe('ItemController (e2e)', () => {
 
   describe('/list/:listId/items/:itemId (DELETE)', () => {
     it('OK - Delete a list', async () => {
-      await using creator = await resourceCreator(app, { list: { quantity: SINGLE }, items: { quantity: SINGLE, remove: false } });
+      await using creator = await resourceCreator(app, {
+        list: { quantity: SINGLE },
+        items: { quantity: SINGLE, remove: false },
+      });
       const [storedList] = creator.lists;
       const [storedItem] = creator.items;
 
@@ -423,7 +455,10 @@ describe('ItemController (e2e)', () => {
       expect(result.statusCode).toEqual(HttpStatus.OK);
 
       const itemService = app.get(ItemService);
-      const remainingItems = await itemService.findAllWithTypeByListId({ listId: storedList.id, user: creator.user });
+      const remainingItems = await itemService.findAllWithTypeByListId({
+        listId: storedList.id,
+        user: creator.user,
+      });
       expect(remainingItems).toHaveLength(0);
     });
 
@@ -437,7 +472,9 @@ describe('ItemController (e2e)', () => {
     });
 
     it('KO - Returns Not Found for non-existent resource', async () => {
-      await using creator = await resourceCreator(app, { list: { quantity: SINGLE } });
+      await using creator = await resourceCreator(app, {
+        list: { quantity: SINGLE },
+      });
       const [storedList] = creator.lists;
 
       const result = await app.inject({

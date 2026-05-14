@@ -1,4 +1,7 @@
-import { FastifyAdapter, type NestFastifyApplication } from '@nestjs/platform-fastify';
+import {
+  FastifyAdapter,
+  type NestFastifyApplication,
+} from '@nestjs/platform-fastify';
 import { Test } from '@nestjs/testing';
 import { configureApp } from '@/app.configurator';
 import { AppModule } from '@/app.module';
@@ -8,7 +11,9 @@ async function createAppE2E(): Promise<NestFastifyApplication> {
     imports: [AppModule],
   }).compile();
 
-  const app: NestFastifyApplication = moduleReference.createNestApplication(new FastifyAdapter());
+  const app: NestFastifyApplication = moduleReference.createNestApplication(
+    new FastifyAdapter(),
+  );
   await configureApp(app);
 
   await app.init();

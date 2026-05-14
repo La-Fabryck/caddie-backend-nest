@@ -1,10 +1,20 @@
-import { Body, Controller, Delete, Get, Param, ParseUUIDPipe, Patch, UseGuards, UseInterceptors } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  ParseUUIDPipe,
+  Patch,
+  UseGuards,
+  UseInterceptors,
+} from '@nestjs/common';
 import type { UserRow } from '@/database/database-types';
 import { CurrentUser } from '@/users/decorators/current-user';
 import { AuthenticationGuard } from '@/users/guards/authentication.guard';
 import { AuthenticationInterceptor } from '@/users/interceptors/authentication.interceptor';
-import { UpdateSubcriberDto } from '../dto/update-subcriber.dto';
-import { SubscribersService } from './subscribers.service';
+import type { UpdateSubcriberDto } from '../dto/update-subcriber.dto';
+import type { SubscribersService } from './subscribers.service';
 
 @Controller('subscribers')
 export class SubscribersController {
@@ -27,12 +37,18 @@ export class SubscribersController {
   @UseGuards(AuthenticationGuard)
   @UseInterceptors(AuthenticationInterceptor)
   @Get(':id')
-  async findOne(@Param('id', ParseUUIDPipe) id: string, @CurrentUser() user: UserRow) {
+  async findOne(
+    @Param('id', ParseUUIDPipe) id: string,
+    @CurrentUser() user: UserRow,
+  ) {
     return this.subscribersService.findOneById({ id, user });
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateSubcriberDto: UpdateSubcriberDto) {
+  update(
+    @Param('id') id: string,
+    @Body() updateSubcriberDto: UpdateSubcriberDto,
+  ) {
     return this.subscribersService.update(id, updateSubcriberDto);
   }
 

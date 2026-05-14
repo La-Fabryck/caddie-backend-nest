@@ -25,7 +25,11 @@ function formatValidationErrors(errors: ValidationError[]): string {
  * Validates a configuration plain object using `plainToInstance` + `validateSync`,
  * then throws with readable messages on failure. Used by `registerAs` factories.
  */
-export function validateWithClass<T extends object>(Target: Constructor<T>, plain: Record<string, unknown>, errorPrefix: string): T {
+export function validateWithClass<T extends object>(
+  Target: Constructor<T>,
+  plain: Record<string, unknown>,
+  errorPrefix: string,
+): T {
   const validated = plainToInstance(Target, plain, {
     enableImplicitConversion: true,
   });

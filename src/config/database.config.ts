@@ -4,7 +4,7 @@ import { IsInt, IsNotEmpty, IsString, Max, Min } from 'class-validator';
 import { MAX_TCP_PORT, MIN_TCP_PORT } from './tcp-port-bounds';
 import { validateWithClass } from './validate-with-class';
 
-export type DatabaseConfig = {
+type DatabaseConfig = {
   host: string;
   port: number;
   user: string;
@@ -12,7 +12,7 @@ export type DatabaseConfig = {
   database: string;
 };
 
-class DatabaseConfigDto {
+class DatabaseConfigDto implements DatabaseConfig {
   @IsString()
   @IsNotEmpty()
   host!: string;
@@ -45,5 +45,11 @@ export default registerAs('database', (): DatabaseConfig => {
     database: process.env['POSTGRES_DB'],
   };
 
-  return validateWithClass(DatabaseConfigDto, plain, 'Database configuration validation failed');
+  return validateWithClass(
+    DatabaseConfigDto,
+    plain,
+    'Database configuration validation failed',
+  );
 });
+
+export type { DatabaseConfig };

@@ -41,7 +41,9 @@ describe('ListController (e2e)', () => {
 
       const payload = JSON.parse(result.payload) as ListWithSubs;
       expect(payload.title).toEqual(list.title);
-      expect(payload.subscribers.some((subscriber) => subscriber.name)).toBeTruthy();
+      expect(
+        payload.subscribers.some((subscriber) => subscriber.name),
+      ).toBeTruthy();
 
       await app.get(ListService).remove({ id: payload.id, user: creator.user });
     });
@@ -77,7 +79,9 @@ describe('ListController (e2e)', () => {
 
   describe('/list (GET)', () => {
     it('OK - Finds list from a User', async () => {
-      await using creator = await resourceCreator(app, { list: { quantity: SINGLE } });
+      await using creator = await resourceCreator(app, {
+        list: { quantity: SINGLE },
+      });
 
       const result = await app.inject({
         method: 'GET',
@@ -90,7 +94,9 @@ describe('ListController (e2e)', () => {
       const payload = JSON.parse(result.payload) as ListRow[];
       expect(payload).not.toHaveLength(0);
       for (const expectedList of payload) {
-        const storedList = creator.lists.find((storedList) => storedList.id === expectedList.id);
+        const storedList = creator.lists.find(
+          (list) => list.id === expectedList.id,
+        );
         expect(storedList).not.toBeNull();
         expect(expectedList.title).toEqual(storedList?.title);
       }
@@ -108,7 +114,9 @@ describe('ListController (e2e)', () => {
 
   describe('/list/:id (GET)', () => {
     it('OK - Finds a list by its id', async () => {
-      await using creator = await resourceCreator(app, { list: { quantity: SINGLE } });
+      await using creator = await resourceCreator(app, {
+        list: { quantity: SINGLE },
+      });
       const [storedList] = creator.lists;
 
       const result = await app.inject({
@@ -147,7 +155,9 @@ describe('ListController (e2e)', () => {
 
   describe('/list/:id (PATCH)', () => {
     it('OK - Update a list', async () => {
-      await using creator = await resourceCreator(app, { list: { quantity: SINGLE } });
+      await using creator = await resourceCreator(app, {
+        list: { quantity: SINGLE },
+      });
       const [storedList] = creator.lists;
 
       const updatePayload: UpdateListDto = {
@@ -192,7 +202,9 @@ describe('ListController (e2e)', () => {
 
   describe('/list/:id (DELETE)', () => {
     it('OK - Delete a list', async () => {
-      await using creator = await resourceCreator(app, { list: { quantity: SINGLE, remove: false } });
+      await using creator = await resourceCreator(app, {
+        list: { quantity: SINGLE, remove: false },
+      });
       const [storedList] = creator.lists;
 
       const result = await app.inject({
@@ -204,7 +216,9 @@ describe('ListController (e2e)', () => {
       expect(result.statusCode).toEqual(HttpStatus.OK);
 
       const listService = app.get(ListService);
-      const remainingLists = await listService.findListsBySubscriber({ user: creator.user });
+      const remainingLists = await listService.findListsBySubscriber({
+        user: creator.user,
+      });
       expect(remainingLists).toHaveLength(0);
     });
 

@@ -4,13 +4,13 @@ import { IsIn, IsInt, IsNotEmpty, IsString, Max, Min } from 'class-validator';
 import { MAX_TCP_PORT, MIN_TCP_PORT } from './tcp-port-bounds';
 import { validateWithClass } from './validate-with-class';
 
-export type AppConfig = {
+type AppConfig = {
   nodeEnv: 'development' | 'production' | 'test';
   listenHost: string;
   listenPort: number;
 };
 
-class AppConfigDto {
+class AppConfigDto implements AppConfig {
   @IsIn(['development', 'production', 'test'])
   nodeEnv!: AppConfig['nodeEnv'];
 
@@ -32,5 +32,11 @@ export default registerAs('app', (): AppConfig => {
     listenPort: process.env['NEST_PORT'],
   };
 
-  return validateWithClass(AppConfigDto, plain, 'App configuration validation failed');
+  return validateWithClass(
+    AppConfigDto,
+    plain,
+    'App configuration validation failed',
+  );
 });
+
+export type { AppConfig };

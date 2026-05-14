@@ -4,7 +4,7 @@ import type { StringValue } from 'ms';
 import { IsMsDurationString } from '@/lib/decorators/is-ms-duration';
 import { validateWithClass } from './validate-with-class';
 
-export type AuthConfig = {
+type AuthConfig = {
   accessCookieName: string;
   refreshCookieName: string;
   accessTokenSecret: string;
@@ -13,7 +13,7 @@ export type AuthConfig = {
   refreshTokenTtl: StringValue;
 };
 
-class AuthConfigDto {
+class AuthConfigDto implements AuthConfig {
   @IsString()
   @IsNotEmpty()
   accessCookieName!: string;
@@ -47,5 +47,11 @@ export default registerAs('auth', (): AuthConfig => {
     refreshTokenTtl: process.env['REFRESH_TOKEN_TTL'],
   };
 
-  return validateWithClass(AuthConfigDto, plain, 'Auth configuration validation failed');
+  return validateWithClass(
+    AuthConfigDto,
+    plain,
+    'Auth configuration validation failed',
+  );
 });
+
+export type { AuthConfig };

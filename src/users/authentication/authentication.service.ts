@@ -1,21 +1,32 @@
-import { ForbiddenException, Injectable, Logger, UnauthorizedException } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
-import { JwtService, type JwtSignOptions, TokenExpiredError } from '@nestjs/jwt';
+import {
+  ForbiddenException,
+  Injectable,
+  Logger,
+  UnauthorizedException,
+} from '@nestjs/common';
+import type { ConfigService } from '@nestjs/config';
+// Nest DI needs `JwtService` as a runtime value for `emitDecoratorMetadata` / param types.
+// eslint-disable-next-line typescript/consistent-type-imports -- Nest DI: JwtService must stay a value import
+import {
+  JwtService,
+  type JwtSignOptions,
+  TokenExpiredError,
+} from '@nestjs/jwt';
 import { compare } from 'bcrypt';
 import type { JwtPayload as JwtRegisteredClaims } from 'jsonwebtoken';
-import { ErrorInterface } from '@/app.configurator';
+import type { ErrorInterface } from '@/app.configurator';
 import type { AuthConfig } from '@/config/auth.config';
-import { LoginDto } from '../dto/login.dto';
+import type { LoginDto } from '../dto/login.dto';
 import { INVALID_LOGIN } from '../messages/authentication';
-import { UsersService } from '../users/users.service';
+import type { UsersService } from '../users/users.service';
 
 /**
  * Application subject (`sub`) plus standard JWT registered claims (`iat`, `exp`, …) from `jsonwebtoken`.
  */
-export type JwtPayload = JwtRegisteredClaims & {
+type JwtPayload = JwtRegisteredClaims & {
   sub: string;
 };
-export type AuthTokens = { accessToken: string; refreshToken: string };
+type AuthTokens = { accessToken: string; refreshToken: string };
 
 @Injectable()
 export class AuthenticationService {
@@ -47,7 +58,10 @@ export class AuthenticationService {
     }
 
     const payload = { sub: user.id };
-    const [accessToken, refreshToken] = await Promise.all([this.signAccessToken(payload), this.signRefreshToken(payload)]);
+    const [accessToken, refreshToken] = await Promise.all([
+      this.signAccessToken(payload),
+      this.signRefreshToken(payload),
+    ]);
 
     return { accessToken, refreshToken };
   }
@@ -63,7 +77,9 @@ export class AuthenticationService {
         const message = `Refresh token expired at ${String(error.expiredAt)}`;
         this.logger.log(message);
       } else if (error instanceof Error) {
-        this.logger.warn(`Refresh token verification failed: ${error.name}, cause : ${error.cause}`);
+        this.logger.warn(
+          `Refresh token verification failed: ${error.name}, cause : ${error.cause}`,
+        );
       } else {
         this.logger.error(`Refresh token verification failed: ${error}`);
       }
@@ -95,3 +111,5 @@ export class AuthenticationService {
     return this.jwtService.signAsync<JwtPayload>(payload, options);
   }
 }
+
+export type { AuthTokens, JwtPayload };

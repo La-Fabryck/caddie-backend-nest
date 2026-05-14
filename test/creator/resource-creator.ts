@@ -8,7 +8,9 @@ import { createManyItems } from 'test/factories/item';
 import { createManyLists } from 'test/factories/list';
 import { createUser } from '../factories/user';
 
-function stringifyCookieArray(cookies: Response['cookies']): ResourceCreator['cookies'] {
+function stringifyCookieArray(
+  cookies: Response['cookies'],
+): ResourceCreator['cookies'] {
   const cookiesObject: Record<string, string> = {};
 
   for (const cookie of cookies) {
@@ -43,8 +45,14 @@ async function resourceCreator(
   app: NestFastifyApplication,
   {
     loginUser = true,
-    list: { quantity: listsQuantity = 0, remove: removeLists = true } = scenarioDefaults,
-    items: { quantity: itemsQuantity = 0, remove: removeItems = true } = scenarioDefaults,
+    list: {
+      quantity: listsQuantity = 0,
+      remove: removeLists = true,
+    } = scenarioDefaults,
+    items: {
+      quantity: itemsQuantity = 0,
+      remove: removeItems = true,
+    } = scenarioDefaults,
   }: Partial<Options> = {},
 ): Promise<ResourceCreator> {
   if (itemsQuantity !== 0 && listsQuantity === 0) {
@@ -70,16 +78,23 @@ async function resourceCreator(
   const lists: ListWithSubs[] = [];
   if (listsQuantity) {
     const creationListsPayload = createManyLists(user, listsQuantity);
-    const createdLists = await Promise.all(creationListsPayload.map(async (list) => listService.create(list)));
+    const createdLists = await Promise.all(
+      creationListsPayload.map(async (list) => listService.create(list)),
+    );
     lists.push(...createdLists);
   }
 
   const itemService = app.get(ItemService);
   const items: ItemRow[] = [];
   if (itemsQuantity) {
-    const itemCreationPayloads: ReturnType<typeof createManyItems> = lists.flatMap((list) => createManyItems(list.id, itemsQuantity));
+    const itemCreationPayloads: ReturnType<typeof createManyItems> =
+      lists.flatMap((list) => createManyItems(list.id, itemsQuantity));
 
-    const createdItems = await Promise.all(itemCreationPayloads.map(async (item) => itemService.create({ createItemPayload: item, user })));
+    const createdItems = await Promise.all(
+      itemCreationPayloads.map(async (item) =>
+        itemService.create({ createItemPayload: item, user }),
+      ),
+    );
     items.push(...createdItems);
   }
 
@@ -90,10 +105,16 @@ async function resourceCreator(
     cookies,
     [Symbol.asyncDispose]: async () => {
       if (removeItems && itemsQuantity) {
-        await Promise.all(items.map(async (item) => itemService.remove(item.listId, item.id, user)));
+        await Promise.all(
+          items.map(async (item) =>
+            itemService.remove(item.listId, item.id, user),
+          ),
+        );
       }
       if (removeLists && listsQuantity) {
-        await Promise.all(lists.map(async (list) => listService.remove({ id: list.id, user })));
+        await Promise.all(
+          lists.map(async (list) => listService.remove({ id: list.id, user })),
+        );
       }
       return usersService.remove(user.id);
     },

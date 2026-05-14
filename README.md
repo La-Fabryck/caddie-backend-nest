@@ -18,6 +18,7 @@ make install
 ```
 
 This includes:
+
 - creating `caddie_network` (if missing)
 - pulling Docker images
 - building the backend image

@@ -1,4 +1,8 @@
-import { type ValidationArguments, ValidatorConstraint, type ValidatorConstraintInterface } from 'class-validator';
+import {
+  type ValidationArguments,
+  ValidatorConstraint,
+  type ValidatorConstraintInterface,
+} from 'class-validator';
 import ms, { type StringValue } from 'ms';
 
 /**

@@ -1,7 +1,15 @@
-import { CanActivate, ExecutionContext, Injectable, Logger, UnauthorizedException } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
+import {
+  type CanActivate,
+  type ExecutionContext,
+  Injectable,
+  Logger,
+  UnauthorizedException,
+} from '@nestjs/common';
+import type { ConfigService } from '@nestjs/config';
+// Nest DI needs `JwtService` as a runtime value for `emitDecoratorMetadata` / param types.
+// eslint-disable-next-line typescript/consistent-type-imports -- Nest DI: JwtService must stay a value import
 import { JwtService, TokenExpiredError } from '@nestjs/jwt';
-import { FastifyRequest } from 'fastify';
+import type { FastifyRequest } from 'fastify';
 import type { AuthConfig } from '@/config/auth.config';
 import type { JwtPayload } from '../authentication/authentication.service';
 
@@ -39,7 +47,9 @@ export class AuthenticationGuard implements CanActivate {
       if (error instanceof TokenExpiredError) {
         this.logger.debug(`Access token expired at ${String(error.expiredAt)}`);
       } else if (error instanceof Error) {
-        this.logger.warn(`Access token verification failed: ${error.name}, cause : ${error.cause}`);
+        this.logger.warn(
+          `Access token verification failed: ${error.name}, cause : ${error.cause}`,
+        );
       } else {
         this.logger.error(`Access token verification failed: ${error}`);
       }

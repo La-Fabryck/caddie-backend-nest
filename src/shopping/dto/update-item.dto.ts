@@ -5,7 +5,10 @@ import { CreateItemDto } from './create-item.dto';
 
 type UpdateItemInterface = Omit<ItemRow, 'id' | 'listId'>;
 
-export class UpdateItemDto extends PartialType(CreateItemDto) implements Partial<UpdateItemInterface> {
+export class UpdateItemDto
+  extends PartialType(CreateItemDto)
+  implements Partial<UpdateItemInterface>
+{
   @IsOptional()
   @IsBoolean()
   isInCart?: boolean;

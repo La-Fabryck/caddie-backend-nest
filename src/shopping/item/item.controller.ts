@@ -1,11 +1,22 @@
-import { Body, Controller, Delete, Get, Param, ParseUUIDPipe, Patch, Post, UseGuards, UseInterceptors } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  ParseUUIDPipe,
+  Patch,
+  Post,
+  UseGuards,
+  UseInterceptors,
+} from '@nestjs/common';
 import type { UserRow } from '@/database/database-types';
 import { CurrentUser } from '@/users/decorators/current-user';
 import { AuthenticationGuard } from '@/users/guards/authentication.guard';
 import { AuthenticationInterceptor } from '@/users/interceptors/authentication.interceptor';
-import { CreateItemDto } from '../dto/create-item.dto';
-import { UpdateItemDto } from '../dto/update-item.dto';
-import { CreateItem, ItemService } from './item.service';
+import type { CreateItemDto } from '../dto/create-item.dto';
+import type { UpdateItemDto } from '../dto/update-item.dto';
+import type { CreateItem, ItemService } from './item.service';
 
 @Controller('/list/:listId/items')
 export class ItemController {
@@ -14,7 +25,11 @@ export class ItemController {
   @UseGuards(AuthenticationGuard)
   @UseInterceptors(AuthenticationInterceptor)
   @Post()
-  async create(@Param('listId', ParseUUIDPipe) listId: string, @Body() createItemDto: CreateItemDto, @CurrentUser() user: UserRow) {
+  async create(
+    @Param('listId', ParseUUIDPipe) listId: string,
+    @Body() createItemDto: CreateItemDto,
+    @CurrentUser() user: UserRow,
+  ) {
     const createItemPayload: CreateItem['createItemPayload'] = {
       listId,
       name: createItemDto.name,
@@ -37,7 +52,10 @@ export class ItemController {
   @UseGuards(AuthenticationGuard)
   @UseInterceptors(AuthenticationInterceptor)
   @Get()
-  async findAll(@Param('listId', ParseUUIDPipe) listId: string, @CurrentUser() user: UserRow) {
+  async findAll(
+    @Param('listId', ParseUUIDPipe) listId: string,
+    @CurrentUser() user: UserRow,
+  ) {
     return this.itemService.findAllWithTypeByListId({ listId, user });
   }
 
@@ -52,10 +70,10 @@ export class ItemController {
     return this.itemService.findOne({ itemId, listId, user });
   }
 
-  // eslint-disable-next-line max-params
   @UseGuards(AuthenticationGuard)
   @UseInterceptors(AuthenticationInterceptor)
   @Patch(':itemId')
+  // eslint-disable-next-line max-params -- Nest route params + body + user
   async update(
     @Param('listId', ParseUUIDPipe) listId: string,
     @Param('itemId', ParseUUIDPipe) itemId: string,
@@ -63,7 +81,6 @@ export class ItemController {
     @CurrentUser() user: UserRow,
   ) {
     return this.itemService.update({
-      // eslint-disable-next-line @typescript-eslint/no-misused-spread
       updateItemPayload: { ...updateShoppingDto, listId, id: itemId },
       user,
     });

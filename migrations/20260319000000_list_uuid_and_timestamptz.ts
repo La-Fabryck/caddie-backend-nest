@@ -1,4 +1,3 @@
-/* eslint-disable unicorn/filename-case -- migration names are fixed (Kysely keys) */
 import { type Kysely, sql } from 'kysely';
 
 /**
@@ -9,13 +8,31 @@ import { type Kysely, sql } from 'kysely';
  * - id defaults: gen_random_uuid() on List, User, Item, Subscriber
  */
 export async function up(database: Kysely<unknown>): Promise<void> {
-  await database.schema.alterTable('Item').dropConstraint('Item_listId_fkey').ifExists().execute();
-  await database.schema.alterTable('Subscriber').dropConstraint('Subscriber_listId_fkey').ifExists().execute();
-  await database.schema.alterTable('Subscriber').dropConstraint('Subscriber_userId_fkey').ifExists().execute();
+  await database.schema
+    .alterTable('Item')
+    .dropConstraint('Item_listId_fkey')
+    .ifExists()
+    .execute();
+  await database.schema
+    .alterTable('Subscriber')
+    .dropConstraint('Subscriber_listId_fkey')
+    .ifExists()
+    .execute();
+  await database.schema
+    .alterTable('Subscriber')
+    .dropConstraint('Subscriber_userId_fkey')
+    .ifExists()
+    .execute();
 
-  await sql`ALTER TABLE "List" ALTER COLUMN "id" TYPE uuid USING "id"::uuid;`.execute(database);
-  await sql`ALTER TABLE "Item" ALTER COLUMN "listId" TYPE uuid USING "listId"::uuid;`.execute(database);
-  await sql`ALTER TABLE "Subscriber" ALTER COLUMN "listId" TYPE uuid USING "listId"::uuid;`.execute(database);
+  await sql`ALTER TABLE "List" ALTER COLUMN "id" TYPE uuid USING "id"::uuid;`.execute(
+    database,
+  );
+  await sql`ALTER TABLE "Item" ALTER COLUMN "listId" TYPE uuid USING "listId"::uuid;`.execute(
+    database,
+  );
+  await sql`ALTER TABLE "Subscriber" ALTER COLUMN "listId" TYPE uuid USING "listId"::uuid;`.execute(
+    database,
+  );
 
   await sql`
     DO $$
@@ -44,10 +61,18 @@ export async function up(database: Kysely<unknown>): Promise<void> {
     .alterColumn('updatedAt', (ac) => ac.setDefault(sql`now()`))
     .execute();
 
-  await sql`ALTER TABLE "User" ALTER COLUMN "id" TYPE uuid USING "id"::uuid;`.execute(database);
-  await sql`ALTER TABLE "Subscriber" ALTER COLUMN "userId" TYPE uuid USING "userId"::uuid;`.execute(database);
-  await sql`ALTER TABLE "Item" ALTER COLUMN "id" TYPE uuid USING "id"::uuid;`.execute(database);
-  await sql`ALTER TABLE "Subscriber" ALTER COLUMN "id" TYPE uuid USING "id"::uuid;`.execute(database);
+  await sql`ALTER TABLE "User" ALTER COLUMN "id" TYPE uuid USING "id"::uuid;`.execute(
+    database,
+  );
+  await sql`ALTER TABLE "Subscriber" ALTER COLUMN "userId" TYPE uuid USING "userId"::uuid;`.execute(
+    database,
+  );
+  await sql`ALTER TABLE "Item" ALTER COLUMN "id" TYPE uuid USING "id"::uuid;`.execute(
+    database,
+  );
+  await sql`ALTER TABLE "Subscriber" ALTER COLUMN "id" TYPE uuid USING "id"::uuid;`.execute(
+    database,
+  );
 
   await database.schema
     .alterTable('User')
@@ -64,30 +89,54 @@ export async function up(database: Kysely<unknown>): Promise<void> {
 
   await database.schema
     .alterTable('Item')
-    .addForeignKeyConstraint('Item_listId_fkey', ['listId'], 'List', ['id'], (callback) =>
-      callback.onUpdate('cascade').onDelete('restrict'),
+    .addForeignKeyConstraint(
+      'Item_listId_fkey',
+      ['listId'],
+      'List',
+      ['id'],
+      (callback) => callback.onUpdate('cascade').onDelete('restrict'),
     )
     .execute();
 
   await database.schema
     .alterTable('Subscriber')
-    .addForeignKeyConstraint('Subscriber_listId_fkey', ['listId'], 'List', ['id'], (callback) =>
-      callback.onUpdate('cascade').onDelete('restrict'),
+    .addForeignKeyConstraint(
+      'Subscriber_listId_fkey',
+      ['listId'],
+      'List',
+      ['id'],
+      (callback) => callback.onUpdate('cascade').onDelete('restrict'),
     )
     .execute();
 
   await database.schema
     .alterTable('Subscriber')
-    .addForeignKeyConstraint('Subscriber_userId_fkey', ['userId'], 'User', ['id'], (callback) =>
-      callback.onUpdate('cascade').onDelete('restrict'),
+    .addForeignKeyConstraint(
+      'Subscriber_userId_fkey',
+      ['userId'],
+      'User',
+      ['id'],
+      (callback) => callback.onUpdate('cascade').onDelete('restrict'),
     )
     .execute();
 }
 
 export async function down(database: Kysely<unknown>): Promise<void> {
-  await database.schema.alterTable('Item').dropConstraint('Item_listId_fkey').ifExists().execute();
-  await database.schema.alterTable('Subscriber').dropConstraint('Subscriber_listId_fkey').ifExists().execute();
-  await database.schema.alterTable('Subscriber').dropConstraint('Subscriber_userId_fkey').ifExists().execute();
+  await database.schema
+    .alterTable('Item')
+    .dropConstraint('Item_listId_fkey')
+    .ifExists()
+    .execute();
+  await database.schema
+    .alterTable('Subscriber')
+    .dropConstraint('Subscriber_listId_fkey')
+    .ifExists()
+    .execute();
+  await database.schema
+    .alterTable('Subscriber')
+    .dropConstraint('Subscriber_userId_fkey')
+    .ifExists()
+    .execute();
 
   await database.schema
     .alterTable('List')
@@ -115,14 +164,28 @@ export async function down(database: Kysely<unknown>): Promise<void> {
     ALTER COLUMN "updatedAt" TYPE timestamp(3) USING ("updatedAt" AT TIME ZONE 'UTC');
   `.execute(database);
 
-  await sql`ALTER TABLE "Subscriber" ALTER COLUMN "listId" TYPE text USING "listId"::text;`.execute(database);
-  await sql`ALTER TABLE "Item" ALTER COLUMN "listId" TYPE text USING "listId"::text;`.execute(database);
-  await sql`ALTER TABLE "List" ALTER COLUMN "id" TYPE text USING "id"::text;`.execute(database);
+  await sql`ALTER TABLE "Subscriber" ALTER COLUMN "listId" TYPE text USING "listId"::text;`.execute(
+    database,
+  );
+  await sql`ALTER TABLE "Item" ALTER COLUMN "listId" TYPE text USING "listId"::text;`.execute(
+    database,
+  );
+  await sql`ALTER TABLE "List" ALTER COLUMN "id" TYPE text USING "id"::text;`.execute(
+    database,
+  );
 
-  await sql`ALTER TABLE "Subscriber" ALTER COLUMN "id" TYPE text USING "id"::text;`.execute(database);
-  await sql`ALTER TABLE "Item" ALTER COLUMN "id" TYPE text USING "id"::text;`.execute(database);
-  await sql`ALTER TABLE "Subscriber" ALTER COLUMN "userId" TYPE text USING "userId"::text;`.execute(database);
-  await sql`ALTER TABLE "User" ALTER COLUMN "id" TYPE text USING "id"::text;`.execute(database);
+  await sql`ALTER TABLE "Subscriber" ALTER COLUMN "id" TYPE text USING "id"::text;`.execute(
+    database,
+  );
+  await sql`ALTER TABLE "Item" ALTER COLUMN "id" TYPE text USING "id"::text;`.execute(
+    database,
+  );
+  await sql`ALTER TABLE "Subscriber" ALTER COLUMN "userId" TYPE text USING "userId"::text;`.execute(
+    database,
+  );
+  await sql`ALTER TABLE "User" ALTER COLUMN "id" TYPE text USING "id"::text;`.execute(
+    database,
+  );
 
   await database.schema
     .alterTable('User')
@@ -139,22 +202,34 @@ export async function down(database: Kysely<unknown>): Promise<void> {
 
   await database.schema
     .alterTable('Item')
-    .addForeignKeyConstraint('Item_listId_fkey', ['listId'], 'List', ['id'], (callback) =>
-      callback.onUpdate('cascade').onDelete('restrict'),
+    .addForeignKeyConstraint(
+      'Item_listId_fkey',
+      ['listId'],
+      'List',
+      ['id'],
+      (callback) => callback.onUpdate('cascade').onDelete('restrict'),
     )
     .execute();
 
   await database.schema
     .alterTable('Subscriber')
-    .addForeignKeyConstraint('Subscriber_listId_fkey', ['listId'], 'List', ['id'], (callback) =>
-      callback.onUpdate('cascade').onDelete('restrict'),
+    .addForeignKeyConstraint(
+      'Subscriber_listId_fkey',
+      ['listId'],
+      'List',
+      ['id'],
+      (callback) => callback.onUpdate('cascade').onDelete('restrict'),
     )
     .execute();
 
   await database.schema
     .alterTable('Subscriber')
-    .addForeignKeyConstraint('Subscriber_userId_fkey', ['userId'], 'User', ['id'], (callback) =>
-      callback.onUpdate('cascade').onDelete('restrict'),
+    .addForeignKeyConstraint(
+      'Subscriber_userId_fkey',
+      ['userId'],
+      'User',
+      ['id'],
+      (callback) => callback.onUpdate('cascade').onDelete('restrict'),
     )
     .execute();
 }

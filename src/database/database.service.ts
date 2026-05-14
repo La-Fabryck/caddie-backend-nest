@@ -1,5 +1,5 @@
-import { Injectable, OnModuleDestroy } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
+import { Injectable, type OnModuleDestroy } from '@nestjs/common';
+import type { ConfigService } from '@nestjs/config';
 import { Kysely, type LogConfig, PostgresDialect } from 'kysely';
 import { Pool } from 'pg';
 import type { AppConfig } from '@/config/app.config';

@@ -85,7 +85,9 @@ describe('ItemTypeController (e2e)', () => {
       const single = 1;
       expect(payload.length).toBe(single);
 
-      expect(payload.every((itemType) => itemType.userId === creator.user.id)).toBe(true);
+      expect(
+        payload.every((itemType) => itemType.userId === creator.user.id),
+      ).toBe(true);
     });
   });
 

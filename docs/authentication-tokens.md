@@ -2,20 +2,20 @@
 
 This backend uses **two JWTs** delivered as HTTP-only cookies:
 
-| Role | Purpose |
-|------|---------|
-| Access token | Short-lived; validated on protected routes |
+| Role          | Purpose                                            |
+| ------------- | -------------------------------------------------- |
+| Access token  | Short-lived; validated on protected routes         |
 | Refresh token | Long-lived; used only to obtain a new access token |
 
 Implementation lives under `src/users/authentication/`, `src/users/guards/authentication.guard.ts`, and JWT registration in `src/users/users.module.ts`.
 
 ## Endpoints
 
-| Method | Path | Behavior |
-|--------|------|----------|
-| `POST` | `/authentication/login` | Validates credentials; sets **access** and **refresh** cookies |
+| Method | Path                      | Behavior                                                                                                                   |
+| ------ | ------------------------- | -------------------------------------------------------------------------------------------------------------------------- |
+| `POST` | `/authentication/login`   | Validates credentials; sets **access** and **refresh** cookies                                                             |
 | `POST` | `/authentication/refresh` | Reads refresh cookie; verifies it; sets a new **access** cookie (refresh cookie unchanged in the current stateless design) |
-| `GET` | `/authentication/logout` | Clears **both** cookies |
+| `GET`  | `/authentication/logout`  | Clears **both** cookies                                                                                                    |
 
 Responses use empty bodies where applicable; tokens are in cookies only.
 
@@ -102,10 +102,10 @@ So the workflow remains: short-lived access JWT for normal calls, long-lived ref
 
 ### Same-origin proxy (recommended)
 
-| Environment | Typical setup |
-|-------------|----------------|
-| Development | Vite `server.proxy` so `/api` (or similar) forwards to Nest |
-| Production | NGINX (or similar) reverse proxy: one public host/path serves the SPA and proxies API routes to Nest |
+| Environment | Typical setup                                                                                        |
+| ----------- | ---------------------------------------------------------------------------------------------------- |
+| Development | Vite `server.proxy` so `/api` (or similar) forwards to Nest                                          |
+| Production  | NGINX (or similar) reverse proxy: one public host/path serves the SPA and proxies API routes to Nest |
 
 The browser should call the API with URLs that are **same-origin** with the SvelteKit app (e.g. `fetch('/api/users')`). Then cookies set by Nest on responses are **first-party** for that origin and are sent automatically on subsequent same-origin `fetch` calls.
 
@@ -138,14 +138,19 @@ let refreshPromise: Promise<Response> | null = null;
 
 function refreshSession(): Promise<Response> {
   if (!refreshPromise) {
-    refreshPromise = fetch('/api/authentication/refresh', { method: 'POST' }).finally(() => {
+    refreshPromise = fetch('/api/authentication/refresh', {
+      method: 'POST',
+    }).finally(() => {
       refreshPromise = null;
     });
   }
   return refreshPromise;
 }
 
-export async function apiFetch(input: string, init: RequestInit = {}): Promise<Response> {
+export async function apiFetch(
+  input: string,
+  init: RequestInit = {},
+): Promise<Response> {
   const response = await fetch(input, init);
 
   if (response.status !== 401) return response;

@@ -1,9 +1,14 @@
-import { ForbiddenException, Injectable, NotImplementedException, UnauthorizedException } from '@nestjs/common';
+import {
+  ForbiddenException,
+  Injectable,
+  NotImplementedException,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { genSalt, hash } from 'bcrypt';
 import type { UserRow } from '@/database/database-types';
-import { DatabaseService } from '@/database/database.service';
-import { CreateUserDto } from '../dto/create-user.dto';
-import { UpdateUserDto } from '../dto/update-user.dto';
+import type { DatabaseService } from '@/database/database.service';
+import type { CreateUserDto } from '../dto/create-user.dto';
+import type { UpdateUserDto } from '../dto/update-user.dto';
 
 @Injectable()
 export class UsersService {
@@ -35,7 +40,13 @@ export class UsersService {
   async findOneByEmail(email: string): Promise<UserRow | null> {
     const user = await this.database
       .selectFrom('User')
-      .where((eb) => eb(eb.fn('lower', [eb.ref('email')]), '=', eb.fn('lower', [eb.val(email)])))
+      .where((eb) =>
+        eb(
+          eb.fn('lower', [eb.ref('email')]),
+          '=',
+          eb.fn('lower', [eb.val(email)]),
+        ),
+      )
       .selectAll()
       .executeTakeFirst();
 
@@ -43,7 +54,11 @@ export class UsersService {
   }
 
   async findOne(id: string): Promise<UserRow> {
-    const user = await this.database.selectFrom('User').where('id', '=', id).selectAll().executeTakeFirst();
+    const user = await this.database
+      .selectFrom('User')
+      .where('id', '=', id)
+      .selectAll()
+      .executeTakeFirst();
 
     if (user == null) {
       throw new UnauthorizedException();
@@ -58,7 +73,10 @@ export class UsersService {
   }
 
   async remove(id: string): Promise<void> {
-    await this.database.deleteFrom('Subscriber').where('userId', '=', id).execute();
+    await this.database
+      .deleteFrom('Subscriber')
+      .where('userId', '=', id)
+      .execute();
     await this.database.deleteFrom('User').where('id', '=', id).execute();
   }
 }

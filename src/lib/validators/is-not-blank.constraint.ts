@@ -1,4 +1,8 @@
-import { ValidationArguments, ValidatorConstraint, ValidatorConstraintInterface } from 'class-validator';
+import {
+  ValidatorConstraint,
+  type ValidationArguments,
+  type ValidatorConstraintInterface,
+} from 'class-validator';
 
 @ValidatorConstraint({ name: 'isNotBlank' })
 export class IsNotBlankConstraint implements ValidatorConstraintInterface {
