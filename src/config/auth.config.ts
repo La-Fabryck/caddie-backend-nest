@@ -13,7 +13,7 @@ export type AuthConfig = {
   refreshTokenTtl: StringValue;
 };
 
-class AuthConfigDto {
+class AuthConfigDto implements AuthConfig {
   @IsString()
   @IsNotEmpty()
   accessCookieName!: string;

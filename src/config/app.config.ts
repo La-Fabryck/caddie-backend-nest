@@ -10,7 +10,7 @@ export type AppConfig = {
   listenPort: number;
 };
 
-class AppConfigDto {
+class AppConfigDto implements AppConfig {
   @IsIn(['development', 'production', 'test'])
   nodeEnv!: AppConfig['nodeEnv'];
 

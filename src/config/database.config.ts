@@ -12,7 +12,7 @@ export type DatabaseConfig = {
   database: string;
 };
 
-class DatabaseConfigDto {
+class DatabaseConfigDto implements DatabaseConfig {
   @IsString()
   @IsNotEmpty()
   host!: string;
