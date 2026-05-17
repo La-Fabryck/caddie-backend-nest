@@ -1,5 +1,5 @@
 # https://editorconfig.org
-# Prettier reads this file and merges these settings; `.prettierrc` overrides when both apply.
+# Shared layout for editors and Oxfmt (indent, EOL, line length). Oxfmt-only options live in `.oxfmtrc.json`.
 root = true
 
 [*]

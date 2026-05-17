@@ -5,7 +5,7 @@ import { AuthenticationGuard } from '@/users/guards/authentication.guard';
 import { AuthenticationInterceptor } from '@/users/interceptors/authentication.interceptor';
 import { CreateItemDto } from '../dto/create-item.dto';
 import { UpdateItemDto } from '../dto/update-item.dto';
-import { CreateItem, ItemService } from './item.service';
+import { type CreateItem, ItemService } from './item.service';
 
 @Controller('/list/:listId/items')
 export class ItemController {
@@ -52,10 +52,10 @@ export class ItemController {
     return this.itemService.findOne({ itemId, listId, user });
   }
 
-  // eslint-disable-next-line max-params
   @UseGuards(AuthenticationGuard)
   @UseInterceptors(AuthenticationInterceptor)
   @Patch(':itemId')
+  // oxlint-disable-next-line max-params
   async update(
     @Param('listId', ParseUUIDPipe) listId: string,
     @Param('itemId', ParseUUIDPipe) itemId: string,
@@ -63,7 +63,7 @@ export class ItemController {
     @CurrentUser() user: UserRow,
   ) {
     return this.itemService.update({
-      // eslint-disable-next-line @typescript-eslint/no-misused-spread
+      // oxlint-disable-next-line @typescript-eslint/no-misused-spread
       updateItemPayload: { ...updateShoppingDto, listId, id: itemId },
       user,
     });

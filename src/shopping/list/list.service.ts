@@ -2,7 +2,7 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import type { Insertable, Kysely } from 'kysely';
 import type { DB, List, ListRow, SubscriberRow, UserRow } from '@/database/database-types';
 import { DatabaseService } from '@/database/database.service';
-import { CreateListDto } from '../dto/create-list.dto';
+import type { CreateListDto } from '../dto/create-list.dto';
 import { SubscribersService } from '../subscriber/subscribers.service';
 
 export type CreateList = CreateListDto & { user: UserRow };

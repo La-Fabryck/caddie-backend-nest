@@ -1,0 +1,17 @@
+{
+  "$schema": "./node_modules/oxfmt/configuration_schema.json",
+  "singleQuote": true,
+  "sortImports": {
+    "internalPattern": ["@/", "test/"],
+    "newlinesBetween": false,
+    "groups": [
+      ["type-builtin", "value-builtin"],
+      ["type-external", "value-external"],
+      ["type-internal", "value-internal"],
+      ["type-parent", "type-sibling", "type-index", "value-parent", "value-sibling", "value-index"],
+      "unknown"
+    ]
+  },
+  "sortPackageJson": true,
+  "trailingComma": "all"
+}

@@ -3,9 +3,9 @@ import { ConfigService } from '@nestjs/config';
 import { JwtService, type JwtSignOptions, TokenExpiredError } from '@nestjs/jwt';
 import { compare } from 'bcrypt';
 import type { JwtPayload as JwtRegisteredClaims } from 'jsonwebtoken';
-import { ErrorInterface } from '@/app.configurator';
+import type { ErrorInterface } from '@/app.configurator';
 import type { AuthConfig } from '@/config/auth.config';
-import { LoginDto } from '../dto/login.dto';
+import type { LoginDto } from '../dto/login.dto';
 import { INVALID_LOGIN } from '../messages/authentication';
 import { UsersService } from '../users/users.service';
 

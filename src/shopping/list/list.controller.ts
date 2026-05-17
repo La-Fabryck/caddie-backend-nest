@@ -41,7 +41,7 @@ export class ListController {
   @Patch(':id')
   async update(@Param('id', ParseUUIDPipe) id: string, @CurrentUser() user: UserRow, @Body() updateShoppingDto: UpdateListDto) {
     return this.listService.update({
-      // eslint-disable-next-line @typescript-eslint/no-misused-spread
+      // oxlint-disable-next-line @typescript-eslint/no-misused-spread
       payload: { ...updateShoppingDto, id },
       user,
     });

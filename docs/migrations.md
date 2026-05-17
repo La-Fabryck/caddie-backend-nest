@@ -17,4 +17,3 @@ npm run db:migrate:make -- <migration_name>
 ```
 
 Example: `npm run db:migrate:make -- add_notes_column`
-

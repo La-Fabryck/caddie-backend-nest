@@ -1,6 +1,6 @@
-import { CallHandler, ExecutionContext, Injectable, NestInterceptor } from '@nestjs/common';
-import { FastifyRequest } from 'fastify';
-import { Observable } from 'rxjs';
+import { type CallHandler, type ExecutionContext, Injectable, type NestInterceptor } from '@nestjs/common';
+import type { FastifyRequest } from 'fastify';
+import type { Observable } from 'rxjs';
 import { UsersService } from '../users/users.service';
 
 @Injectable()

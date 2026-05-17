@@ -1,10 +1,8 @@
 // @ts-check
 import eslint from '@eslint/js';
-import { defineConfig } from 'eslint/config';
-import eslintPluginPerfectionist from 'eslint-plugin-perfectionist';
 import eslintPluginUnicorn from 'eslint-plugin-unicorn';
-import eslintPluginPrettierRecommended from 'eslint-plugin-prettier/recommended';
 import unusedImports from 'eslint-plugin-unused-imports';
+import { defineConfig } from 'eslint/config';
 import globals from 'globals';
 import tseslint from 'typescript-eslint';
 
@@ -15,7 +13,6 @@ export default defineConfig(
   },
   eslint.configs.recommended,
   ...tseslint.configs.strictTypeChecked,
-  eslintPluginPrettierRecommended,
   eslintPluginUnicorn.configs.recommended,
   {
     languageOptions: {
@@ -35,7 +32,6 @@ export default defineConfig(
     },
 
     plugins: {
-      perfectionist: eslintPluginPerfectionist,
       'unused-imports': unusedImports,
     },
 
@@ -196,52 +192,18 @@ export default defineConfig(
       // <----- eslint rules
 
       // Force type imports:
-      "@typescript-eslint/consistent-type-imports": [
-        "error",
+      '@typescript-eslint/consistent-type-imports': [
+        'error',
         {
-          "prefer": "type-imports",
-          "fixStyle": "separate-type-imports"
-        }
+          prefer: 'type-imports',
+          fixStyle: 'separate-type-imports',
+        },
       ],
-      "@typescript-eslint/consistent-type-exports": [
-        "error",
-        { "fixMixedExportsWithInlineTypeSpecifier": true }
-      ],
-      "no-duplicate-imports": "error",
-      "@typescript-eslint/no-import-type-side-effects": "error",
+      '@typescript-eslint/consistent-type-exports': ['error', { fixMixedExportsWithInlineTypeSpecifier: true }],
+      'no-duplicate-imports': 'error',
+      '@typescript-eslint/no-import-type-side-effects': 'error',
 
-      // Sort imports (perfectionist replaces import-x/order)
-      'perfectionist/sort-imports': [
-        'error',
-        {
-          type: 'alphabetical',
-          order: 'asc',
-          ignoreCase: true,
-          internalPattern: ['^@/.+', '^test/.+'],
-          // Type and value together per category → alphabetical by path (e.g. @faker before @nestjs)
-          groups: [
-            ['type-builtin', 'value-builtin'],
-            ['type-external', 'value-external'],
-            ['type-internal', 'value-internal'],
-            ['type-parent', 'type-sibling', 'type-index', 'value-parent', 'value-sibling', 'value-index'],
-            'ts-equals-import',
-            'unknown',
-          ],
-          newlinesBetween: 'ignore',
-          tsconfig: {
-            rootDir: import.meta.dirname,
-            filename: 'tsconfig.json',
-          },
-        },
-      ],
-      'perfectionist/sort-named-imports': [
-        'error',
-        {
-          type: 'alphabetical',
-          order: 'asc',
-          ignoreCase: true,
-        },
-      ],
+      // Import sort + format: Oxfmt (`sortImports` in `.oxfmtrc.json`), not ESLint.
 
       // Find and remove unused es6 module imports
       'unused-imports/no-unused-imports': 'error',

@@ -1,4 +1,3 @@
-/* eslint-disable unicorn/filename-case -- migration names are fixed (Kysely keys) */
 import { type Kysely, sql } from 'kysely';
 
 // `unknown` is required here since migrations should be frozen in time. alternatively, keep a "snapshot" db interface.

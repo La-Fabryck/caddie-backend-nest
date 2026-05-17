@@ -1,9 +1,9 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { Insertable, type Kysely, Updateable } from 'kysely';
+import type { Insertable, Kysely, Updateable } from 'kysely';
 import type { DB, Item, ItemRow, ItemTypeRow, UserRow } from '@/database/database-types';
 import { DatabaseService } from '@/database/database.service';
-import { CreateItemDto } from '../dto/create-item.dto';
-import { UpdateItemDto } from '../dto/update-item.dto';
+import type { CreateItemDto } from '../dto/create-item.dto';
+import type { UpdateItemDto } from '../dto/update-item.dto';
 import { ItemTypeService } from '../item-type/item-type.service';
 import { ListService } from '../list/list.service';
 

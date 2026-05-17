@@ -2,8 +2,8 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import type { Kysely } from 'kysely';
 import type { DB, SubscriberRow, UserRow } from '@/database/database-types';
 import { DatabaseService } from '@/database/database.service';
-import { CreateSubcriberDto } from '../dto/create-subcriber.dto';
-import { UpdateSubcriberDto } from '../dto/update-subcriber.dto';
+import type { CreateSubcriberDto } from '../dto/create-subcriber.dto';
+import type { UpdateSubcriberDto } from '../dto/update-subcriber.dto';
 
 type CreateSubcriber = CreateSubcriberDto & { user: UserRow };
 
