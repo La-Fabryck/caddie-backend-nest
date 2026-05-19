@@ -2,6 +2,15 @@
 
 Lint and format: `npm run lint` / `npm run format` (Oxfmt + Oxlint). Type-aware rules need `oxlint-tsgolint` (`options.typeAware` in [`oxlint.config.ts`](../oxlint.config.ts)).
 
+## Git hooks
+
+Pre-commit (Husky → lint-staged) runs on **staged files only**:
+
+- `*.{js,ts,mjs,cjs}` — `oxfmt --write`, then `oxlint --fix`
+- `*.{json,md,yml,yaml}` — `oxfmt --write --no-error-on-unmatched-pattern` (Oxfmt ignores `package-lock.json`; the flag avoids a hook failure when only the lockfile is staged)
+
+Full-repo checks stay on `npm run lint` (Makefile `ncu-doctor-test`, `sync-fastify`, CI, etc.). Hooks install via `npm ci` / `npm run prepare` (`prepare`: `husky`).
+
 ## Configuration
 
 - [`oxlint.config.ts`](../oxlint.config.ts) — all rules and overrides (edit here)
