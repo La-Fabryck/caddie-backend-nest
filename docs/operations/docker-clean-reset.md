@@ -37,5 +37,5 @@ make reset-dev
 Then start dev:
 
 ```bash
-docker compose up
+make start
 ```

@@ -32,7 +32,7 @@ Without the script (for manual runs), use:
 
 ```bash
 docker compose -f docker/app/prod/compose.yml up --build
-docker compose -f docker/app/prod/compose.yml run --rm backend npm run db:migrate:kysely
+docker compose -f docker/app/prod/compose.yml run --rm backend npm run db:migrate:latest
 ```
 
 ## Notes

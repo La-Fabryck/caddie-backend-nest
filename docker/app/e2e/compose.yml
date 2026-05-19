@@ -1,0 +1,68 @@
+# Isolated from dev: separate compose project (name), network, DB name, no host port.
+# Postgres uses tmpfs + relaxed durability — safe only for ephemeral e2e data.
+name: caddie-e2e
+
+services:
+  postgres:
+    image: postgres:18-alpine
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U ${POSTGRES_USER:-postgres} -d ${POSTGRES_DB:-caddie_e2e}']
+      interval: 2s
+      timeout: 3s
+      retries: 10
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-password}
+      POSTGRES_DB: caddie_e2e
+    tmpfs:
+      - /var/lib/postgresql
+    command:
+      - postgres
+      - -c
+      - fsync=off
+      - -c
+      - synchronous_commit=off
+      - -c
+      - full_page_writes=off
+    networks:
+      - e2e
+
+  test:
+    build:
+      context: ../../..
+      dockerfile: docker/app/e2e/Dockerfile
+    depends_on:
+      postgres:
+        condition: service_healthy
+    healthcheck:
+      test:
+        [
+          'CMD-SHELL',
+          'node -e "require(\"http\").get(\"http://127.0.0.1:3001\",(r)=>{process.exit(r.statusCode<500?0:1)}).on(\"error\",()=>process.exit(1))"',
+        ]
+      interval: 2s
+      timeout: 5s
+      retries: 15
+      start_period: 30s
+    env_file:
+      - .env.e2e
+    environment:
+      NODE_ENV: test
+      POSTGRES_HOST: postgres
+      POSTGRES_PORT: 5432
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-password}
+      POSTGRES_DB: caddie_e2e
+    # Host lockfiles: doctor runs npm ci in the running container (no rebuild per bump)
+    volumes:
+      - ../../../package.json:/app/package.json:ro
+      - ../../../package-lock.json:/app/package-lock.json:ro
+      - ../../../.npmrc:/app/.npmrc:ro
+    networks:
+      - e2e
+    ports:
+      - '3001:3001'
+      - '9230:9230'
+
+networks:
+  e2e:

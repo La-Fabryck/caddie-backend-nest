@@ -4,25 +4,31 @@
     {
       "name": "Debug: Caddie",
       "type": "node",
-      "request": "attach",
-      "address": "0.0.0.0",
-      "port": 9229,
-      "sourceMaps": true,
-      "restart": true,
-      "localRoot": "${workspaceFolder}",
-      "remoteRoot": "/app",
+      "request": "launch",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["run", "start:debug"],
+      "cwd": "${workspaceFolder}",
+      "console": "integratedTerminal",
+      "internalConsoleOptions": "neverOpen",
       "skipFiles": ["<node_internals>/**"]
     },
     {
       "name": "Debug Jest E2E Tests",
       "type": "node",
+      "request": "launch",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["run", "test:debug"],
+      "cwd": "${workspaceFolder}",
+      "console": "integratedTerminal",
+      "internalConsoleOptions": "neverOpen",
+      "skipFiles": ["<node_internals>/**"]
+    },
+    {
+      "name": "Debug Jest E2E (attach :9230)",
+      "type": "node",
       "request": "attach",
-      "address": "0.0.0.0",
       "port": 9230,
-      "sourceMaps": true,
       "restart": true,
-      "localRoot": "${workspaceFolder}",
-      "remoteRoot": "/app",
       "skipFiles": ["<node_internals>/**"]
     }
   ]
