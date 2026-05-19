@@ -28,7 +28,8 @@
     "test:cov": "node --experimental-vm-modules node_modules/jest/bin/jest.js --config ./test/jest.e2e.json --coverage",
     "test:debug": "node --inspect=0.0.0.0:9230 --experimental-vm-modules -r tsconfig-paths/register -r ts-node/register node_modules/jest/bin/jest.js --config ./test/jest.e2e.json --runInBand --watchAll",
     "test:e2e": "node --experimental-vm-modules node_modules/jest/bin/jest.js --config ./test/jest.e2e.json",
-    "ncu:doctor-test": "make ncu-doctor-test"
+    "ncu:doctor-test": "make ncu-doctor-test",
+    "prepare": "husky"
   },
   "dependencies": {
     "@fastify/cookie": "^11.0.2",
@@ -65,6 +66,7 @@
     "jest": "^30.4.2",
     "kysely-codegen": "^0.20.0",
     "light-my-request": "^6.6.0",
+    "lint-staged": "^17.0.5",
     "oxfmt": "0.50.0",
     "oxlint": "1.65.0",
     "oxlint-tsgolint": "^0.23.0",
@@ -73,6 +75,13 @@
     "ts-node": "^10.9.2",
     "tsconfig-paths": "^4.2.0",
     "typescript": "^6.0.3"
+  },
+  "lint-staged": {
+    "*.{js,ts,mjs,cjs}": [
+      "oxfmt --write",
+      "oxlint --fix"
+    ],
+    "*.{json,md,yml,yaml}": "oxfmt --write --no-error-on-unmatched-pattern"
   },
   "jest": {
     "collectCoverageFrom": [

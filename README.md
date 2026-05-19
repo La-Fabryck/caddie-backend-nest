@@ -31,7 +31,7 @@ This starts Postgres in Docker, runs migrations, then `npm run start:dev` on the
 Or step by step:
 
 ```bash
-make start-deps          # Postgres only
+docker compose start          # Postgres only
 npm run db:migrate:latest
 npm run start:dev
 ```
@@ -44,6 +44,8 @@ Optional:
 node -v
 npm run lint
 ```
+
+Pre-commit hooks (Oxfmt + Oxlint on staged files) install with `npm ci`; see [`docs/oxlint-migrate.md`](docs/oxlint-migrate.md#git-hooks).
 
 ## E2E tests
 
