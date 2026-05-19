@@ -2,8 +2,8 @@ import { ForbiddenException, Injectable, NotImplementedException, UnauthorizedEx
 import { genSalt, hash } from 'bcrypt';
 import type { UserRow } from '@/database/database-types';
 import { DatabaseService } from '@/database/database.service';
-import { CreateUserDto } from '../dto/create-user.dto';
-import { UpdateUserDto } from '../dto/update-user.dto';
+import type { CreateUserDto } from '../dto/create-user.dto';
+import type { UpdateUserDto } from '../dto/update-user.dto';
 
 @Injectable()
 export class UsersService {

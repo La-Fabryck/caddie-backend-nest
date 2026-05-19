@@ -1,4 +1,3 @@
-/* eslint-disable unicorn/filename-case -- migration names are fixed (Kysely keys) */
 import type { Kysely } from 'kysely';
 
 /**

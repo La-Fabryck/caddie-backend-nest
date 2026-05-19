@@ -2,8 +2,8 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import type { Insertable, Updateable } from 'kysely';
 import type { ItemType, ItemTypeRow, UserRow } from '@/database/database-types';
 import { DatabaseService } from '@/database/database.service';
-import { CreateItemTypeDto } from '../dto/create-item-type.dto';
-import { UpdateItemTypeDto } from '../dto/update-item-type.dto';
+import type { CreateItemTypeDto } from '../dto/create-item-type.dto';
+import type { UpdateItemTypeDto } from '../dto/update-item-type.dto';
 
 @Injectable()
 export class ItemTypeService {
@@ -61,7 +61,7 @@ export class ItemTypeService {
     await this.findOneById(id, user);
 
     const itemType: Updateable<ItemType> = {
-      // eslint-disable-next-line @typescript-eslint/no-misused-spread
+      // oxlint-disable-next-line @typescript-eslint/no-misused-spread
       ...payload,
     };
 

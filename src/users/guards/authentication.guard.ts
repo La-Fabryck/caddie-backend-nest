@@ -1,7 +1,7 @@
-import { CanActivate, ExecutionContext, Injectable, Logger, UnauthorizedException } from '@nestjs/common';
+import { type CanActivate, type ExecutionContext, Injectable, Logger, UnauthorizedException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { JwtService, TokenExpiredError } from '@nestjs/jwt';
-import { FastifyRequest } from 'fastify';
+import type { FastifyRequest } from 'fastify';
 import type { AuthConfig } from '@/config/auth.config';
 import type { JwtPayload } from '../authentication/authentication.service';
 
