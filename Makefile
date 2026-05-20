@@ -65,7 +65,7 @@ ci-e2e:
 ci-e2e-down:
 	$(E2E_COMPOSE) down -v --remove-orphans
 
-# Reset to clean dev: remove project resources for prod+dev, ensure network, remove root .dockerignore
+# Reset to clean dev: remove project resources for prod+dev
 reset-dev:
 	@echo "Stopping and removing prod stack resources (containers, images, volumes)..."
 	docker compose --env-file .env -f docker/app/prod/compose.yml down -v --rmi all --remove-orphans
@@ -73,8 +73,6 @@ reset-dev:
 	docker compose down -v --rmi all --remove-orphans
 	@echo "Stopping and removing e2e stack resources..."
 	$(E2E_COMPOSE) down -v --rmi local --remove-orphans
-	@echo "Removing root .dockerignore (copied by prod build)..."
-	rm -f .dockerignore
 	@echo "Dev environment reset complete. Run: make start"
 
 sloc:
