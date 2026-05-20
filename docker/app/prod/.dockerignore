@@ -37,8 +37,8 @@ jest.config.*
 README*
 LICENSE
 .editorconfig
-oxfmt.config.ts
-oxlint.config.ts
+oxfmt.config.mts
+oxlint.config.mts
 Makefile
 Dockerfile*
 compose*.yml

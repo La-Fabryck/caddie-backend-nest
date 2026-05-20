@@ -1,7 +1,8 @@
 import { defineConfig } from 'oxfmt';
 
 /**
- * Oxfmt configuration. Edit formatting and import line order here.
+ * Oxfmt configuration. Use `.mts` so Node treats this as ESM without `package.json`
+ * `"type": "module"` (Nest stays CJS until first-class ESM support).
  *
  * @see docs/oxlint-migrate.md
  */

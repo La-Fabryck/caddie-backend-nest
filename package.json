@@ -19,8 +19,12 @@
     "start:dev": "nest start --watch --env-file=.env",
     "start:debug": "nest start --watch --debug ${NEST_IP}:${DEBUG_PORT} --env-file=.env",
     "start:prod": "node dist/src/main.js",
-    "lint": "oxfmt --check . && oxlint .",
-    "format": "oxfmt --write . && oxlint --fix .",
+    "lint": "npm run check:oxfmt -- . && npm run check:oxlint -- .",
+    "check:oxfmt": "oxfmt --check -c oxfmt.config.mts",
+    "check:oxlint": "oxlint -c oxlint.config.mts",
+    "format": "npm run fix:oxfmt -- . && npm run fix:oxlint -- .",
+    "fix:oxfmt": "oxfmt --write -c oxfmt.config.mts",
+    "fix:oxlint": "oxlint --fix -c oxlint.config.mts",
     "db:migrate:latest": "kysely migrate latest",
     "db:migrate:make": "kysely migrate make",
     "test": "jest",
@@ -77,11 +81,11 @@
     "typescript": "^6.0.3"
   },
   "lint-staged": {
-    "*.{js,ts,mjs,cjs}": [
-      "oxfmt --write",
-      "oxlint --fix"
+    "*.{js,ts,mjs,cjs,mts}": [
+      "npm run fix:oxfmt --",
+      "npm run fix:oxlint --"
     ],
-    "*.{json,md,yml,yaml}": "oxfmt --write --no-error-on-unmatched-pattern"
+    "*.{json,md,yml,yaml}": "npm run fix:oxfmt --"
   },
   "jest": {
     "collectCoverageFrom": [
