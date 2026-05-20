@@ -23,12 +23,9 @@ dist
 .env.*
 !.env.sample
 
-# Tests and tooling
+# Test artifacts and tooling (not test/ — e2e image needs it)
 coverage
 .nyc_output
-*.spec.ts
-*.test.ts
-test
 jest.config.*
 .eslintrc*
 .eslintignore

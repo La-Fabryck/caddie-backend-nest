@@ -1,6 +1,6 @@
 #!/usr/bin/env sh
 
-# Prod Docker: copy .dockerignore to repo root, ensure network, start stack (detached), run migrations.
+# Prod Docker: ensure network, start stack (detached), run migrations.
 # Run from repo root: ./docker/app/prod/build.sh
 
 set -e
@@ -12,7 +12,6 @@ if [ ! -f "$ROOT_DIR/.env" ]; then
 	exit 1
 fi
 
-cp "$SCRIPT_DIR/.dockerignore" "$ROOT_DIR/.dockerignore"
 docker network create caddie_network || true
 cd "$ROOT_DIR"
 
