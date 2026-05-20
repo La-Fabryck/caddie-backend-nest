@@ -19,6 +19,7 @@ Later'ish :
 - Small cache for users
 - Use Zod as validator ? [Zod Integration](https://docs.nestjs.com/pipes#object-schema-validation) - Waiting [NestJS 12 supports native scheman](https://github.com/nestjs/nest/pull/16391)
 - ~~Migrate to [Kysely](https://kysely.dev/)~~
+- Align Kysely query/error logs with the app logger (`DatabaseService` still uses Kysely’s built-in `log` config → console, not Nest/pino)
 - CQRS architecture
 - Move Auth user from Fastify Request to [NestJS LocalStorage](https://docs.nestjs.com/recipes/async-local-storage
 

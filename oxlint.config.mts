@@ -1,13 +1,17 @@
 import { defineConfig } from 'oxlint';
 
+/** Limit for `max-params` (named so this file passes `no-magic-numbers`). */
+const MAX_FUNCTION_PARAMS = 3;
+
 /**
- * Oxlint configuration (type-aware). Edit rules here; ESLint will be removed later.
+ * Oxlint configuration (type-aware). Use `.mts` so Node treats this as ESM without
+ * `package.json` `"type": "module"` (Nest stays CJS until first-class ESM support).
  *
  * @see docs/oxlint-migrate.md
  */
 export default defineConfig({
   plugins: ['typescript', 'unicorn', 'import', 'node'],
-  // TODO: Enable category bundles after ESLint removal and triage (see targets below).
+  // TODO: Enable category bundles after triage (see targets below).
   // Today `correctness` is off because @oxlint/migrate lists those rules explicitly in `rules`.
   // Turning categories on adds rules *on top of* that list — run `npm run lint` after each change.
   //
@@ -38,7 +42,7 @@ export default defineConfig({
     jest: true,
     node: true,
   },
-  ignorePatterns: ['oxlint.config.ts', 'oxfmt.config.ts', './dist/*', './coverage/*'],
+  ignorePatterns: ['./dist/*', './coverage/*'],
   rules: {
     'constructor-super': 'error',
     'for-direction': 'error',
@@ -266,7 +270,7 @@ export default defineConfig({
     'func-style': ['error', 'declaration'],
     'default-case': 'error',
     'default-case-last': 'error',
-    'max-params': ['error', 3],
+    'max-params': ['error', MAX_FUNCTION_PARAMS],
     'no-bitwise': 'error',
     'no-alert': 'error',
     'no-caller': 'error',
