@@ -1,5 +1,5 @@
 # Stage 1: All deps (incl. dev — Jest, Nest CLI, Kysely migrate, etc.)
-FROM node:24-alpine AS deps
+FROM node:26-alpine AS deps
 WORKDIR /app
 
 COPY package*.json .npmrc ./
@@ -7,7 +7,7 @@ COPY package*.json .npmrc ./
 RUN npm ci
 
 # Stage 2: API + exec Jest (nest start — no dist / no start:prod)
-FROM node:24-alpine AS e2e
+FROM node:26-alpine AS e2e
 WORKDIR /app
 
 COPY --from=deps /app/node_modules ./node_modules
