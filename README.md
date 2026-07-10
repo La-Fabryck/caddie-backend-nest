@@ -7,7 +7,7 @@ NestJS backend service for Caddie, with PostgreSQL in Docker for local developme
 ### Prerequisites
 
 - Docker + Docker Compose
-- Node.js >= 24 (see [`.node-version`](.node-version); fnm, asdf, etc.)
+- Node.js >= 26 (see [`.node-version`](.node-version); fnm, asdf, etc.)
 - Make
 
 ### Install and bootstrap
