@@ -20,6 +20,7 @@
     "start:debug": "nest start --watch --debug ${NEST_IP}:${DEBUG_PORT} --env-file=.env",
     "start:prod": "node dist/src/main.js",
     "lint": "npm run check:oxfmt -- . && npm run check:oxlint -- .",
+    "typecheck": "tsc --noEmit && tsc --noEmit -p test/tsconfig.json",
     "check:oxfmt": "oxfmt --check -c oxfmt.config.mts",
     "check:oxlint": "oxlint -c oxlint.config.mts",
     "format": "npm run fix:oxfmt -- . && npm run fix:oxlint -- .",
