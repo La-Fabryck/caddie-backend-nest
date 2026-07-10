@@ -10,7 +10,7 @@ update:
 	npx --yes npm-check-updates --upgrade --interactive --reject fastify --format group
 	@$(MAKE) sync-fastify
 
-# Doctor: build once, stack up; each upgrade = lint + npm ci + exec test:e2e (lockfiles mounted)
+# Doctor: build once, stack up; each upgrade = lint + typecheck + build (host) + npm ci + exec test:e2e
 update-doctor:
 	@echo "Doctor upgrade (lint + e2e gate, Fastify excluded)..."
 	$(E2E_COMPOSE) build test
@@ -22,6 +22,7 @@ update-doctor:
 ncu-doctor-test:
 	npm run lint
 	npm run typecheck
+	npm run build
 	$(E2E_COMPOSE) exec test sh -c "npm ci && npm run test:e2e"
 
 # Postgres → migrate → API up (CMD npm start)
