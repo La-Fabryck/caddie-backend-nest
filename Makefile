@@ -21,6 +21,7 @@ update-doctor:
 
 ncu-doctor-test:
 	npm run lint
+	npm run typecheck
 	$(E2E_COMPOSE) exec test sh -c "npm ci && npm run test:e2e"
 
 # Postgres → migrate → API up (CMD npm start)
@@ -29,11 +30,12 @@ e2e-up:
 	$(E2E_COMPOSE) run --rm --no-deps test npm run db:migrate:latest
 	$(E2E_COMPOSE) up -d test --wait
 
-# Pin Fastify to @nestjs/platform-fastify, then lint (no auto-format)
+# Pin Fastify to @nestjs/platform-fastify, then lint and typecheck
 sync-fastify:
 	@echo "Syncing Fastify to: $(NEST_FASTIFY_VERSION)"
 	npm install fastify@$(NEST_FASTIFY_VERSION)
 	npm run lint
+	npm run typecheck
 	@echo "Fastify synced to: $(NEST_FASTIFY_VERSION)"
 
 # Install dependencies
