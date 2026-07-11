@@ -71,7 +71,7 @@
     "jest": "^30.4.2",
     "kysely-codegen": "^0.20.0",
     "light-my-request": "^6.6.0",
-    "lint-staged": "^17.0.8",
+    "nano-staged": "^1.0.2",
     "oxfmt": "0.58.0",
     "oxlint": "1.73.0",
     "oxlint-tsgolint": "^0.24.0",
@@ -81,7 +81,7 @@
     "tsconfig-paths": "^4.2.0",
     "typescript": "^6.0.3"
   },
-  "lint-staged": {
+  "nano-staged": {
     "*.{js,ts,mjs,cjs,mts}": [
       "npm run fix:oxfmt --",
       "npm run fix:oxlint --"
