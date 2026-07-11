@@ -4,10 +4,12 @@ Lint and format: `npm run lint` / `npm run format` (Oxfmt + Oxlint). Type-aware 
 
 ## Git hooks
 
-Pre-commit (Husky → lint-staged) runs on **staged files only**:
+Pre-commit (Husky) runs in order:
 
-- `*.{js,ts,mjs,cjs,mts}` — `npm run fix:oxfmt --`, then `npm run fix:oxlint --` (staged paths appended after `--`)
-- `*.{json,md,yml,yaml}` — `npm run fix:oxfmt --`
+1. **nano-staged** — staged files only:
+   - `*.{js,ts,mjs,cjs,mts}` — `npm run fix:oxfmt --`, then `npm run fix:oxlint --` (staged paths appended after `--`)
+   - `*.{json,md,yml,yaml}` — `npm run fix:oxfmt --`
+2. **`npm run typecheck`** — full project (`tsc --noEmit` on app + test tsconfigs)
 
 Atomic scripts in `package.json`: `check:oxfmt` / `check:oxlint` (read-only), `fix:oxfmt` / `fix:oxlint` (write + `--fix`). Top-level `npm run lint` / `npm run format` run the check/fix pair on `.`.
 
