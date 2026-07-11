@@ -15,9 +15,9 @@ COPY src ./src
 COPY package*.json tsconfig*.json nest-cli.json .swcrc .npmrc ./
 
 # TODO: consider --omit=peer when ready
-ENV NODE_ENV=production
+# --ignore-scripts: skip prepare (husky); devDep is omitted so the hook binary is absent
 RUN npm run build \
-    && npm ci --omit=dev --omit=optional \
+    && npm ci --omit=dev --omit=optional --ignore-scripts \
     && npm cache clean --force
 
 # Stage 3: Runtime
@@ -34,6 +34,8 @@ COPY --chown=node:node migrations ./migrations
 
 # Copy package.json for commands
 COPY --chown=node:node package.json ./
+
+ENV NODE_ENV=production
 
 # Use the node user from the image
 USER node
