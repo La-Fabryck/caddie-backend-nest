@@ -1,8 +1,13 @@
 .PHONY: update update-doctor sync-fastify install versions start ci-e2e ci-e2e-up ci-e2e-down ncu-doctor-test sloc sloc-details reset-dev help
 
+MAKEFLAGS += --no-print-directory
+
 NEST_FASTIFY_VERSION := $(shell npm info @nestjs/platform-fastify dependencies.fastify)
 E2E_ENV_FILE := $(if $(wildcard .env),--env-file .env,)
 E2E_COMPOSE := docker compose -p caddie-e2e $(E2E_ENV_FILE) -f docker/app/e2e/compose.yml
+
+# ponytail: oxfmt/nest/jest lack --quiet; one status line, dump log only on failure
+STEP := sh -c 'label=$$1; shift; out=$$("$$@" 2>&1); r=$$?; if [ $$r -eq 0 ]; then echo "$$label ok"; else printf "%s\n" "$$out"; echo "$$label failed"; exit $$r; fi' --
 
 # Update all dependencies and sync fastify, with grouped formatting
 update:
@@ -13,30 +18,31 @@ update:
 # Doctor: build once, stack up; each upgrade = lint + typecheck + build (host) + npm ci + exec test:e2e
 update-doctor:
 	@echo "Doctor upgrade (lint + e2e gate, Fastify excluded)..."
-	$(E2E_COMPOSE) build test
+	@$(E2E_COMPOSE) --progress quiet build test
 	@$(MAKE) e2e-up
 	@(npx --yes npm-check-updates --upgrade --interactive --reject fastify --doctor --doctorTest "make ncu-doctor-test" --format group; \
-		r=$$?; $(E2E_COMPOSE) down; exit $$r)
+		r=$$?; $(E2E_COMPOSE) --progress quiet down; exit $$r)
 	@$(MAKE) sync-fastify
 
 ncu-doctor-test:
-	npm run lint
-	npm run typecheck
-	npm run build
-	$(E2E_COMPOSE) exec test sh -c "npm ci && npm run test:e2e"
+	@$(STEP) typecheck npm run typecheck
+	@$(STEP) lint npm run lint
+	@$(STEP) build npm run build
+	@$(STEP) e2e $(E2E_COMPOSE) --progress quiet exec -T test \
+		sh -c 'npm ci --silent && NODE_NO_WARNINGS=1 npm run test:e2e'
 
 # Postgres → migrate → API up (CMD npm start)
 e2e-up:
-	$(E2E_COMPOSE) up -d postgres --wait
-	$(E2E_COMPOSE) run --rm --no-deps test npm run db:migrate:latest
-	$(E2E_COMPOSE) up -d test --wait
+	@$(E2E_COMPOSE) --progress quiet up -d postgres --wait
+	@$(STEP) migrate $(E2E_COMPOSE) --progress quiet run --rm --no-deps -T test npm run db:migrate:latest
+	@$(E2E_COMPOSE) --progress quiet up -d test --wait
 
 # Pin Fastify to @nestjs/platform-fastify, then lint and typecheck
 sync-fastify:
 	@echo "Syncing Fastify to: $(NEST_FASTIFY_VERSION)"
-	npm install fastify@$(NEST_FASTIFY_VERSION)
-	npm run lint
-	npm run typecheck
+	@npm install --no-fund --no-audit --silent fastify@$(NEST_FASTIFY_VERSION)
+	@$(STEP) typecheck npm run typecheck
+	@$(STEP) lint npm run lint
 	@echo "Fastify synced to: $(NEST_FASTIFY_VERSION)"
 
 # Install dependencies
