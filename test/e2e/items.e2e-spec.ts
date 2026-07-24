@@ -27,7 +27,7 @@ describe('ItemController (e2e)', () => {
   describe('/list/:listId/items (POST)', () => {
     it('OK - Creates a list', async () => {
       await using creator = await resourceCreator(app, { list: { quantity: SINGLE } });
-      const [storedList] = creator.lists;
+      const storedList = creator.list;
 
       const item: CreateItemDto = {
         name: faker.food.ingredient(),
@@ -78,7 +78,7 @@ describe('ItemController (e2e)', () => {
 
     it('OK - Creates an item with explicit quantity', async () => {
       await using creator = await resourceCreator(app, { list: { quantity: SINGLE } });
-      const [storedList] = creator.lists;
+      const storedList = creator.list;
       const quantity = faker.number.int({ min: 2, max: 10 });
 
       const item: CreateItemDto = {
@@ -102,7 +102,7 @@ describe('ItemController (e2e)', () => {
 
     it('OK - Creates an item with item type', async () => {
       await using creator = await resourceCreator(app, { list: { quantity: SINGLE } });
-      const [storedList] = creator.lists;
+      const storedList = creator.list;
 
       const typeResult = await app.inject({
         method: 'POST',
@@ -133,7 +133,7 @@ describe('ItemController (e2e)', () => {
     it('KO - Rejects item type from another user on create', async () => {
       await using creator = await resourceCreator(app, { list: { quantity: SINGLE } });
       await using outsider = await resourceCreator(app);
-      const [storedList] = creator.lists;
+      const storedList = creator.list;
 
       const typeResult = await app.inject({
         method: 'POST',
@@ -205,7 +205,7 @@ describe('ItemController (e2e)', () => {
         list: { quantity: SINGLE },
         items: { quantity: faker.number.int({ min: 1, max: 3 }) },
       });
-      const [storedList] = creator.lists;
+      const storedList = creator.list;
 
       const result = await app.inject({
         method: 'GET',
@@ -238,8 +238,8 @@ describe('ItemController (e2e)', () => {
   describe('/list/:listId/items/:itemId (GET)', () => {
     it('OK - Finds an item by its id', async () => {
       await using creator = await resourceCreator(app, { list: { quantity: SINGLE }, items: { quantity: SINGLE } });
-      const [storedList] = creator.lists;
-      const [storedItem] = creator.items;
+      const storedList = creator.list;
+      const storedItem = creator.item;
 
       const result = await app.inject({
         method: 'GET',
@@ -268,7 +268,7 @@ describe('ItemController (e2e)', () => {
 
     it('KO - Returns Not Found for non-existent resource', async () => {
       await using creator = await resourceCreator(app, { list: { quantity: SINGLE } });
-      const [storedList] = creator.lists;
+      const storedList = creator.list;
 
       const result = await app.inject({
         method: 'GET',
@@ -283,8 +283,8 @@ describe('ItemController (e2e)', () => {
   describe('/list/:listId/items/:itemId (PATCH)', () => {
     it('OK - Update an item', async () => {
       await using creator = await resourceCreator(app, { list: { quantity: SINGLE }, items: { quantity: SINGLE } });
-      const [storedList] = creator.lists;
-      const [storedItem] = creator.items;
+      const storedList = creator.list;
+      const storedItem = creator.item;
 
       const updatePayload: UpdateItemDto = {
         name: faker.food.ingredient(),
@@ -318,7 +318,7 @@ describe('ItemController (e2e)', () => {
 
     it('KO - Returns Not Found for non-existent resource', async () => {
       await using creator = await resourceCreator(app, { list: { quantity: SINGLE } });
-      const [storedList] = creator.lists;
+      const storedList = creator.list;
 
       const result = await app.inject({
         method: 'PATCH',
@@ -331,8 +331,8 @@ describe('ItemController (e2e)', () => {
 
     it('OK - Update quantity', async () => {
       await using creator = await resourceCreator(app, { list: { quantity: SINGLE }, items: { quantity: SINGLE } });
-      const [storedList] = creator.lists;
-      const [storedItem] = creator.items;
+      const storedList = creator.list;
+      const storedItem = creator.item;
       const quantity = faker.number.int({ min: 2, max: 10 });
 
       const updatePayload: UpdateItemDto = {
@@ -354,8 +354,8 @@ describe('ItemController (e2e)', () => {
 
     it('OK - Update item type', async () => {
       await using creator = await resourceCreator(app, { list: { quantity: SINGLE }, items: { quantity: SINGLE } });
-      const [storedList] = creator.lists;
-      const [storedItem] = creator.items;
+      const storedList = creator.list;
+      const storedItem = creator.item;
 
       const typeResult = await app.inject({
         method: 'POST',
@@ -384,8 +384,8 @@ describe('ItemController (e2e)', () => {
     it('KO - Rejects item type from another user', async () => {
       await using creator = await resourceCreator(app, { list: { quantity: SINGLE }, items: { quantity: SINGLE } });
       await using outsider = await resourceCreator(app);
-      const [targetList] = creator.lists;
-      const [storedItem] = creator.items;
+      const targetList = creator.list;
+      const storedItem = creator.item;
 
       const typeResult = await app.inject({
         method: 'POST',
@@ -411,8 +411,8 @@ describe('ItemController (e2e)', () => {
   describe('/list/:listId/items/:itemId (DELETE)', () => {
     it('OK - Delete a list', async () => {
       await using creator = await resourceCreator(app, { list: { quantity: SINGLE }, items: { quantity: SINGLE, remove: false } });
-      const [storedList] = creator.lists;
-      const [storedItem] = creator.items;
+      const storedList = creator.list;
+      const storedItem = creator.item;
 
       const result = await app.inject({
         method: 'DELETE',
@@ -438,7 +438,7 @@ describe('ItemController (e2e)', () => {
 
     it('KO - Returns Not Found for non-existent resource', async () => {
       await using creator = await resourceCreator(app, { list: { quantity: SINGLE } });
-      const [storedList] = creator.lists;
+      const storedList = creator.list;
 
       const result = await app.inject({
         method: 'DELETE',

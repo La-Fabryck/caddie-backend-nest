@@ -109,7 +109,7 @@ describe('ListController (e2e)', () => {
   describe('/list/:id (GET)', () => {
     it('OK - Finds a list by its id', async () => {
       await using creator = await resourceCreator(app, { list: { quantity: SINGLE } });
-      const [storedList] = creator.lists;
+      const storedList = creator.list;
 
       const result = await app.inject({
         method: 'GET',
@@ -148,7 +148,7 @@ describe('ListController (e2e)', () => {
   describe('/list/:id (PATCH)', () => {
     it('OK - Update a list', async () => {
       await using creator = await resourceCreator(app, { list: { quantity: SINGLE } });
-      const [storedList] = creator.lists;
+      const storedList = creator.list;
 
       const updatePayload: UpdateListDto = {
         title: faker.food.dish(),
@@ -193,7 +193,7 @@ describe('ListController (e2e)', () => {
   describe('/list/:id (DELETE)', () => {
     it('OK - Delete a list', async () => {
       await using creator = await resourceCreator(app, { list: { quantity: SINGLE, remove: false } });
-      const [storedList] = creator.lists;
+      const storedList = creator.list;
 
       const result = await app.inject({
         method: 'DELETE',

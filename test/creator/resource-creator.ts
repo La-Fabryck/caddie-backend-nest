@@ -8,16 +8,6 @@ import { createManyItems } from 'test/factories/item';
 import { createManyLists } from 'test/factories/list';
 import { createUser } from '../factories/user';
 
-function stringifyCookieArray(cookies: Response['cookies']): ResourceCreator['cookies'] {
-  const cookiesObject: Record<string, string> = {};
-
-  for (const cookie of cookies) {
-    cookiesObject[cookie.name] = cookie.value;
-  }
-
-  return cookiesObject;
-}
-
 type ScenarioOptions = {
   quantity: number;
   remove: boolean;
@@ -31,14 +21,50 @@ type Options = {
 
 type ResourceCreator = {
   user: UserRow;
+  /** All created lists (may be empty). Prefer `.list` when you asked for one. */
   lists: ListWithSubs[];
+  /** All created items (may be empty). Prefer `.item` when you asked for one. */
   items: ItemRow[];
+  /**
+   * First created list. Throws if none exist — use after `list: { quantity: n }`.
+   * Avoids `noUncheckedIndexedAccess` on `lists[0]` / `const [list] = lists`.
+   */
+  list: ListWithSubs;
+  /**
+   * First created item. Throws if none exist — use after `items: { quantity: n }`.
+   */
+  item: ItemRow;
   cookies: NonNullable<InjectOptions['cookies']>;
   [Symbol.asyncDispose]: () => Promise<void>;
 };
 
 const scenarioDefaults: ScenarioOptions = { quantity: 0, remove: true };
 
+function stringifyCookieArray(cookies: Response['cookies']): ResourceCreator['cookies'] {
+  const cookiesObject: Record<string, string> = {};
+
+  for (const cookie of cookies) {
+    cookiesObject[cookie.name] = cookie.value;
+  }
+
+  return cookiesObject;
+}
+
+/** First element or throw — keeps call sites typed without tuple generics. */
+function only<T>(values: readonly T[], label: string): T {
+  const value = values[0];
+  if (value == null) {
+    throw new Error(`expected a ${label} — pass ${label === 'list' ? 'list' : 'items'}: { quantity: n }`);
+  }
+  return value;
+}
+
+/**
+ * Builds disposable test fixtures (user, optional lists/items, auth cookies).
+ *
+ * Use `.list` / `.item` when you created a single resource; use `.lists` / `.items`
+ * when iterating or looking up by id.
+ */
 async function resourceCreator(
   app: NestFastifyApplication,
   {
@@ -87,6 +113,12 @@ async function resourceCreator(
     user: { ...user, password: userPayload.password },
     lists,
     items,
+    get list() {
+      return only(lists, 'list');
+    },
+    get item() {
+      return only(items, 'item');
+    },
     cookies,
     [Symbol.asyncDispose]: async () => {
       if (removeItems && itemsQuantity) {
