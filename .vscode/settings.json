@@ -14,9 +14,6 @@
   "rest-client.rememberCookiesForSubsequentRequests": false,
   "rest-client.previewOption": "exchange",
 
-  "eslint.enable": false,
-  "eslint.validate": [],
-
   "oxc.enable": true,
   "oxc.typeAware": true,
 
