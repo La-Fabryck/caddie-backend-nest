@@ -1,4 +1,4 @@
-.PHONY: update update-doctor sync-fastify install versions start ci-e2e ci-e2e-up ci-e2e-down ncu-doctor-test sloc sloc-details reset-dev help
+.PHONY: update update-doctor sync-fastify install versions start ci-e2e e2e-up ci-e2e-down ncu-doctor-test sloc sloc-details reset-dev help
 
 MAKEFLAGS += --no-print-directory
 
@@ -18,6 +18,7 @@ update:
 # Doctor: build once, stack up; each upgrade = lint + typecheck + build (host) + npm ci + exec test:e2e
 update-doctor:
 	@echo "Doctor upgrade (lint + e2e gate, Fastify excluded)..."
+	@echo "Building e2e image and starting Docker stack..."
 	@$(E2E_COMPOSE) --progress quiet build test
 	@$(MAKE) e2e-up
 	@(npx --yes npm-check-updates --upgrade --interactive --reject fastify --doctor --doctorTest "make ncu-doctor-test" --format group; \
