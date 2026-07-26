@@ -1,16 +1,18 @@
-import { Injectable, type OnModuleDestroy } from '@nestjs/common';
+import { Injectable, Logger, type OnModuleDestroy } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { Kysely, type LogConfig, PostgresDialect } from 'kysely';
+import { Kysely, type LogEvent, PostgresDialect } from 'kysely';
 import { Pool } from 'pg';
-import type { AppConfig } from '@/config/app.config';
 import type { DatabaseConfig } from '@/config/database.config';
 import type { DB } from './database-types';
+
+const QUERY_DURATION_DECIMALS = 1;
 
 @Injectable()
 export class DatabaseService extends Kysely<DB> implements OnModuleDestroy {
   constructor(configService: ConfigService) {
+    // Must create before `super()` — `this` is unavailable until then.
+    const logger = new Logger(DatabaseService.name);
     const database = configService.getOrThrow<DatabaseConfig>('database');
-    const { nodeEnv } = configService.getOrThrow<AppConfig>('app');
 
     const pool = new Pool({
       host: database.host,
@@ -20,11 +22,18 @@ export class DatabaseService extends Kysely<DB> implements OnModuleDestroy {
       database: database.database,
       max: 10,
     });
-    const log: LogConfig = nodeEnv === 'test' ? ['error'] : ['query', 'error'];
 
     super({
       dialect: new PostgresDialect({ pool }),
-      log,
+      log(event: LogEvent): void {
+        const duration = `${event.queryDurationMillis.toFixed(QUERY_DURATION_DECIMALS)}ms`;
+        if (event.level === 'error') {
+          const stack = event.error instanceof Error ? event.error.stack : undefined;
+          logger.error(`Query failed (${duration}): ${event.query.sql}`, stack);
+        } else {
+          logger.log(`Query (${duration}): ${event.query.sql}`);
+        }
+      },
     });
   }
 
