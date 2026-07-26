@@ -63,7 +63,7 @@ versions:
 
 # Postgres (Docker) + Nest on host
 start:
-	docker compose start --wait
+	docker compose up -d --wait
 	npm run start:dev
 
 # E2E in Docker: stack up, exec Jest on the running API container
