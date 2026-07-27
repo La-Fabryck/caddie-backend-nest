@@ -15,9 +15,8 @@ COPY src ./src
 COPY package*.json tsconfig*.json nest-cli.json .swcrc .npmrc ./
 
 # TODO: consider --omit=peer when ready
-# --ignore-scripts: skip prepare (husky); devDep is omitted so the hook binary is absent
 RUN npm run build \
-    && npm ci --omit=dev --omit=optional --ignore-scripts \
+    && npm ci --omit=dev --omit=optional \
     && npm cache clean --force
 
 # Stage 3: Runtime

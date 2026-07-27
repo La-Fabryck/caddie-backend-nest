@@ -19,7 +19,9 @@
     "start:dev": "nest start --watch --env-file=.env",
     "start:debug": "nest start --watch --debug ${NEST_IP}:${DEBUG_PORT} --env-file=.env",
     "start:prod": "node dist/src/main.js",
-    "typecheck": "tsc --noEmit && tsc --noEmit -p test/tsconfig.json",
+    "typecheck": "tsc --noEmit & p1=$!; tsc --noEmit -p test/tsconfig.json & p2=$!; e=0; wait \"$p1\" || e=$?; wait \"$p2\" || e=$?; exit \"$e\"",
+    "typecheck:src": "tsc --noEmit",
+    "typecheck:test": "tsc --noEmit -p test/tsconfig.json",
     "lint": "npm run check:oxfmt -- . && npm run check:oxlint -- .",
     "check:oxfmt": "oxfmt --check -c oxfmt.config.mts",
     "check:oxlint": "oxlint -c oxlint.config.mts --deny-warnings",
@@ -33,8 +35,7 @@
     "test:cov": "node --experimental-vm-modules node_modules/jest/bin/jest.js --config ./test/jest.e2e.json --coverage",
     "test:debug": "node --inspect=0.0.0.0:9230 --experimental-vm-modules -r tsconfig-paths/register -r ts-node/register node_modules/jest/bin/jest.js --config ./test/jest.e2e.json --runInBand --watchAll",
     "test:e2e": "node --experimental-vm-modules node_modules/jest/bin/jest.js --config ./test/jest.e2e.json",
-    "ncu:doctor-test": "make ncu-doctor-test",
-    "prepare": "husky"
+    "ncu:doctor-test": "make ncu-doctor-test"
   },
   "dependencies": {
     "@fastify/cookie": "^11.1.2",
@@ -67,11 +68,10 @@
     "@types/jest": "^30.0.0",
     "@types/node": "^26.1.1",
     "@types/pg": "^8.20.0",
-    "husky": "^9.1.7",
     "jest": "^30.4.2",
     "kysely-codegen": "^0.20.0",
+    "lefthook": "^2.1.10",
     "light-my-request": "^6.6.0",
-    "nano-staged": "^1.0.2",
     "oxfmt": "0.60.0",
     "oxlint": "1.75.0",
     "oxlint-tsgolint": "^7.0.2001",
@@ -80,13 +80,6 @@
     "ts-node": "^10.9.2",
     "tsconfig-paths": "^4.2.0",
     "typescript": "^6.0.3"
-  },
-  "nano-staged": {
-    "*.{js,ts,mjs,cjs,mts}": [
-      "npm run fix:oxfmt --",
-      "npm run fix:oxlint --"
-    ],
-    "*.{json,md,yml,yaml}": "npm run fix:oxfmt --"
   },
   "jest": {
     "collectCoverageFrom": [
@@ -112,9 +105,10 @@
     "npm": ">=11.15.0"
   },
   "allowScripts": {
-    "fsevents": false,
     "@swc/core": true,
     "bcrypt": true,
+    "fsevents": false,
+    "lefthook": true,
     "unrs-resolver": true
   }
 }

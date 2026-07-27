@@ -4,16 +4,14 @@ Lint and format: `npm run lint` / `npm run format` (Oxfmt + Oxlint). Type-aware 
 
 ## Git hooks
 
-Pre-commit (Husky) runs in order:
+Pre-commit ([Lefthook](https://github.com/evilmartians/lefthook)) ([`lefthook.yml`](../lefthook.yml)):
 
-1. **nano-staged** — staged files only:
-   - `*.{js,ts,mjs,cjs,mts}` — `npm run fix:oxfmt --`, then `npm run fix:oxlint --` (staged paths appended after `--`)
-   - `*.{json,md,yml,yaml}` — `npm run fix:oxfmt --`
-2. **`npm run typecheck`** — full project (`tsc --noEmit` on app + test tsconfigs)
+- **format-and-lint** (piped, sequential) — **oxfmt** on staged `*.{js,ts,mjs,cjs,mts,json,md,yml,yaml}`, then **oxlint** on staged `*.{js,ts,mjs,cjs,mts}` (`stage_fixed` re-stages fixes)
+- **`typecheck`** — `typecheck:src` and `typecheck:test` in **parallel** (`tsc --noEmit` on app + test tsconfigs), also in **parallel** with format-and-lint
 
 Atomic scripts in `package.json`: `check:oxfmt` / `check:oxlint` (read-only), `fix:oxfmt` / `fix:oxlint` (write + `--fix`). Top-level `npm run lint` / `npm run format` run the check/fix pair on `.`.
 
-Full-repo checks stay on `npm run lint` (Makefile `ncu-doctor-test`, `sync-fastify`, CI, etc.). Hooks install via `npm ci` / `npm run prepare` (`prepare`: `husky`).
+Full-repo checks stay on `npm run lint` (Makefile `ncu-doctor-test`, `sync-fastify`, CI, etc.). Hooks install via lefthook’s postinstall on `npm ci` / `npm install` (`allowScripts.lefthook`: `true`).
 
 ## Configuration
 

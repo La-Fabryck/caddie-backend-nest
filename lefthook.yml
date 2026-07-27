@@ -1,0 +1,23 @@
+pre-commit:
+  parallel: true
+  jobs:
+    - name: format-and-lint
+      group:
+        piped: true
+        jobs:
+          - name: oxfmt
+            glob: '*.{js,ts,mjs,cjs,mts,json,md,yml,yaml}'
+            run: npm run fix:oxfmt -- {staged_files}
+            stage_fixed: true
+          - name: oxlint
+            glob: '*.{js,ts,mjs,cjs,mts}'
+            run: npm run fix:oxlint -- {staged_files}
+            stage_fixed: true
+    - name: typecheck
+      group:
+        parallel: true
+        jobs:
+          - name: typecheck-src
+            run: npm run typecheck:src
+          - name: typecheck-test
+            run: npm run typecheck:test
