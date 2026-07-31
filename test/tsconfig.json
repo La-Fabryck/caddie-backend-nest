@@ -3,6 +3,7 @@
   "include": ["**/*.ts"],
   "compilerOptions": {
     "rootDir": "..",
+    "tsBuildInfoFile": "../node_modules/.cache/tsc/tsconfig.test.tsbuildinfo",
     "types": ["jest", "node"],
     "paths": {
       "@/*": ["../src/*"],
