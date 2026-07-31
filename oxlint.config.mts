@@ -11,30 +11,28 @@ const MAX_FUNCTION_PARAMS = 3;
  */
 export default defineConfig({
   plugins: ['typescript', 'unicorn', 'import', 'node'],
-  // TODO: Enable category bundles after triage (see targets below).
-  // Today `correctness` is off because @oxlint/migrate lists those rules explicitly in `rules`.
-  // Turning categories on adds rules *on top of* that list — run `npm run lint` after each change.
+  // Category bundles (on top of the migrated `rules` list). e2e overrides mute
+  // `no-unsafe-type-assertion` for `JSON.parse(...) as T` — keep that rule in src/.
   //
-  // | Category     | Suggested | Notes |
-  // |--------------|-----------|-------|
-  // | correctness  | error     | Extra rules beyond the migrated ESLint set (~4 new errors in a trial). |
-  // | suspicious   | warn      | Likely bugs; trial had ~33 warnings (e.g. no-unsafe-type-assertion in e2e). |
-  // | perf         | warn      | Performance smells; usually low noise, worth enabling. |
-  // | pedantic     | (skip)    | Too strict for day-to-day; many false positives. Revisit only if you want max rigor. |
-  // | style        | —         | Mostly overlaps unicorn + Oxfmt; optional. |
-  // | restriction  | —         | Bans patterns (e.g. console); only if you want hard bans via category. |
-  // | nursery      | —         | Unstable rules; use only experimentally. |
-  //
-  // targets = {
-  //   correctness: 'error',
-  //   suspicious: 'warn',
-  //   perf: 'warn',
-  // };
+  // | Category     | Level  | Notes |
+  // |--------------|--------|-------|
+  // | correctness  | error  | Enabled. |
+  // | suspicious   | warn   | Enabled; e2e has an override for JSON.parse assertions. |
+  // | perf         | warn   | Enabled. |
+  // | pedantic     | (skip) | Too strict for day-to-day; many false positives. |
+  // | style        | —      | Mostly overlaps unicorn + Oxfmt; optional. |
+  // | restriction  | —      | Bans patterns (e.g. console); only if you want hard bans via category. |
+  // | nursery      | —      | Unstable rules; use only experimentally. |
   categories: {
     correctness: 'error',
+    perf: 'warn',
+    suspicious: 'warn',
   },
   options: {
     typeAware: true,
+    denyWarnings: true,
+    reportUnusedDisableDirectives: 'deny',
+    respectEslintDisableDirectives: false,
   },
   env: {
     builtin: true,
@@ -438,6 +436,13 @@ export default defineConfig({
       files: ['migrations/**/*.ts'],
       rules: {
         'unicorn/filename-case': 'off',
+      },
+    },
+    // e2e inject payloads: `JSON.parse(...) as T` is intentional; keep the rule in src/
+    {
+      files: ['test/**/*.e2e-spec.ts'],
+      rules: {
+        'typescript/no-unsafe-type-assertion': 'off',
       },
     },
   ],

@@ -90,7 +90,7 @@ describe('ListController (e2e)', () => {
       const payload = JSON.parse(result.payload) as ListRow[];
       expect(payload).not.toHaveLength(0);
       for (const expectedList of payload) {
-        const storedList = creator.lists.find((storedList) => storedList.id === expectedList.id);
+        const storedList = creator.lists.find((list) => list.id === expectedList.id);
         expect(storedList).not.toBeNull();
         expect(expectedList.title).toEqual(storedList?.title);
       }

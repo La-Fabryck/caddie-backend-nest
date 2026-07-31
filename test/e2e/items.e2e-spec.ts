@@ -218,7 +218,7 @@ describe('ItemController (e2e)', () => {
       const payload = JSON.parse(result.payload) as ItemRow[];
       expect(payload).not.toHaveLength(0);
       for (const expectedItems of payload) {
-        const storedItems = creator.items.find((storedList) => storedList.id === expectedItems.id);
+        const storedItems = creator.items.find((storedItem) => storedItem.id === expectedItems.id);
         expect(storedItems).not.toBeNull();
         expect(expectedItems.name).toEqual(storedItems?.name);
         expect(expectedItems.quantity).toEqual(storedItems?.quantity);

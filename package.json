@@ -16,11 +16,11 @@
   "scripts": {
     "build": "nest build",
     "check:oxfmt": "oxfmt --check -c oxfmt.config.mts",
-    "check:oxlint": "oxlint -c oxlint.config.mts --deny-warnings",
+    "check:oxlint": "oxlint -c oxlint.config.mts",
     "db:migrate:latest": "kysely migrate latest",
     "db:migrate:make": "kysely migrate make",
     "fix:oxfmt": "oxfmt --write -c oxfmt.config.mts",
-    "fix:oxlint": "oxlint --fix -c oxlint.config.mts --deny-warnings",
+    "fix:oxlint": "oxlint --fix -c oxlint.config.mts",
     "format": "npm run fix:oxfmt -- . && npm run fix:oxlint -- .",
     "lint": "npm run check:oxfmt -- . && npm run check:oxlint -- .",
     "start": "nest start --env-file=.env",
