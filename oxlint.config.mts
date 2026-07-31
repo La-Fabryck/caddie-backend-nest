@@ -31,7 +31,7 @@ export default defineConfig({
   //   perf: 'warn',
   // };
   categories: {
-    correctness: 'off',
+    correctness: 'error',
   },
   options: {
     typeAware: true,

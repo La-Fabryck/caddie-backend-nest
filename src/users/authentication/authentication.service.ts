@@ -8,6 +8,7 @@ import type { AuthConfig } from '@/config/auth.config';
 import type { LoginDto } from '../dto/login.dto';
 import { INVALID_LOGIN } from '../messages/authentication';
 import { UsersService } from '../users/users.service';
+import { formatErrorForLog } from '../utils/format-error-for-log';
 
 /**
  * Application subject (`sub`) plus standard JWT registered claims (`iat`, `exp`, …) from `jsonwebtoken`.
@@ -60,12 +61,11 @@ export class AuthenticationService {
       });
     } catch (error: unknown) {
       if (error instanceof TokenExpiredError) {
-        const message = `Refresh token expired at ${String(error.expiredAt)}`;
-        this.logger.log(message);
+        this.logger.log(`Refresh token expired at ${formatErrorForLog(error.expiredAt)}`);
       } else if (error instanceof Error) {
-        this.logger.warn(`Refresh token verification failed: ${error.name}, cause : ${error.cause}`);
+        this.logger.warn(`Refresh token verification failed: ${formatErrorForLog(error)}`);
       } else {
-        this.logger.error(`Refresh token verification failed: ${error}`);
+        this.logger.error(`Refresh token verification failed: ${formatErrorForLog(error)}`);
       }
 
       throw new UnauthorizedException();

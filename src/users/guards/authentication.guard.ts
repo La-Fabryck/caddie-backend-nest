@@ -4,7 +4,7 @@ import { JwtService, TokenExpiredError } from '@nestjs/jwt';
 import type { FastifyRequest } from 'fastify';
 import type { AuthConfig } from '@/config/auth.config';
 import type { JwtPayload } from '../authentication/authentication.service';
-
+import { formatErrorForLog } from '../utils/format-error-for-log';
 @Injectable()
 export class AuthenticationGuard implements CanActivate {
   private readonly logger = new Logger(AuthenticationGuard.name);
@@ -37,11 +37,11 @@ export class AuthenticationGuard implements CanActivate {
       return true;
     } catch (error: unknown) {
       if (error instanceof TokenExpiredError) {
-        this.logger.debug(`Access token expired at ${String(error.expiredAt)}`);
+        this.logger.debug(`Access token expired at ${formatErrorForLog(error.expiredAt)}`);
       } else if (error instanceof Error) {
-        this.logger.warn(`Access token verification failed: ${error.name}, cause : ${error.cause}`);
+        this.logger.warn(`Access token verification failed: ${formatErrorForLog(error)}`);
       } else {
-        this.logger.error(`Access token verification failed: ${error}`);
+        this.logger.error(`Access token verification failed: ${formatErrorForLog(error)}`);
       }
 
       throw new UnauthorizedException();
