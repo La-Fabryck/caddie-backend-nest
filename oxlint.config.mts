@@ -60,7 +60,6 @@ export default defineConfig({
     'no-empty-static-block': 'error',
     'no-ex-assign': 'error',
     'no-extra-boolean-cast': 'error',
-    'no-fallthrough': 'error',
     'no-global-assign': 'error',
     'no-invalid-regexp': 'error',
     'no-irregular-whitespace': 'error',
@@ -77,18 +76,6 @@ export default defineConfig({
     'no-unsafe-optional-chaining': 'error',
     'no-unused-labels': 'error',
     'no-unused-private-class-members': 'error',
-    'no-unused-vars': [
-      'error',
-      {
-        args: 'all',
-        argsIgnorePattern: '^_',
-        caughtErrors: 'all',
-        caughtErrorsIgnorePattern: '^_',
-        destructuredArrayIgnorePattern: '^_',
-        varsIgnorePattern: '^_',
-        ignoreRestSiblings: true,
-      },
-    ],
     'no-useless-assignment': 'error',
     'no-useless-backreference': 'error',
     'no-useless-catch': 'error',
@@ -400,6 +387,8 @@ export default defineConfig({
     // turn off core rules that tsc already covers (avoids false positives / duplicate noise,
     // e.g. no-undef); enable no-var / prefer-const / prefer-rest-params / prefer-spread
     // because they fit TS. Project is TS-only — these are not duplicated in top-level `rules`.
+    // Also: no-unused-vars ↔ noUnusedLocals / noUnusedParameters;
+    // no-fallthrough ↔ noFallthroughCasesInSwitch.
     {
       files: ['**/*.ts', '**/*.tsx', '**/*.mts', '**/*.cts'],
       rules: {
@@ -409,6 +398,7 @@ export default defineConfig({
         'no-const-assign': 'off',
         'no-dupe-class-members': 'off',
         'no-dupe-keys': 'off',
+        'no-fallthrough': 'off',
         'no-func-assign': 'off',
         'no-import-assign': 'off',
         'no-new-native-nonconstructor': 'off',
@@ -419,6 +409,7 @@ export default defineConfig({
         'no-undef': 'off',
         'no-unreachable': 'off',
         'no-unsafe-negation': 'off',
+        'no-unused-vars': 'off',
         'no-var': 'error',
         'no-with': 'off',
         'prefer-const': 'error',
