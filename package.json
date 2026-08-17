@@ -32,7 +32,7 @@
     "test:debug": "node --inspect=0.0.0.0:9230 --experimental-vm-modules -r tsconfig-paths/register -r ts-node/register node_modules/jest/bin/jest.js --config ./test/jest.e2e.json --runInBand --watchAll",
     "test:e2e": "node --experimental-vm-modules node_modules/jest/bin/jest.js --config ./test/jest.e2e.json",
     "test:watch": "node --experimental-vm-modules node_modules/jest/bin/jest.js --config ./test/jest.e2e.json --runInBand --watchAll",
-    "typecheck": "tsc --noEmit && tsc --noEmit -p test/tsconfig.json",
+    "typecheck": "npm run typecheck:src && npm run typecheck:test",
     "typecheck:src": "tsc --noEmit",
     "typecheck:test": "tsc --noEmit -p test/tsconfig.json"
   },
