@@ -31,7 +31,7 @@ export default defineConfig({
   options: {
     typeAware: true,
     denyWarnings: true,
-    reportUnusedDisableDirectives: 'deny',
+    reportUnusedDisableDirectives: 'error',
     respectEslintDisableDirectives: false,
   },
   env: {
