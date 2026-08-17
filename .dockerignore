@@ -1,46 +1,58 @@
 # Dependencies (reinstalled in image)
 node_modules
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
-pnpm-debug.log*
 
 # Build output (rebuilt in image)
 dist
 
-# Git and IDE
+# Git
 .git
 .gitignore
+.dockerignore
+
+# IDE / editor
 .cursor
 .vscode
 .idea
 *.swp
 *.swo
 *~
+*.http
 
-# Env and secrets
+# Env and secrets (e2e Dockerfile copies docker/app/e2e/.env.e2e)
 .env
 .env.*
-!.env.sample
+!docker/app/e2e/.env.e2e
 
-# Test artifacts and tooling (not test/ — e2e image needs it)
+# Test artifacts (not test/ — e2e image needs it)
 coverage
 .nyc_output
 jest.config.*
-.eslintrc*
-.eslintignore
 
-# Docs and misc
-README*
-LICENSE
+# Lint / format (host-only)
+oxfmt.config.*
+oxlint.config.*
 .editorconfig
-oxfmt.config.mts
-oxlint.config.mts
+
+# Git hooks
+lefthook.yml
+lefthook-local.yml
+
+# Host toolchain
+.node-version
+
+# Docs
+*.md
+docs
+
+# Image build scaffolding (not COPY'd into the image)
 Makefile
 Dockerfile*
 compose*.yml
 docker-compose*
+*.sh
 
-# OS
+# Logs and OS
+logs
+*.log
 .DS_Store
 Thumbs.db
