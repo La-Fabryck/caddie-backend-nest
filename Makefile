@@ -34,7 +34,7 @@ update-lockfile:
 	@( \
 		npm install --package-lock-only --no-fund --no-audit && \
 		$(MAKE) sync-fastify && \
-		npm ci --no-fund --no-audit && \
+		npm ci --prefer-offline --no-fund --no-audit && \
 		$(MAKE) doctor-test; \
 		r=$$?; \
 		if [ $$r -eq 0 ]; then \
@@ -44,7 +44,7 @@ update-lockfile:
 			echo "update-lockfile failed, restoring package.json and package-lock.json"; \
 			mv package-lock.json.bak package-lock.json; \
 			mv package.json.bak package.json; \
-			npm ci --no-fund --no-audit; \
+			npm ci --prefer-offline --no-fund --no-audit; \
 		fi; \
 		$(E2E_COMPOSE) --progress quiet down; \
 		exit $$r \
@@ -55,7 +55,7 @@ doctor-test:
 	@$(STEP) lint npm run lint
 	@$(STEP) build npm run build
 	@$(STEP) e2e $(E2E_COMPOSE) --progress quiet exec -T test \
-		sh -c 'npm ci --silent && NODE_NO_WARNINGS=1 npm run test:e2e'
+		sh -c 'npm ci --prefer-offline --silent && NODE_NO_WARNINGS=1 npm run test:e2e'
 
 # Postgres → migrate → API up (CMD npm start)
 e2e-up:
@@ -77,7 +77,7 @@ install:
 	docker compose pull
 	$(E2E_COMPOSE) pull
 	@echo "Install Node dependencies on host"
-	npm ci
+	npm ci --prefer-offline
 	@echo "Build e2e test image"
 	$(E2E_COMPOSE) build test
 

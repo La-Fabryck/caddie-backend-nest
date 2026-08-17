@@ -4,7 +4,7 @@ WORKDIR /app
 
 COPY package*.json .npmrc ./
 
-RUN npm ci
+RUN npm ci --prefer-offline
 
 # Stage 2: Build
 FROM node:26-alpine AS builder
@@ -16,7 +16,7 @@ COPY package*.json tsconfig*.json nest-cli.json .swcrc .npmrc ./
 
 # TODO: consider --omit=peer when ready
 RUN npm run build \
-    && npm ci --omit=dev --omit=optional \
+    && npm ci --prefer-offline --omit=dev --omit=optional \
     && npm cache clean --force
 
 # Stage 3: Runtime

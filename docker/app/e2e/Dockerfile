@@ -4,7 +4,7 @@ WORKDIR /app
 
 COPY package*.json .npmrc ./
 
-RUN npm ci
+RUN npm ci --prefer-offline
 
 # Stage 2: API + exec Jest (nest start — no dist / no start:prod)
 FROM node:26-alpine AS e2e
