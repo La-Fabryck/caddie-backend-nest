@@ -17,8 +17,9 @@
     "build": "nest build",
     "check:oxfmt": "oxfmt --check -c oxfmt.config.mts",
     "check:oxlint": "oxlint -c oxlint.config.mts",
-    "db:migrate:latest": "kysely migrate latest",
-    "db:migrate:make": "kysely migrate make",
+    "db:codegen": "node --env-file-if-exists=.env ./node_modules/kysely-codegen/dist/cli/bin.js --config-file .config/kysely-codegen.config.ts",
+    "db:migrate:latest": "node --env-file-if-exists=.env ./node_modules/kysely-ctl/dist/bin.mjs migrate latest",
+    "db:migrate:make": "node --env-file-if-exists=.env ./node_modules/kysely-ctl/dist/bin.mjs migrate make",
     "fix:oxfmt": "oxfmt --write -c oxfmt.config.mts",
     "fix:oxlint": "oxlint --fix -c oxlint.config.mts",
     "format": "npm run fix:oxfmt -- . && npm run fix:oxlint -- .",
@@ -34,7 +35,8 @@
     "test:watch": "node --experimental-vm-modules node_modules/jest/bin/jest.js --config ./test/jest.e2e.json --runInBand --watchAll",
     "typecheck": "npm run typecheck:src && npm run typecheck:test",
     "typecheck:src": "tsc --noEmit",
-    "typecheck:test": "tsc --noEmit -p test/tsconfig.json"
+    "typecheck:test": "tsc --noEmit -p test/tsconfig.json",
+    "knip": "knip --treat-config-hints-as-errors"
   },
   "dependencies": {
     "@fastify/cookie": "^11.1.2",
@@ -68,14 +70,13 @@
     "@types/node": "^26.2.0",
     "@types/pg": "^8.21.0",
     "jest": "^30.4.2",
+    "knip": "^6.32.2",
     "kysely-codegen": "^0.20.0",
     "lefthook": "^2.1.10",
     "light-my-request": "^6.6.0",
     "oxfmt": "0.63.0",
     "oxlint": "1.78.0",
     "oxlint-tsgolint": "^7.0.2001",
-    "source-map-support": "^0.5.21",
-    "ts-loader": "^9.6.2",
     "ts-node": "^10.9.2",
     "tsconfig-paths": "^4.2.0",
     "typescript": "^6.0.3"

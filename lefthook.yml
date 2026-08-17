@@ -21,3 +21,5 @@ pre-commit:
             run: npm run typecheck:src
           - name: typecheck-test
             run: npm run typecheck:test
+    - name: knip
+      run: npm run knip

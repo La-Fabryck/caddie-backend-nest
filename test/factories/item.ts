@@ -14,4 +14,4 @@ function createManyItems(listId: string, count: number): CreateItem['createItemP
   return Array.from({ length: count }, () => createItem(listId));
 }
 
-export { createItem, createManyItems };
+export { createManyItems };

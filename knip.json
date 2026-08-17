@@ -1,0 +1,9 @@
+{
+  "$schema": "https://unpkg.com/knip@6/schema.json",
+  "tags": ["-lintignore"],
+  "entry": ["src/main.ts", ".config/kysely.config.ts", ".config/kysely-codegen.config.ts", "migrations/*.ts"],
+  "jest": {
+    "config": ["package.json", "test/jest.e2e.json"],
+    "entry": ["**/*.e2e-spec.ts"]
+  }
+}

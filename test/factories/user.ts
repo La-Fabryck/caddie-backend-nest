@@ -11,8 +11,4 @@ function createUser(overrides: Partial<UserRow> = {}): UserRow {
   };
 }
 
-function createManyUsers(count: number): UserRow[] {
-  return Array.from({ length: count }, () => createUser());
-}
-
-export { createUser, createManyUsers };
+export { createUser };

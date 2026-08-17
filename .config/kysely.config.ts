@@ -1,9 +1,6 @@
 import path from 'node:path';
-import { config } from 'dotenv';
 import { defineConfig } from 'kysely-ctl';
 import { Pool } from 'pg';
-
-config();
 
 function getRequired(environment: NodeJS.ProcessEnv, key: string): string {
   const value = environment[key];
