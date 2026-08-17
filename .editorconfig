@@ -11,5 +11,7 @@ insert_final_newline = true
 trim_trailing_whitespace = true
 max_line_length = 140
 
+# Prose: no wrap ruler (soft-wrap in the editor). Trailing space stays trimmed from [*];
+# two-space Markdown hard breaks are a footgun — use a trailing `\` or `<br>` if needed.
 [*.md]
-trim_trailing_whitespace = false
+max_line_length = off

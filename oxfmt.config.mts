@@ -21,4 +21,14 @@ export default defineConfig({
   },
   sortPackageJson: true,
   trailingComma: 'all',
+  overrides: [
+    {
+      files: ['*.md'],
+      options: {
+        // editorconfig `max_line_length = off` is not numeric, so oxfmt would else use 100
+        printWidth: 140,
+        proseWrap: 'preserve',
+      },
+    },
+  ],
 });
