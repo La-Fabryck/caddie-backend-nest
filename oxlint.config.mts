@@ -40,7 +40,7 @@ export default defineConfig({
     jest: true,
     node: true,
   },
-  ignorePatterns: ['./dist/*', './coverage/*'],
+  ignorePatterns: ['./dist/*', './coverage/*', './src/database/database-raw.d.ts'],
   rules: {
     'for-direction': 'error',
     'no-async-promise-executor': 'error',

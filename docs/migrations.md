@@ -17,3 +17,13 @@ npm run db:migrate:make -- <migration_name>
 ```
 
 Example: `npm run db:migrate:make -- add_notes_column`
+
+## Generate types
+
+After migrations, introspect the database into [`src/database/database-raw.d.ts`](../src/database/database-raw.d.ts):
+
+```bash
+npm run db:codegen
+```
+
+That file is the raw kysely-codegen snapshot. App code uses [`src/database/database-types.d.ts`](../src/database/database-types.d.ts), which wraps defaults in Kysely `Generated` and uses `Date` instead of codegen’s `Timestamp`. Copy new tables or columns from the raw file into `database-types.d.ts`; do not point codegen at the hand-maintained file.

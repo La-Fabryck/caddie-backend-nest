@@ -5,7 +5,7 @@
   "moduleNameMapper": {
     "@/(.*)": "<rootDir>/src/$1"
   },
-  "setupFilesAfterEnv": ["./test/jest.setup.ts"],
+  "setupFilesAfterEnv": ["<rootDir>/test/jest.setup.ts"],
   "testEnvironment": "node",
   "testRegex": ".e2e-spec.ts$",
   "transform": {

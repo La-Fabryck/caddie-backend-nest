@@ -2,7 +2,6 @@ import { ForbiddenException, Injectable, Logger, UnauthorizedException } from '@
 import { ConfigService } from '@nestjs/config';
 import { JwtService, type JwtSignOptions, TokenExpiredError } from '@nestjs/jwt';
 import { compare } from 'bcrypt';
-import type { JwtPayload as JwtRegisteredClaims } from 'jsonwebtoken';
 import type { ErrorInterface } from '@/app.configurator';
 import type { AuthConfig } from '@/config/auth.config';
 import type { LoginDto } from '../dto/login.dto';
@@ -10,12 +9,12 @@ import { INVALID_LOGIN } from '../messages/authentication';
 import { UsersService } from '../users/users.service';
 import { formatErrorForLog } from '../utils/format-error-for-log';
 
-/**
- * Application subject (`sub`) plus standard JWT registered claims (`iat`, `exp`, …) from `jsonwebtoken`.
- */
-export type JwtPayload = JwtRegisteredClaims & {
+/** Registered claims we use: https://datatracker.ietf.org/doc/html/rfc7519#section-4.1 */
+export interface JwtPayload {
   sub: string;
-};
+  exp?: number;
+  iat?: number;
+}
 export type AuthTokens = { accessToken: string; refreshToken: string };
 
 @Injectable()

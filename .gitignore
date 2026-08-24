@@ -37,5 +37,9 @@ lerna-debug.log*
 !.vscode/tasks.json
 !.vscode/launch.json
 !.vscode/extensions.json
+
 # Lefthook local overrides
 lefthook-local.yml
+
+# kysely-codegen snapshot (hand-maintained types live in database-types.d.ts)
+/src/database/database-raw.d.ts

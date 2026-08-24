@@ -15,4 +15,4 @@ function createManyLists(user: UserRow, count: number): CreateList[] {
   return Array.from({ length: count }, () => createList(user));
 }
 
-export { createList, createManyLists };
+export { createManyLists };
