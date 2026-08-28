@@ -26,3 +26,15 @@ Later'ish :
 Later :
 
 - Implement pino logger with [correlation ID](https://sagarvaghela.medium.com/nestjs-logging-pino-correlation-id-and-gcp-cloud-logging-90a7e6c13a8d)
+
+## Unify parsers — TypeScript 7.1, keep Lefthook
+
+Today the repo compiles TypeScript twice: **Nest CLI + SWC** (app) and **Vitest/Vite + unplugin-swc** (tests). Lint/format is already Oxc. Git hooks stay on Lefthook (named jobs, piped format→lint, typecheck ∥ knip). Vite+ staged is lint-staged: glob concurrency only, no Lefthook job graph — skip it.
+
+TS 7.0 is CLI-only. Nest needs the **programmatic API** in **7.1**. Stay on `typescript@^6` until Nest CLI actually loads 7.1.
+
+1. Watch Nest CLI for 7.1 (`getParsedCommandLineOfConfigFile` and friends — a bump alone may not be enough; the API is described as new).
+2. When Nest supports it: `typescript@^7.1`, keep `builder` + `typeCheck: true` in `nest-cli.json`.
+3. Switch the Nest builder from SWC back to `tsc` / `tsgo` if metadata and watch/debug still match. Delete `@swc/cli`, `@swc/core`, `.swcrc`.
+4. Tests: drop `unplugin-swc` — either Vite 8 [Oxc `emitDecoratorMetadata`](https://vite.dev/guide/features#emitdecoratormetadata) (can spike this anytime) or the same TS 7.1 pipeline as the app.
+5. Lefthook unchanged.
