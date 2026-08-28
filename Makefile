@@ -6,7 +6,7 @@ NEST_FASTIFY_VERSION := $(shell npm info @nestjs/platform-fastify dependencies.f
 E2E_ENV_FILE := $(if $(wildcard .env),--env-file .env,)
 E2E_COMPOSE := docker compose -p caddie-e2e $(E2E_ENV_FILE) -f docker/app/e2e/compose.yml
 
-# ponytail: oxfmt/nest/jest lack --quiet; one status line, dump log only on failure
+# ponytail: oxfmt/nest/vitest lack --quiet; one status line, dump log only on failure
 STEP := sh -c 'label=$$1; shift; out=$$("$$@" 2>&1); r=$$?; if [ $$r -eq 0 ]; then echo "$$label ok"; else printf "%s\n" "$$out"; echo "$$label failed"; exit $$r; fi' --
 
 # Doctor upgrade then lockfile refresh

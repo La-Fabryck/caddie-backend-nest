@@ -4,7 +4,7 @@
   "compilerOptions": {
     "rootDir": "..",
     "tsBuildInfoFile": "../node_modules/.cache/tsc/tsconfig.test.tsbuildinfo",
-    "types": ["jest", "node"],
+    "types": ["vitest/globals", "node"],
     "paths": {
       "@/*": ["../src/*"],
       "test/*": ["./*"]

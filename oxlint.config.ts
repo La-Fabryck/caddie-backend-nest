@@ -4,8 +4,7 @@ import { defineConfig } from 'oxlint';
 const MAX_FUNCTION_PARAMS = 3;
 
 /**
- * Oxlint configuration (type-aware). Use `.mts` so Node treats this as ESM without
- * `package.json` `"type": "module"` (Nest stays CJS until first-class ESM support).
+ * Oxlint configuration (type-aware).
  *
  * @see docs/oxlint-migrate.md
  */
@@ -37,7 +36,7 @@ export default defineConfig({
   env: {
     builtin: true,
     es2026: true,
-    jest: true,
+    vitest: true,
     node: true,
   },
   ignorePatterns: ['./dist/*', './coverage/*', './src/database/database-raw.d.ts'],
@@ -210,7 +209,8 @@ export default defineConfig({
     'unicorn/relative-url-style': 'error',
     'unicorn/require-array-join-separator': 'error',
     'unicorn/require-module-attributes': 'error',
-    'unicorn/require-module-specifiers': 'error',
+    // Source stays extensionless; SWC `resolveFully` adds `.js` on emit for Node ESM.
+    'unicorn/require-module-specifiers': 'off',
     'unicorn/require-number-to-fixed-digits-argument': 'error',
     'unicorn/switch-case-braces': 'error',
     'unicorn/switch-case-break-position': 'error',
@@ -418,7 +418,7 @@ export default defineConfig({
       },
     },
     {
-      files: ['src/config/**/*.ts', '.config/**/*.ts', 'test/jest.setup.ts'],
+      files: ['src/config/**/*.ts', '.config/**/*.ts', 'test/setup.ts'],
       rules: {
         'node/no-process-env': 'off',
       },
