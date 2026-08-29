@@ -389,7 +389,7 @@ export default defineConfig({
     // Also: no-unused-vars ↔ noUnusedLocals / noUnusedParameters;
     // no-fallthrough ↔ noFallthroughCasesInSwitch.
     {
-      files: ['**/*.ts', '**/*.tsx', '**/*.mts', '**/*.cts'],
+      files: ['**/*.ts'],
       rules: {
         'constructor-super': 'off',
         'getter-return': 'off',
@@ -414,7 +414,7 @@ export default defineConfig({
         'prefer-const': 'error',
         'prefer-rest-params': 'error',
         'prefer-spread': 'error',
-        // Source stays extensionless; SWC `resolveFully` adds `.js` on emit for Node ESM.
+        // Extensionless specifiers: SWC `resolveFully` rewrites src/ emit; tests and configs use bundler/Vitest.
         'unicorn/require-module-specifiers': 'off',
       },
     },

@@ -6,7 +6,7 @@ Lint and format: `npm run lint` / `npm run format` (Oxfmt + Oxlint). Type-aware 
 
 Pre-commit ([Lefthook](https://github.com/evilmartians/lefthook)) ([`lefthook.yml`](../lefthook.yml)):
 
-- **format-and-lint** (piped, sequential) — **oxfmt** on staged `*.{js,ts,mjs,cjs,mts,json,md,yml,yaml}`, then **oxlint** on staged `*.{js,ts,mjs,cjs,mts}` (`stage_fixed` re-stages fixes)
+- **format-and-lint** (piped, sequential) — **oxfmt** on staged `*.{ts,json,md,yml,yaml}`, then **oxlint** on staged `*.ts` (`stage_fixed` re-stages fixes)
 - **`typecheck`** — `typecheck:src` and `typecheck:test` in **parallel** (lefthook group), also in **parallel** with format-and-lint
 - **`knip`** — unused files/exports/dependencies (`npm run check:knip`; full repo, fails on issues)
 

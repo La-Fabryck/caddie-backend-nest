@@ -27,14 +27,17 @@ Later :
 
 - Implement pino logger with [correlation ID](https://sagarvaghela.medium.com/nestjs-logging-pino-correlation-id-and-gcp-cloud-logging-90a7e6c13a8d)
 
-## Unify parsers — TypeScript 7.1, keep Lefthook
+## Unify parsers — drop SWC via `#/` + `.js` after TS 7.1
 
-Today the repo compiles TypeScript twice: **Nest CLI + SWC** (app) and **Vitest/Vite + unplugin-swc** (tests). Lint/format is already Oxc. Git hooks stay on Lefthook (named jobs, piped format→lint, typecheck ∥ knip). Vite+ staged is lint-staged: glob concurrency only, no Lefthook job graph — skip it.
+Match the Nest 12 scaffold (`nodenext`, `builder: "tsc"`, `node dist/main`) but keep aliases as Node [subpath imports](https://nodejs.org/api/packages.html#subpath-imports) (`#/…`, not `@/`). No SWC, no `tsconfig-paths`, no `tsc-alias`.
 
-TS 7.0 is CLI-only. Nest needs the **programmatic API** in **7.1**. Stay on `typescript@^6` until Nest CLI actually loads 7.1.
+**Wait for Nest CLI to load TypeScript 7.1** (`tsgo`) so watch/typecheck stay fast. Until then keep `builder: "swc"` (current emit is the speed we want). Do not switch to JS `tsc` just to delete SWC.
 
-1. Watch Nest CLI for 7.1 (`getParsedCommandLineOfConfigFile` and friends — a bump alone may not be enough; the API is described as new).
-2. When Nest supports it: `typescript@^7.1`, keep `builder` + `typeCheck: true` in `nest-cli.json`.
-3. Switch the Nest builder from SWC back to `tsc` / `tsgo` if metadata and watch/debug still match. Delete `@swc/cli`, `@swc/core`, `.swcrc`.
-4. Tests: drop `unplugin-swc` — either Vite 8 [Oxc `emitDecoratorMetadata`](https://vite.dev/guide/features#emitdecoratormetadata) (can spike this anytime) or the same TS 7.1 pipeline as the app.
-5. Lefthook unchanged.
+When Nest supports 7.1:
+
+1. `typescript@^7.1`. `module` / `moduleResolution`: `nodenext`. Relative imports get `.js` (`from './foo.js'` → `foo.ts`). Turn `unicorn/require-module-specifiers` **on**.
+2. Replace `@/` with `#/` (or `#src/`). `package.json` `"imports"` → `./dist/…`; `tsconfig` `paths` / `types` condition → `./src/…` so typecheck does not need `dist/` first.
+3. `test/` can stay a Vitest-only alias (never emitted). Point Vitest at tsconfig like the scaffold (`vite-tsconfig-paths`); drop `unplugin-swc`.
+4. `nest-cli.json`: default `tsc` / `tsgo` (delete `builder: "swc"`). Delete `@swc/cli`, `@swc/core`, `unplugin-swc`, `.swcrc`. Lefthook unchanged.
+
+Do not use `tsconfig-paths` at runtime (CJS hook, broken for ESM).
