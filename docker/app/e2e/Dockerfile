@@ -1,4 +1,4 @@
-# Stage 1: All deps (incl. dev — Jest, Nest CLI, Kysely migrate, etc.)
+# Stage 1: All deps (incl. dev — Vitest, Nest CLI, Kysely migrate, etc.)
 FROM node:26-alpine AS deps
 WORKDIR /app
 
@@ -6,7 +6,7 @@ COPY package*.json .npmrc ./
 
 RUN npm ci --prefer-offline
 
-# Stage 2: API + exec Jest (nest start — no dist / no start:prod)
+# Stage 2: API + exec Vitest (nest start — no dist / no start:prod)
 FROM node:26-alpine AS e2e
 WORKDIR /app
 
@@ -16,7 +16,7 @@ COPY src ./src
 COPY test ./test
 COPY migrations ./migrations
 COPY .config ./.config
-COPY tsconfig*.json nest-cli.json .swcrc ./
+COPY tsconfig*.json nest-cli.json .swcrc vitest.config*.ts ./
 COPY docker/app/e2e/.env.e2e .env
 
 CMD ["npm", "start"]

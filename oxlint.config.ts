@@ -4,8 +4,7 @@ import { defineConfig } from 'oxlint';
 const MAX_FUNCTION_PARAMS = 3;
 
 /**
- * Oxlint configuration (type-aware). Use `.mts` so Node treats this as ESM without
- * `package.json` `"type": "module"` (Nest stays CJS until first-class ESM support).
+ * Oxlint configuration (type-aware).
  *
  * @see docs/oxlint-migrate.md
  */
@@ -37,7 +36,7 @@ export default defineConfig({
   env: {
     builtin: true,
     es2026: true,
-    jest: true,
+    vitest: true,
     node: true,
   },
   ignorePatterns: ['./dist/*', './coverage/*', './src/database/database-raw.d.ts'],
@@ -390,7 +389,7 @@ export default defineConfig({
     // Also: no-unused-vars ↔ noUnusedLocals / noUnusedParameters;
     // no-fallthrough ↔ noFallthroughCasesInSwitch.
     {
-      files: ['**/*.ts', '**/*.tsx', '**/*.mts', '**/*.cts'],
+      files: ['**/*.ts'],
       rules: {
         'constructor-super': 'off',
         'getter-return': 'off',
@@ -415,10 +414,12 @@ export default defineConfig({
         'prefer-const': 'error',
         'prefer-rest-params': 'error',
         'prefer-spread': 'error',
+        // Extensionless specifiers: SWC `resolveFully` rewrites src/ emit; tests and configs use bundler/Vitest.
+        'unicorn/require-module-specifiers': 'off',
       },
     },
     {
-      files: ['src/config/**/*.ts', '.config/**/*.ts', 'test/jest.setup.ts'],
+      files: ['src/config/**/*.ts', '.config/**/*.ts', 'test/setup.ts'],
       rules: {
         'node/no-process-env': 'off',
       },

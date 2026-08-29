@@ -15,5 +15,4 @@ async function bootstrap(): Promise<void> {
   await app.listen({ port: appConfig.listenPort, host: appConfig.listenHost });
 }
 
-// oxlint-disable-next-line unicorn/prefer-top-level-await
-void bootstrap();
+await bootstrap();

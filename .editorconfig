@@ -1,5 +1,5 @@
 # https://editorconfig.org
-# Shared layout for editors and Oxfmt (indent, EOL, line length). Oxfmt-only options live in `oxfmt.config.mts`.
+# Shared layout for editors and Oxfmt (indent, EOL, line length). Oxfmt-only options live in `oxfmt.config.ts`.
 root = true
 
 [*]

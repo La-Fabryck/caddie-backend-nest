@@ -7,7 +7,19 @@
       "decorators": true,
       "dynamicImport": true
     },
-    "baseUrl": "./"
+    "transform": {
+      "legacyDecorator": true,
+      "decoratorMetadata": true
+    },
+    "baseUrl": "./",
+    "paths": {
+      "@/*": ["src/*"]
+    }
+  },
+  "module": {
+    "type": "es6",
+    "resolveFully": true,
+    "outFileExtension": "js"
   },
   "minify": false
 }

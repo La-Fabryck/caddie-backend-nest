@@ -38,7 +38,7 @@ services:
       test:
         [
           'CMD-SHELL',
-          'node -e "require(\"http\").get(\"http://127.0.0.1:3001\",(r)=>{process.exit(r.statusCode<500?0:1)}).on(\"error\",()=>process.exit(1))"',
+          'node --input-type=module -e "import http from ''node:http''; http.get(''http://127.0.0.1:3001'',(r)=>{process.exit(r.statusCode<500?0:1)}).on(''error'',()=>process.exit(1))"',
         ]
       interval: 2s
       timeout: 5s

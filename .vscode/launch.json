@@ -13,7 +13,7 @@
       "skipFiles": ["<node_internals>/**"]
     },
     {
-      "name": "Debug Jest E2E Tests",
+      "name": "Debug Vitest E2E Tests",
       "type": "node",
       "request": "launch",
       "runtimeExecutable": "npm",
@@ -24,7 +24,7 @@
       "skipFiles": ["<node_internals>/**"]
     },
     {
-      "name": "Debug Jest E2E (attach :9230)",
+      "name": "Debug Vitest E2E (attach :9230)",
       "type": "node",
       "request": "attach",
       "port": 9230,
