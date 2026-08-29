@@ -209,8 +209,7 @@ export default defineConfig({
     'unicorn/relative-url-style': 'error',
     'unicorn/require-array-join-separator': 'error',
     'unicorn/require-module-attributes': 'error',
-    // Source stays extensionless; SWC `resolveFully` adds `.js` on emit for Node ESM.
-    'unicorn/require-module-specifiers': 'off',
+    'unicorn/require-module-specifiers': 'error',
     'unicorn/require-number-to-fixed-digits-argument': 'error',
     'unicorn/switch-case-braces': 'error',
     'unicorn/switch-case-break-position': 'error',
@@ -415,6 +414,8 @@ export default defineConfig({
         'prefer-const': 'error',
         'prefer-rest-params': 'error',
         'prefer-spread': 'error',
+        // Source stays extensionless; SWC `resolveFully` adds `.js` on emit for Node ESM.
+        'unicorn/require-module-specifiers': 'off',
       },
     },
     {
