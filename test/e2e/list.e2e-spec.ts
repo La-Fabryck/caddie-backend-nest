@@ -3,7 +3,7 @@ import { HttpStatus } from '@nestjs/common';
 import type { NestFastifyApplication } from '@nestjs/platform-fastify';
 import type { ErrorInterface } from '@/app.configurator';
 import type { ListRow } from '@/database/database-types';
-import type { CreateListDto } from '@/shopping/dto/create-list.dto';
+import { type CreateListDto, LIST_TITLE_MAX_LENGTH } from '@/shopping/dto/create-list.dto';
 import type { UpdateListDto } from '@/shopping/dto/update-list.dto';
 import { ListService, type ListWithSubs } from '@/shopping/list/list.service';
 import { resourceCreator } from 'test/creator/resource-creator';
@@ -27,7 +27,7 @@ describe('ListController (e2e)', () => {
       await using creator = await resourceCreator(app);
 
       const list: CreateListDto = {
-        title: faker.food.dish(),
+        title: faker.food.dish().slice(0, LIST_TITLE_MAX_LENGTH),
         pseudonym: faker.person.firstName(),
       };
 
@@ -151,7 +151,7 @@ describe('ListController (e2e)', () => {
       const storedList = creator.list;
 
       const updatePayload: UpdateListDto = {
-        title: faker.food.dish(),
+        title: faker.food.dish().slice(0, LIST_TITLE_MAX_LENGTH),
       };
 
       const result = await app.inject({

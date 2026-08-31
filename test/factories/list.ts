@@ -1,10 +1,11 @@
 import { faker } from '@faker-js/faker';
 import type { UserRow } from '@/database/database-types';
+import { LIST_TITLE_MAX_LENGTH } from '@/shopping/dto/create-list.dto';
 import type { CreateList } from '@/shopping/list/list.service';
 
 function createList(user: UserRow, overrides: Partial<CreateList> = {}): CreateList {
   return {
-    title: faker.food.dish(),
+    title: faker.food.dish().slice(0, LIST_TITLE_MAX_LENGTH),
     pseudonym: faker.person.fullName(),
     user: user,
     ...overrides,
