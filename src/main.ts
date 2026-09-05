@@ -6,8 +6,11 @@ import { configureApp } from './app.configurator';
 import { AppModule } from './app.module';
 
 async function bootstrap(): Promise<void> {
-  const app = await NestFactory.create<NestFastifyApplication>(AppModule, new FastifyAdapter());
+  const app = await NestFactory.create<NestFastifyApplication>(AppModule, new FastifyAdapter(), {
+    routeConflictPolicy: { duplicate: 'error' },
+  });
   await configureApp(app);
+  app.enableShutdownHooks();
 
   const configService = app.get(ConfigService);
   const appConfig = configService.getOrThrow<AppConfig>('app');
