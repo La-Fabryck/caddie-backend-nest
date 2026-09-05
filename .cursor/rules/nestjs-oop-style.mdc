@@ -15,7 +15,7 @@ alwaysApply: false
 
 ## Types and contracts
 
-- **DTOs** as `class`es with `class-validator` / `class-transformer` for input; separate **response DTOs** or serializers when the API shape differs from persistence.
+- **Input DTOs** as Zod schemas (`z.infer<typeof schema>`) attached via `@Body({ schema })`; separate **response DTOs** or serializers when the API shape differs from persistence. Config `registerAs` factories parse env with Zod (`z.coerce` for ports).
 - Prefer **interfaces** (or abstract classes) for ports and **concrete classes** for Nest providers implementing them.
 
 ## Cross-cutting behavior

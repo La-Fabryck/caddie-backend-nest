@@ -2,7 +2,7 @@ import { Body, Controller, Get, HttpCode, HttpStatus, Post, Req, Res, Unauthoriz
 import { ConfigService } from '@nestjs/config';
 import type { FastifyReply, FastifyRequest } from 'fastify';
 import type { AuthConfig } from '@/config/auth.config';
-import { LoginDto } from '../dto/login.dto';
+import { type LoginDto, loginSchema } from '../dto/login.dto';
 import { AuthenticationService } from './authentication.service';
 
 @Controller('authentication')
@@ -18,7 +18,7 @@ export class AuthenticationController {
 
   @HttpCode(HttpStatus.OK)
   @Post('login')
-  async login(@Body() loginDto: LoginDto, @Res() reply: FastifyReply) {
+  async login(@Body({ schema: loginSchema }) loginDto: LoginDto, @Res() reply: FastifyReply) {
     const { accessToken, refreshToken } = await this.authentificationService.login(loginDto);
     const accessCookieKey = this.auth.accessCookieName;
     const refreshCookieKey = this.auth.refreshCookieName;

@@ -1,4 +1,4 @@
-import { PartialType } from '@nestjs/mapped-types';
-import { CreateSubcriberDto } from './create-subcriber.dto';
+import { type CreateSubcriberDto, createSubcriberSchema } from './create-subcriber.dto';
 
-export class UpdateSubcriberDto extends PartialType(CreateSubcriberDto) {}
+export const updateSubcriberSchema = createSubcriberSchema.partial().default({});
+export type UpdateSubcriberDto = Partial<CreateSubcriberDto>;

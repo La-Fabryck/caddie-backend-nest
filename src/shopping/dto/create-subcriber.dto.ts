@@ -1,15 +1,10 @@
-import { IsUUID } from 'class-validator';
-import type { Subscriber } from '@/database/database-types';
-import { IsNotBlank } from '@/lib/decorators/is-not-blank';
+import { z } from 'zod';
+import { zNotBlank } from '@/lib/zod/z-not-blank';
 import { SUBSCRIBER_NAME } from '../messages/subscriber';
 
-type CreateSubcriberInterface = Omit<Subscriber, 'id' | 'userId'>;
-
-export class CreateSubcriberDto implements CreateSubcriberInterface {
+export const createSubcriberSchema = z.object({
   //TODO: Remove
-  @IsUUID()
-  listId!: string;
-
-  @IsNotBlank({ message: SUBSCRIBER_NAME })
-  name!: string;
-}
+  listId: z.uuid(),
+  name: zNotBlank(SUBSCRIBER_NAME),
+});
+export type CreateSubcriberDto = z.infer<typeof createSubcriberSchema>;

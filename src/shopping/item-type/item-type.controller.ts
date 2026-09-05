@@ -3,8 +3,8 @@ import type { UserRow } from '@/database/database-types';
 import { CurrentUser } from '@/users/decorators/current-user';
 import { AuthenticationGuard } from '@/users/guards/authentication.guard';
 import { AuthenticationInterceptor } from '@/users/interceptors/authentication.interceptor';
-import { CreateItemTypeDto } from '../dto/create-item-type.dto';
-import { UpdateItemTypeDto } from '../dto/update-item-type.dto';
+import { type CreateItemTypeDto, createItemTypeSchema } from '../dto/create-item-type.dto';
+import { type UpdateItemTypeDto, updateItemTypeSchema } from '../dto/update-item-type.dto';
 import { ItemTypeService } from './item-type.service';
 
 @Controller('item-types')
@@ -14,7 +14,7 @@ export class ItemTypeController {
   @UseGuards(AuthenticationGuard)
   @UseInterceptors(AuthenticationInterceptor)
   @Post()
-  async create(@Body() createItemTypeDto: CreateItemTypeDto, @CurrentUser() user: UserRow) {
+  async create(@Body({ schema: createItemTypeSchema }) createItemTypeDto: CreateItemTypeDto, @CurrentUser() user: UserRow) {
     return this.itemTypeService.create(createItemTypeDto, user);
   }
 
@@ -28,7 +28,11 @@ export class ItemTypeController {
   @UseGuards(AuthenticationGuard)
   @UseInterceptors(AuthenticationInterceptor)
   @Patch(':id')
-  async update(@Param('id', ParseUUIDPipe) id: string, @Body() updateItemTypeDto: UpdateItemTypeDto, @CurrentUser() user: UserRow) {
+  async update(
+    @Param('id', ParseUUIDPipe) id: string,
+    @Body({ schema: updateItemTypeSchema }) updateItemTypeDto: UpdateItemTypeDto,
+    @CurrentUser() user: UserRow,
+  ) {
     return this.itemTypeService.update(id, updateItemTypeDto, user);
   }
 

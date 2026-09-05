@@ -3,8 +3,8 @@ import type { UserRow } from '@/database/database-types';
 import { CurrentUser } from '@/users/decorators/current-user';
 import { AuthenticationGuard } from '@/users/guards/authentication.guard';
 import { AuthenticationInterceptor } from '@/users/interceptors/authentication.interceptor';
-import { CreateItemDto } from '../dto/create-item.dto';
-import { UpdateItemDto } from '../dto/update-item.dto';
+import { type CreateItemDto, createItemSchema } from '../dto/create-item.dto';
+import { type UpdateItemDto, updateItemSchema } from '../dto/update-item.dto';
 import { type CreateItem, ItemService } from './item.service';
 
 @Controller('/list/:listId/items')
@@ -14,7 +14,11 @@ export class ItemController {
   @UseGuards(AuthenticationGuard)
   @UseInterceptors(AuthenticationInterceptor)
   @Post()
-  async create(@Param('listId', ParseUUIDPipe) listId: string, @Body() createItemDto: CreateItemDto, @CurrentUser() user: UserRow) {
+  async create(
+    @Param('listId', ParseUUIDPipe) listId: string,
+    @Body({ schema: createItemSchema }) createItemDto: CreateItemDto,
+    @CurrentUser() user: UserRow,
+  ) {
     const createItemPayload: CreateItem['createItemPayload'] = {
       listId,
       name: createItemDto.name,
@@ -59,11 +63,10 @@ export class ItemController {
   async update(
     @Param('listId', ParseUUIDPipe) listId: string,
     @Param('itemId', ParseUUIDPipe) itemId: string,
-    @Body() updateShoppingDto: UpdateItemDto,
+    @Body({ schema: updateItemSchema }) updateShoppingDto: UpdateItemDto,
     @CurrentUser() user: UserRow,
   ) {
     return this.itemService.update({
-      // oxlint-disable-next-line @typescript-eslint/no-misused-spread
       updateItemPayload: { ...updateShoppingDto, listId, id: itemId },
       user,
     });
