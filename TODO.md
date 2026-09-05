@@ -17,7 +17,7 @@ Later'ish :
 - ~~JWT Refresh~~
 - ~~Integration Tests~~
 - Small cache for users
-- Use Zod as validator ? [Zod Integration](https://docs.nestjs.com/pipes#object-schema-validation) - Waiting [NestJS 12 supports native scheman](https://github.com/nestjs/nest/pull/16391)
+- ~~Use Zod as validator (Nest 12 `StandardSchemaValidationPipe`)~~
 - ~~Migrate to [Kysely](https://kysely.dev/)~~
 - ~~Align Kysely query/error logs with the app logger~~ (Nest `Logger` via Kysely `log` callback; still pending pino)
 - CQRS architecture

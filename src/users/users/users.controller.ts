@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, Param, Patch, Post } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, ParseUUIDPipe, Patch, Post } from '@nestjs/common';
 import { type CreateUserDto, createUserSchema } from '../dto/create-user.dto';
 import { type UpdateUserDto, updateUserSchema } from '../dto/update-user.dto';
 import { UserResponseDto } from '../dto/user-response.dto';
@@ -15,18 +15,18 @@ export class UsersController {
   }
 
   @Get(':id')
-  async findOne(@Param('id') id: string): Promise<UserResponseDto> {
+  async findOne(@Param('id', ParseUUIDPipe) id: string): Promise<UserResponseDto> {
     const user = await this.usersService.findOne(id);
     return UserResponseDto.fromUser(user);
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body({ schema: updateUserSchema }) updateUserDto: UpdateUserDto) {
+  update(@Param('id', ParseUUIDPipe) id: string, @Body({ schema: updateUserSchema }) updateUserDto: UpdateUserDto) {
     this.usersService.update(id, updateUserDto);
   }
 
   @Delete(':id')
-  async remove(@Param('id') id: string) {
+  async remove(@Param('id', ParseUUIDPipe) id: string) {
     await this.usersService.remove(id);
   }
 }

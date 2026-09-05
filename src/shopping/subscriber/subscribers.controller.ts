@@ -32,12 +32,12 @@ export class SubscribersController {
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body({ schema: updateSubcriberSchema }) updateSubcriberDto: UpdateSubcriberDto) {
+  update(@Param('id', ParseUUIDPipe) id: string, @Body({ schema: updateSubcriberSchema }) updateSubcriberDto: UpdateSubcriberDto) {
     return this.subscribersService.update(id, updateSubcriberDto);
   }
 
   @Delete(':id')
-  remove(@Param('id') id: string) {
+  remove(@Param('id', ParseUUIDPipe) id: string) {
     return this.subscribersService.remove(id);
   }
 }
