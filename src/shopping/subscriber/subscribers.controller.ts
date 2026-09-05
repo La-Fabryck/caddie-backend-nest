@@ -3,7 +3,7 @@ import type { UserRow } from '@/database/database-types';
 import { CurrentUser } from '@/users/decorators/current-user';
 import { AuthenticationGuard } from '@/users/guards/authentication.guard';
 import { AuthenticationInterceptor } from '@/users/interceptors/authentication.interceptor';
-import { UpdateSubcriberDto } from '../dto/update-subcriber.dto';
+import { type UpdateSubcriberDto, updateSubcriberSchema } from '../dto/update-subcriber.dto';
 import { SubscribersService } from './subscribers.service';
 
 @Controller('subscribers')
@@ -32,7 +32,7 @@ export class SubscribersController {
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateSubcriberDto: UpdateSubcriberDto) {
+  update(@Param('id') id: string, @Body({ schema: updateSubcriberSchema }) updateSubcriberDto: UpdateSubcriberDto) {
     return this.subscribersService.update(id, updateSubcriberDto);
   }
 

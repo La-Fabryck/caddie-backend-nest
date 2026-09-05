@@ -1,40 +1,17 @@
 import { registerAs } from '@nestjs/config';
-import { Type } from 'class-transformer';
-import { IsInt, IsNotEmpty, IsString, Max, Min } from 'class-validator';
+import { z } from 'zod';
 import { MAX_TCP_PORT, MIN_TCP_PORT } from './tcp-port-bounds';
-import { validateWithClass } from './validate-with-class';
+import { validateWithSchema } from './validate-with-schema';
 
-export type DatabaseConfig = {
-  host: string;
-  port: number;
-  user: string;
-  password: string;
-  database: string;
-};
+const databaseConfigSchema = z.object({
+  host: z.string().nonempty(),
+  port: z.coerce.number().int().min(MIN_TCP_PORT).max(MAX_TCP_PORT),
+  user: z.string().nonempty(),
+  password: z.string().nonempty(),
+  database: z.string().nonempty(),
+});
 
-class DatabaseConfigDto implements DatabaseConfig {
-  @IsString()
-  @IsNotEmpty()
-  host!: string;
-
-  @Type(() => Number)
-  @IsInt()
-  @Min(MIN_TCP_PORT)
-  @Max(MAX_TCP_PORT)
-  port!: number;
-
-  @IsString()
-  @IsNotEmpty()
-  user!: string;
-
-  @IsString()
-  @IsNotEmpty()
-  password!: string;
-
-  @IsString()
-  @IsNotEmpty()
-  database!: string;
-}
+export type DatabaseConfig = z.infer<typeof databaseConfigSchema>;
 
 export default registerAs('database', (): DatabaseConfig => {
   const plain: Record<string, unknown> = {
@@ -45,5 +22,5 @@ export default registerAs('database', (): DatabaseConfig => {
     database: process.env['POSTGRES_DB'],
   };
 
-  return validateWithClass(DatabaseConfigDto, plain, 'Database configuration validation failed');
+  return validateWithSchema(databaseConfigSchema, plain, 'Database configuration validation failed');
 });

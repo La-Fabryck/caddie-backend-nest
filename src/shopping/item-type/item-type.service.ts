@@ -61,7 +61,6 @@ export class ItemTypeService {
     await this.findOneById(id, user);
 
     const itemType: Updateable<ItemType> = {
-      // oxlint-disable-next-line @typescript-eslint/no-misused-spread
       ...payload,
     };
 

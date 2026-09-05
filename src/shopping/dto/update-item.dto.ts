@@ -1,12 +1,10 @@
-import { PartialType } from '@nestjs/mapped-types';
-import { IsBoolean, IsOptional } from 'class-validator';
-import type { ItemRow } from '@/database/database-types';
-import { CreateItemDto } from './create-item.dto';
+import { z } from 'zod';
+import { type CreateItemDto, createItemSchema } from './create-item.dto';
 
-type UpdateItemInterface = Omit<ItemRow, 'id' | 'listId'>;
-
-export class UpdateItemDto extends PartialType(CreateItemDto) implements Partial<UpdateItemInterface> {
-  @IsOptional()
-  @IsBoolean()
-  isInCart?: boolean;
-}
+export const updateItemSchema = createItemSchema
+  .partial()
+  .extend({
+    isInCart: z.boolean().optional(),
+  })
+  .default({});
+export type UpdateItemDto = Partial<CreateItemDto> & { isInCart?: boolean };

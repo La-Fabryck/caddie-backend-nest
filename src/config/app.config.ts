@@ -1,29 +1,15 @@
 import { registerAs } from '@nestjs/config';
-import { Type } from 'class-transformer';
-import { IsIn, IsInt, IsNotEmpty, IsString, Max, Min } from 'class-validator';
+import { z } from 'zod';
 import { MAX_TCP_PORT, MIN_TCP_PORT } from './tcp-port-bounds';
-import { validateWithClass } from './validate-with-class';
+import { validateWithSchema } from './validate-with-schema';
 
-export type AppConfig = {
-  nodeEnv: 'development' | 'production' | 'test';
-  listenHost: string;
-  listenPort: number;
-};
+const appConfigSchema = z.object({
+  nodeEnv: z.enum(['development', 'production', 'test']),
+  listenHost: z.string().nonempty(),
+  listenPort: z.coerce.number().int().min(MIN_TCP_PORT).max(MAX_TCP_PORT),
+});
 
-class AppConfigDto implements AppConfig {
-  @IsIn(['development', 'production', 'test'])
-  nodeEnv!: AppConfig['nodeEnv'];
-
-  @IsString()
-  @IsNotEmpty()
-  listenHost!: string;
-
-  @Type(() => Number)
-  @IsInt()
-  @Min(MIN_TCP_PORT)
-  @Max(MAX_TCP_PORT)
-  listenPort!: number;
-}
+export type AppConfig = z.infer<typeof appConfigSchema>;
 
 export default registerAs('app', (): AppConfig => {
   const plain: Record<string, unknown> = {
@@ -32,5 +18,5 @@ export default registerAs('app', (): AppConfig => {
     listenPort: process.env['NEST_PORT'],
   };
 
-  return validateWithClass(AppConfigDto, plain, 'App configuration validation failed');
+  return validateWithSchema(appConfigSchema, plain, 'App configuration validation failed');
 });

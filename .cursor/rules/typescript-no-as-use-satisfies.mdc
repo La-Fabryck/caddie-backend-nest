@@ -15,7 +15,7 @@ alwaysApply: false
 
 - `as any`, `as unknown`, or **`as unknown as T`** (double assertion).
 - Assertions to silence errors (`as Foo` on values you are not sure are `Foo`).
-- Wide assertions on API/JSON payloads without validation — use runtime validation (e.g. `class-validator`, schemas) and map to typed DTOs.
+- Wide assertions on API/JSON payloads without validation — use runtime validation (e.g. Zod schemas) and map to typed DTOs.
 
 ## Prefer
 
@@ -38,7 +38,7 @@ const cfg = { port: 3000 } satisfies ServerConfig;
 return data as UserDto;
 
 // Good: validate or map explicitly
-return plainToInstance(UserDto, data);
+return createUserSchema.parse(data);
 
 // Bad in catch blocks
 catch (error) {

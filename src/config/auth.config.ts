@@ -1,41 +1,18 @@
 import { registerAs } from '@nestjs/config';
-import { IsNotEmpty, IsString } from 'class-validator';
-import type { StringValue } from 'ms';
-import { IsMsDurationString } from '@/lib/decorators/is-ms-duration';
-import { validateWithClass } from './validate-with-class';
+import { z } from 'zod';
+import { zMsDuration } from '@/lib/zod/z-ms-duration';
+import { validateWithSchema } from './validate-with-schema';
 
-export type AuthConfig = {
-  accessCookieName: string;
-  refreshCookieName: string;
-  accessTokenSecret: string;
-  refreshTokenSecret: string;
-  accessTokenTtl: StringValue;
-  refreshTokenTtl: StringValue;
-};
+const authConfigSchema = z.object({
+  accessCookieName: z.string().nonempty(),
+  refreshCookieName: z.string().nonempty(),
+  accessTokenSecret: z.string().nonempty(),
+  refreshTokenSecret: z.string().nonempty(),
+  accessTokenTtl: zMsDuration(),
+  refreshTokenTtl: zMsDuration(),
+});
 
-class AuthConfigDto implements AuthConfig {
-  @IsString()
-  @IsNotEmpty()
-  accessCookieName!: string;
-
-  @IsString()
-  @IsNotEmpty()
-  refreshCookieName!: string;
-
-  @IsString()
-  @IsNotEmpty()
-  accessTokenSecret!: string;
-
-  @IsString()
-  @IsNotEmpty()
-  refreshTokenSecret!: string;
-
-  @IsMsDurationString()
-  accessTokenTtl!: StringValue;
-
-  @IsMsDurationString()
-  refreshTokenTtl!: StringValue;
-}
+export type AuthConfig = z.infer<typeof authConfigSchema>;
 
 export default registerAs('auth', (): AuthConfig => {
   const plain: Record<string, unknown> = {
@@ -47,5 +24,5 @@ export default registerAs('auth', (): AuthConfig => {
     refreshTokenTtl: process.env['REFRESH_TOKEN_TTL'],
   };
 
-  return validateWithClass(AuthConfigDto, plain, 'Auth configuration validation failed');
+  return validateWithSchema(authConfigSchema, plain, 'Auth configuration validation failed');
 });

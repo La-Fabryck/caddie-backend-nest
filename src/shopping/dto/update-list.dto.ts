@@ -1,4 +1,4 @@
-import { PartialType } from '@nestjs/mapped-types';
-import { CreateListDto } from './create-list.dto';
+import { type CreateListDto, createListSchema } from './create-list.dto';
 
-export class UpdateListDto extends PartialType(CreateListDto) {}
+export const updateListSchema = createListSchema.partial().default({});
+export type UpdateListDto = Partial<CreateListDto>;

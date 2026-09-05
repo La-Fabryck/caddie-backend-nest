@@ -58,9 +58,6 @@ describe('UserController (e2e)', () => {
         {
           message: 'USER_NAME',
         },
-        {
-          message: 'USER_NAME',
-        },
       ],
       password: [
         {

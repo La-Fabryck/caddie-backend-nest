@@ -1,13 +1,12 @@
-import type { List } from '@/database/database-types';
-import { IsNotBlank } from '@/lib/decorators/is-not-blank';
+import { z } from 'zod';
+import { zNotBlank } from '@/lib/zod/z-not-blank';
 import { LIST_PSEUDONYM, LIST_TITLE } from '../messages/list';
 
-type CreateListInterface = Pick<List, 'title'>;
+/** Matches `List.title` varchar(50). */
+export const LIST_TITLE_MAX_LENGTH = 50;
 
-export class CreateListDto implements CreateListInterface {
-  @IsNotBlank({ message: LIST_TITLE })
-  title!: string;
-
-  @IsNotBlank({ message: LIST_PSEUDONYM })
-  pseudonym!: string;
-}
+export const createListSchema = z.object({
+  title: zNotBlank(LIST_TITLE).max(LIST_TITLE_MAX_LENGTH, LIST_TITLE),
+  pseudonym: zNotBlank(LIST_PSEUDONYM),
+});
+export type CreateListDto = z.infer<typeof createListSchema>;

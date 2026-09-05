@@ -3,8 +3,8 @@ import type { UserRow } from '@/database/database-types';
 import { CurrentUser } from '@/users/decorators/current-user';
 import { AuthenticationGuard } from '@/users/guards/authentication.guard';
 import { AuthenticationInterceptor } from '@/users/interceptors/authentication.interceptor';
-import { CreateListDto } from '../dto/create-list.dto';
-import { UpdateListDto } from '../dto/update-list.dto';
+import { type CreateListDto, createListSchema } from '../dto/create-list.dto';
+import { type UpdateListDto, updateListSchema } from '../dto/update-list.dto';
 import { ListService } from './list.service';
 
 @Controller('list')
@@ -14,7 +14,7 @@ export class ListController {
   @UseGuards(AuthenticationGuard)
   @UseInterceptors(AuthenticationInterceptor)
   @Post()
-  async create(@Body() createListDto: CreateListDto, @CurrentUser() user: UserRow) {
+  async create(@Body({ schema: createListSchema }) createListDto: CreateListDto, @CurrentUser() user: UserRow) {
     return this.listService.create({
       title: createListDto.title,
       pseudonym: createListDto.pseudonym,
@@ -39,9 +39,12 @@ export class ListController {
   @UseGuards(AuthenticationGuard)
   @UseInterceptors(AuthenticationInterceptor)
   @Patch(':id')
-  async update(@Param('id', ParseUUIDPipe) id: string, @CurrentUser() user: UserRow, @Body() updateShoppingDto: UpdateListDto) {
+  async update(
+    @Param('id', ParseUUIDPipe) id: string,
+    @CurrentUser() user: UserRow,
+    @Body({ schema: updateListSchema }) updateShoppingDto: UpdateListDto,
+  ) {
     return this.listService.update({
-      // oxlint-disable-next-line @typescript-eslint/no-misused-spread
       payload: { ...updateShoppingDto, id },
       user,
     });
