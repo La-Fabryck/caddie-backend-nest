@@ -1,5 +1,5 @@
 import ms, { type StringValue } from 'ms';
-import { z } from 'zod';
+import { z, type ZodType } from 'zod';
 
 /**
  * Parses strings the same way `ms` / JWT `expiresIn` does. `StringValue` from `ms` is only a
@@ -19,7 +19,7 @@ function isMsDuration(value: string): value is StringValue {
   return typeof parsed === 'number' && Number.isFinite(parsed);
 }
 
-export function zMsDuration() {
+export function zMsDuration(): ZodType<StringValue, string> {
   return z.string().refine(isMsDuration, 'must be a duration string accepted by ms (e.g. 15m, 7d, 3600000)');
 }
 

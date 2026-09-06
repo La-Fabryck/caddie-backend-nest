@@ -7,16 +7,6 @@ import { msDurationToSeconds } from '@/lib/zod/z-ms-duration';
 import { type LoginDto, loginSchema } from '../dto/login.dto';
 import { AuthenticationService } from './authentication.service';
 
-function sessionCookieOptions(maxAge: number): CookieSerializeOptions {
-  return {
-    httpOnly: true,
-    sameSite: true,
-    secure: true,
-    path: '/',
-    maxAge,
-  };
-}
-
 @Controller('authentication')
 export class AuthenticationController {
   private readonly auth: AuthConfig;
@@ -28,29 +18,25 @@ export class AuthenticationController {
     private readonly authentificationService: AuthenticationService,
   ) {
     this.auth = configService.getOrThrow<AuthConfig>('auth');
-    this.accessCookieOptions = sessionCookieOptions(msDurationToSeconds(this.auth.accessTokenTtl));
-    this.refreshCookieOptions = sessionCookieOptions(msDurationToSeconds(this.auth.refreshTokenTtl));
+    this.accessCookieOptions = this.sessionCookieOptions(msDurationToSeconds(this.auth.accessTokenTtl));
+    this.refreshCookieOptions = this.sessionCookieOptions(msDurationToSeconds(this.auth.refreshTokenTtl));
   }
 
   @HttpCode(HttpStatus.OK)
   @Post('login')
   async login(@Body({ schema: loginSchema }) loginDto: LoginDto, @Res() reply: FastifyReply) {
     const { accessToken, refreshToken } = await this.authentificationService.login(loginDto);
-    const accessCookieKey = this.auth.accessCookieName;
-    const refreshCookieKey = this.auth.refreshCookieName;
 
     return reply
-      .cookie(accessCookieKey, accessToken, this.accessCookieOptions)
-      .cookie(refreshCookieKey, refreshToken, this.refreshCookieOptions)
+      .cookie(this.auth.accessCookieName, accessToken, this.accessCookieOptions)
+      .cookie(this.auth.refreshCookieName, refreshToken, this.refreshCookieOptions)
       .send();
   }
 
   @HttpCode(HttpStatus.OK)
   @Post('refresh')
   async refresh(@Req() request: FastifyRequest, @Res() reply: FastifyReply) {
-    const accessCookieKey = this.auth.accessCookieName;
-    const refreshCookieKey = this.auth.refreshCookieName;
-    const refreshToken = request.cookies[refreshCookieKey] ?? null;
+    const refreshToken = request.cookies[this.auth.refreshCookieName];
 
     if (refreshToken == null) {
       throw new UnauthorizedException();
@@ -59,16 +45,23 @@ export class AuthenticationController {
     const tokens = await this.authentificationService.refresh(refreshToken);
 
     return reply
-      .cookie(accessCookieKey, tokens.accessToken, this.accessCookieOptions)
-      .cookie(refreshCookieKey, tokens.refreshToken, this.refreshCookieOptions)
+      .cookie(this.auth.accessCookieName, tokens.accessToken, this.accessCookieOptions)
+      .cookie(this.auth.refreshCookieName, tokens.refreshToken, this.refreshCookieOptions)
       .send();
   }
 
   @Get('logout')
   async logout(@Res({ passthrough: true }) reply: FastifyReply) {
-    const accessCookieKey = this.auth.accessCookieName;
-    const refreshCookieKey = this.auth.refreshCookieName;
+    return reply.clearCookie(this.auth.accessCookieName).clearCookie(this.auth.refreshCookieName).send();
+  }
 
-    return reply.clearCookie(accessCookieKey).clearCookie(refreshCookieKey).send();
+  private sessionCookieOptions(maxAge: number): CookieSerializeOptions {
+    return {
+      httpOnly: true,
+      sameSite: true,
+      secure: true,
+      path: '/',
+      maxAge,
+    };
   }
 }
