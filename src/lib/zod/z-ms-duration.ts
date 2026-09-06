@@ -22,3 +22,14 @@ function isMsDuration(value: string): value is StringValue {
 export function zMsDuration() {
   return z.string().refine(isMsDuration, 'must be a duration string accepted by ms (e.g. 15m, 7d, 3600000)');
 }
+
+const MILLISECONDS_PER_SECOND = 1000;
+
+/**
+ * Turns an `ms` duration (`15m`, `14d`) into seconds.
+ * JWT `expiresIn` and our TTL env vars use that string form; cookie `Max-Age` does not — it is
+ * an integer number of seconds. `ms()` yields milliseconds, so this is the unit bridge.
+ */
+export function msDurationToSeconds(value: StringValue): number {
+  return Math.floor(ms(value) / MILLISECONDS_PER_SECOND);
+}

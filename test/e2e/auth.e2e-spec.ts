@@ -1,7 +1,10 @@
 import { HttpStatus } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 import type { NestFastifyApplication } from '@nestjs/platform-fastify';
 import type { ErrorInterface } from '@/app.configurator';
+import type { AuthConfig } from '@/config/auth.config';
+import { msDurationToSeconds } from '@/lib/zod/z-ms-duration';
 import type { JwtPayload } from '@/users/authentication/authentication.service';
 import type { LoginDto } from '@/users/dto/login.dto';
 import { resourceCreator } from 'test/creator/resource-creator';
@@ -34,12 +37,14 @@ describe('AuthenticationController (e2e)', () => {
 
     expect(result.payload).toBeFalsy();
 
+    const auth = app.get(ConfigService).getOrThrow<AuthConfig>('auth');
     const accessCookie = result.cookies.find((cookie) => cookie.name === 'SESSION_ID');
     expect(accessCookie).not.toBeFalsy();
     expect(accessCookie?.httpOnly).toBe(true);
     expect(accessCookie?.sameSite).toBe('Strict');
     expect(accessCookie?.secure).toBe(true);
     expect(accessCookie?.['path']).toBe('/');
+    expect(accessCookie?.maxAge).toBe(msDurationToSeconds(auth.accessTokenTtl));
 
     const refreshCookie = result.cookies.find((cookie) => cookie.name === 'SESSION_REFRESH_ID');
     expect(refreshCookie).not.toBeFalsy();
@@ -47,6 +52,7 @@ describe('AuthenticationController (e2e)', () => {
     expect(refreshCookie?.sameSite).toBe('Strict');
     expect(refreshCookie?.secure).toBe(true);
     expect(refreshCookie?.['path']).toBe('/');
+    expect(refreshCookie?.maxAge).toBe(msDurationToSeconds(auth.refreshTokenTtl));
 
     const jwtService = app.get(JwtService);
     const jwt = jwtService.verify<JwtPayload>(accessCookie?.value ?? '');

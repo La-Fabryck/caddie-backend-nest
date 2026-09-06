@@ -1,19 +1,35 @@
+import type { CookieSerializeOptions } from '@fastify/cookie';
 import { Body, Controller, Get, HttpCode, HttpStatus, Post, Req, Res, UnauthorizedException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import type { FastifyReply, FastifyRequest } from 'fastify';
 import type { AuthConfig } from '@/config/auth.config';
+import { msDurationToSeconds } from '@/lib/zod/z-ms-duration';
 import { type LoginDto, loginSchema } from '../dto/login.dto';
 import { AuthenticationService } from './authentication.service';
+
+function sessionCookieOptions(maxAge: number): CookieSerializeOptions {
+  return {
+    httpOnly: true,
+    sameSite: true,
+    secure: true,
+    path: '/',
+    maxAge,
+  };
+}
 
 @Controller('authentication')
 export class AuthenticationController {
   private readonly auth: AuthConfig;
+  private readonly accessCookieOptions: CookieSerializeOptions;
+  private readonly refreshCookieOptions: CookieSerializeOptions;
 
   constructor(
     configService: ConfigService,
     private readonly authentificationService: AuthenticationService,
   ) {
     this.auth = configService.getOrThrow<AuthConfig>('auth');
+    this.accessCookieOptions = sessionCookieOptions(msDurationToSeconds(this.auth.accessTokenTtl));
+    this.refreshCookieOptions = sessionCookieOptions(msDurationToSeconds(this.auth.refreshTokenTtl));
   }
 
   @HttpCode(HttpStatus.OK)
@@ -24,18 +40,8 @@ export class AuthenticationController {
     const refreshCookieKey = this.auth.refreshCookieName;
 
     return reply
-      .cookie(accessCookieKey, accessToken, {
-        httpOnly: true,
-        sameSite: true,
-        secure: true,
-        path: '/',
-      })
-      .cookie(refreshCookieKey, refreshToken, {
-        httpOnly: true,
-        sameSite: true,
-        secure: true,
-        path: '/',
-      })
+      .cookie(accessCookieKey, accessToken, this.accessCookieOptions)
+      .cookie(refreshCookieKey, refreshToken, this.refreshCookieOptions)
       .send();
   }
 
@@ -53,18 +59,8 @@ export class AuthenticationController {
     const tokens = await this.authentificationService.refresh(refreshToken);
 
     return reply
-      .cookie(accessCookieKey, tokens.accessToken, {
-        httpOnly: true,
-        sameSite: true,
-        secure: true,
-        path: '/',
-      })
-      .cookie(refreshCookieKey, tokens.refreshToken, {
-        httpOnly: true,
-        sameSite: true,
-        secure: true,
-        path: '/',
-      })
+      .cookie(accessCookieKey, tokens.accessToken, this.accessCookieOptions)
+      .cookie(refreshCookieKey, tokens.refreshToken, this.refreshCookieOptions)
       .send();
   }
 
