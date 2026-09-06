@@ -24,7 +24,7 @@ export class AuthenticationController {
 
   @HttpCode(HttpStatus.OK)
   @Post('login')
-  async login(@Body({ schema: loginSchema }) loginDto: LoginDto, @Res() reply: FastifyReply) {
+  async login(@Body({ schema: loginSchema }) loginDto: LoginDto, @Res() reply: FastifyReply): Promise<FastifyReply> {
     const { accessToken, refreshToken } = await this.authentificationService.login(loginDto);
 
     return reply
@@ -35,7 +35,7 @@ export class AuthenticationController {
 
   @HttpCode(HttpStatus.OK)
   @Post('refresh')
-  async refresh(@Req() request: FastifyRequest, @Res() reply: FastifyReply) {
+  async refresh(@Req() request: FastifyRequest, @Res() reply: FastifyReply): Promise<FastifyReply> {
     const refreshToken = request.cookies[this.auth.refreshCookieName];
 
     if (refreshToken == null) {
@@ -51,7 +51,7 @@ export class AuthenticationController {
   }
 
   @Get('logout')
-  async logout(@Res({ passthrough: true }) reply: FastifyReply) {
+  async logout(@Res({ passthrough: true }) reply: FastifyReply): Promise<FastifyReply> {
     return reply.clearCookie(this.auth.accessCookieName).clearCookie(this.auth.refreshCookieName).send();
   }
 

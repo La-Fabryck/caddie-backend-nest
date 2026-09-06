@@ -21,7 +21,7 @@ async function configureApp(app: NestFastifyApplication): Promise<void> {
 
   app.useGlobalPipes(
     new StandardSchemaValidationPipe({
-      exceptionFactory: (issues) => {
+      exceptionFactory: (issues): BadRequestException => {
         const result: ErrorInterface = {};
         for (const issue of issues) {
           const key = issuePathKey(issue.path);

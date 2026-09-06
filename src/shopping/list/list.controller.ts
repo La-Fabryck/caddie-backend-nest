@@ -1,11 +1,11 @@
 import { Body, Controller, Delete, Get, Param, ParseUUIDPipe, Patch, Post, UseGuards, UseInterceptors } from '@nestjs/common';
-import type { UserRow } from '@/database/database-types';
+import type { ListRow, UserRow } from '@/database/database-types';
 import { CurrentUser } from '@/users/decorators/current-user';
 import { AuthenticationGuard } from '@/users/guards/authentication.guard';
 import { AuthenticationInterceptor } from '@/users/interceptors/authentication.interceptor';
 import { type CreateListDto, createListSchema } from '../dto/create-list.dto';
 import { type UpdateListDto, updateListSchema } from '../dto/update-list.dto';
-import { ListService } from './list.service';
+import { ListService, type ListWithSubs } from './list.service';
 
 @Controller('list')
 export class ListController {
@@ -14,7 +14,7 @@ export class ListController {
   @UseGuards(AuthenticationGuard)
   @UseInterceptors(AuthenticationInterceptor)
   @Post()
-  async create(@Body({ schema: createListSchema }) createListDto: CreateListDto, @CurrentUser() user: UserRow) {
+  async create(@Body({ schema: createListSchema }) createListDto: CreateListDto, @CurrentUser() user: UserRow): Promise<ListWithSubs> {
     return this.listService.create({
       title: createListDto.title,
       pseudonym: createListDto.pseudonym,
@@ -25,14 +25,14 @@ export class ListController {
   @UseGuards(AuthenticationGuard)
   @UseInterceptors(AuthenticationInterceptor)
   @Get()
-  async findAllByAuthor(@CurrentUser() user: UserRow) {
+  async findAllByAuthor(@CurrentUser() user: UserRow): Promise<ListRow[]> {
     return this.listService.findListsBySubscriber({ user });
   }
 
   @UseGuards(AuthenticationGuard)
   @UseInterceptors(AuthenticationInterceptor)
   @Get(':id')
-  async findOneById(@Param('id', ParseUUIDPipe) id: string, @CurrentUser() user: UserRow) {
+  async findOneById(@Param('id', ParseUUIDPipe) id: string, @CurrentUser() user: UserRow): Promise<ListRow> {
     return this.listService.findOneById({ id, user });
   }
 
@@ -43,7 +43,7 @@ export class ListController {
     @Param('id', ParseUUIDPipe) id: string,
     @CurrentUser() user: UserRow,
     @Body({ schema: updateListSchema }) updateShoppingDto: UpdateListDto,
-  ) {
+  ): Promise<ListRow> {
     return this.listService.update({
       payload: { ...updateShoppingDto, id },
       user,
@@ -53,7 +53,7 @@ export class ListController {
   @UseGuards(AuthenticationGuard)
   @UseInterceptors(AuthenticationInterceptor)
   @Delete(':id')
-  async remove(@Param('id', ParseUUIDPipe) id: string, @CurrentUser() user: UserRow) {
+  async remove(@Param('id', ParseUUIDPipe) id: string, @CurrentUser() user: UserRow): Promise<void> {
     return this.listService.remove({ id, user });
   }
 }

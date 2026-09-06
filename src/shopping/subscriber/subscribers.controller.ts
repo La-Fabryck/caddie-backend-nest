@@ -1,5 +1,5 @@
 import { Body, Controller, Delete, Get, Param, ParseUUIDPipe, Patch, UseGuards, UseInterceptors } from '@nestjs/common';
-import type { UserRow } from '@/database/database-types';
+import type { SubscriberRow, UserRow } from '@/database/database-types';
 import { CurrentUser } from '@/users/decorators/current-user';
 import { AuthenticationGuard } from '@/users/guards/authentication.guard';
 import { AuthenticationInterceptor } from '@/users/interceptors/authentication.interceptor';
@@ -20,24 +20,24 @@ export class SubscribersController {
   @UseGuards(AuthenticationGuard)
   @UseInterceptors(AuthenticationInterceptor)
   @Get()
-  async findAll(@CurrentUser() user: UserRow) {
+  async findAll(@CurrentUser() user: UserRow): Promise<SubscriberRow[]> {
     return this.subscribersService.findAllByUser({ user });
   }
 
   @UseGuards(AuthenticationGuard)
   @UseInterceptors(AuthenticationInterceptor)
   @Get(':id')
-  async findOne(@Param('id', ParseUUIDPipe) id: string, @CurrentUser() user: UserRow) {
+  async findOne(@Param('id', ParseUUIDPipe) id: string, @CurrentUser() user: UserRow): Promise<SubscriberRow> {
     return this.subscribersService.findOneById({ id, user });
   }
 
   @Patch(':id')
-  update(@Param('id', ParseUUIDPipe) id: string, @Body({ schema: updateSubcriberSchema }) updateSubcriberDto: UpdateSubcriberDto) {
+  update(@Param('id', ParseUUIDPipe) id: string, @Body({ schema: updateSubcriberSchema }) updateSubcriberDto: UpdateSubcriberDto): string {
     return this.subscribersService.update(id, updateSubcriberDto);
   }
 
   @Delete(':id')
-  remove(@Param('id', ParseUUIDPipe) id: string) {
+  remove(@Param('id', ParseUUIDPipe) id: string): string {
     return this.subscribersService.remove(id);
   }
 }

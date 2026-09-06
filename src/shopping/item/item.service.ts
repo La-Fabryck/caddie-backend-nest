@@ -20,7 +20,7 @@ type UpdateItem = {
 type FindItem = { listId: string; itemId: string; user: UserRow };
 
 type FindItems = { listId: string; user: UserRow };
-type ItemWithTypeRow = ItemRow & { itemType: Omit<ItemTypeRow, 'userId'> | null };
+export type ItemWithTypeRow = ItemRow & { itemType: Omit<ItemTypeRow, 'userId'> | null };
 
 @Injectable()
 class ItemService {

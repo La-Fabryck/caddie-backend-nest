@@ -341,6 +341,9 @@ export default defineConfig({
     'typescript/prefer-enum-initializers': 'error',
     'typescript/promise-function-async': 'error',
     'typescript/strict-boolean-expressions': 'error',
+    'typescript/explicit-function-return-type': 'error',
+    'typescript/explicit-module-boundary-types': 'error',
+    'typescript/unified-signatures': 'error',
     'typescript/consistent-type-exports': [
       'error',
       {

@@ -5,7 +5,7 @@ import { AuthenticationGuard } from '@/users/guards/authentication.guard';
 import { AuthenticationInterceptor } from '@/users/interceptors/authentication.interceptor';
 import { type CreateItemDto, createItemSchema } from '../dto/create-item.dto';
 import { type UpdateItemDto, updateItemSchema } from '../dto/update-item.dto';
-import { type CreateItem, ItemService } from './item.service';
+import { type CreateItem, ItemService, type ItemWithTypeRow } from './item.service';
 
 @Controller('/list/:listId/items')
 export class ItemController {
@@ -18,7 +18,7 @@ export class ItemController {
     @Param('listId', ParseUUIDPipe) listId: string,
     @Body({ schema: createItemSchema }) createItemDto: CreateItemDto,
     @CurrentUser() user: UserRow,
-  ) {
+  ): Promise<ItemWithTypeRow> {
     const createItemPayload: CreateItem['createItemPayload'] = {
       listId,
       name: createItemDto.name,
@@ -41,7 +41,7 @@ export class ItemController {
   @UseGuards(AuthenticationGuard)
   @UseInterceptors(AuthenticationInterceptor)
   @Get()
-  async findAll(@Param('listId', ParseUUIDPipe) listId: string, @CurrentUser() user: UserRow) {
+  async findAll(@Param('listId', ParseUUIDPipe) listId: string, @CurrentUser() user: UserRow): Promise<ItemWithTypeRow[]> {
     return this.itemService.findAllWithTypeByListId({ listId, user });
   }
 
@@ -52,7 +52,7 @@ export class ItemController {
     @Param('listId', ParseUUIDPipe) listId: string,
     @Param('itemId', ParseUUIDPipe) itemId: string,
     @CurrentUser() user: UserRow,
-  ) {
+  ): Promise<ItemWithTypeRow> {
     return this.itemService.findOne({ itemId, listId, user });
   }
 
@@ -65,7 +65,7 @@ export class ItemController {
     @Param('itemId', ParseUUIDPipe) itemId: string,
     @Body({ schema: updateItemSchema }) updateShoppingDto: UpdateItemDto,
     @CurrentUser() user: UserRow,
-  ) {
+  ): Promise<ItemWithTypeRow> {
     return this.itemService.update({
       updateItemPayload: { ...updateShoppingDto, listId, id: itemId },
       user,
@@ -79,7 +79,7 @@ export class ItemController {
     @Param('listId', ParseUUIDPipe) listId: string,
     @Param('itemId', ParseUUIDPipe) itemId: string,
     @CurrentUser() user: UserRow,
-  ) {
+  ): Promise<void> {
     await this.itemService.remove(listId, itemId, user);
   }
 }
