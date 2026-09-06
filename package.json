@@ -1,6 +1,6 @@
 {
   "name": "caddie-backend-nest",
-  "version": "0.4.0",
+  "version": "0.5.0",
   "private": false,
   "description": "Backend for shopping app built with NestJS, Kysely and Fastify",
   "keywords": [
