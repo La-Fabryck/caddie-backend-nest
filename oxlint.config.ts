@@ -16,15 +16,15 @@ export default defineConfig({
   // | Category     | Level  | Notes |
   // |--------------|--------|-------|
   // | correctness  | error  | Enabled; not repeated in `rules`. |
-  // | suspicious   | error  | Enabled; e2e has an override for JSON.parse assertions. |
-  // | perf         | error  | Enabled. |
+  // | suspicious   | warn   | Enabled; e2e has an override for JSON.parse assertions. |
+  // | perf         | error  | Enabled; not repeated in `rules`. |
   // | pedantic     | (skip) | Too strict for day-to-day; many false positives. |
   // | style        | —      | Mostly overlaps unicorn + Oxfmt; optional. |
   // | restriction  | —      | Bans patterns (e.g. console); only if you want hard bans via category. |
   // | nursery      | —      | Unstable rules; use only experimentally. |
   categories: {
     correctness: 'error',
-    perf: 'warn',
+    perf: 'error',
     suspicious: 'warn',
   },
   options: {
@@ -108,9 +108,7 @@ export default defineConfig({
     'unicorn/no-zero-fractions': 'error',
     'unicorn/numeric-separators-style': 'error',
     'unicorn/prefer-add-event-listener': 'error',
-    'unicorn/prefer-array-find': 'error',
     'unicorn/prefer-array-flat': 'error',
-    'unicorn/prefer-array-flat-map': 'error',
     'unicorn/prefer-array-index-of': 'error',
     'unicorn/prefer-array-some': 'error',
     'unicorn/prefer-at': 'error',
@@ -146,7 +144,6 @@ export default defineConfig({
     'unicorn/prefer-reflect-apply': 'error',
     'unicorn/prefer-regexp-test': 'error',
     'unicorn/prefer-response-static-json': 'error',
-    'unicorn/prefer-set-has': 'error',
     'unicorn/prefer-spread': 'error',
     'unicorn/prefer-string-raw': 'error',
     'unicorn/prefer-string-replace-all': 'error',
@@ -182,7 +179,6 @@ export default defineConfig({
       },
     ],
     yoda: ['error', 'never'],
-    'no-await-in-loop': 'error',
     'no-else-return': 'error',
     'func-style': ['error', 'declaration'],
     'default-case': 'error',
@@ -201,7 +197,6 @@ export default defineConfig({
     ],
     'no-script-url': 'error',
     'no-unneeded-ternary': 'error',
-    'no-useless-call': 'error',
     'no-duplicate-imports': 'error',
     'typescript/ban-ts-comment': [
       'error',
