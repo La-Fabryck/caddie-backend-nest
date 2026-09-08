@@ -16,7 +16,7 @@ export default defineConfig({
   // | Category     | Level  | Notes |
   // |--------------|--------|-------|
   // | correctness  | error  | Enabled; not repeated in `rules`. |
-  // | suspicious   | warn   | Enabled; e2e has an override for JSON.parse assertions. |
+  // | suspicious   | error  | Enabled; not repeated in `rules`. |
   // | perf         | error  | Enabled; not repeated in `rules`. |
   // | pedantic     | (skip) | Too strict for day-to-day; many false positives. |
   // | style        | —      | Mostly overlaps unicorn + Oxfmt; optional. |
@@ -25,7 +25,7 @@ export default defineConfig({
   categories: {
     correctness: 'error',
     perf: 'error',
-    suspicious: 'warn',
+    suspicious: 'error',
   },
   options: {
     typeAware: true,
@@ -46,9 +46,7 @@ export default defineConfig({
     'no-prototype-builtins': 'error',
     'no-regex-spaces': 'error',
     'no-useless-assignment': 'error',
-    'preserve-caught-error': 'error',
     'no-array-constructor': 'error',
-    'no-useless-constructor': 'error',
     'import/no-named-default': 'error',
     'node/handle-callback-err': 'error',
     'node/no-exports-assign': 'error',
@@ -63,27 +61,22 @@ export default defineConfig({
     'unicorn/consistent-date-clone': 'error',
     'unicorn/consistent-empty-array-spread': 'error',
     'unicorn/consistent-existence-index-check': 'error',
-    'unicorn/consistent-function-scoping': 'error',
     'unicorn/consistent-template-literal-escape': 'error',
     'unicorn/error-message': 'error',
     'unicorn/escape-case': 'error',
     'unicorn/filename-case': 'error',
     'unicorn/new-for-builtins': 'error',
     'unicorn/no-abusive-eslint-disable': 'error',
-    'unicorn/no-accessor-recursion': 'error',
     'unicorn/no-anonymous-default-export': 'error',
     'unicorn/no-array-callback-reference': 'error',
     'unicorn/no-array-for-each': 'error',
     'unicorn/no-array-method-this-argument': 'error',
     'unicorn/no-array-reduce': 'error',
-    'unicorn/no-array-reverse': 'error',
-    'unicorn/no-array-sort': 'error',
     'unicorn/no-await-expression-member': 'error',
     'unicorn/no-console-spaces': 'error',
     'unicorn/no-document-cookie': 'error',
     'unicorn/no-hex-escape': 'error',
     'unicorn/no-immediate-mutation': 'error',
-    'unicorn/no-instanceof-builtins': 'error',
     'unicorn/no-lonely-if': 'error',
     'unicorn/no-magic-array-flat-depth': 'error',
     'unicorn/no-negated-condition': 'error',
@@ -107,7 +100,6 @@ export default defineConfig({
     'unicorn/no-useless-undefined': 'error',
     'unicorn/no-zero-fractions': 'error',
     'unicorn/numeric-separators-style': 'error',
-    'unicorn/prefer-add-event-listener': 'error',
     'unicorn/prefer-array-flat': 'error',
     'unicorn/prefer-array-index-of': 'error',
     'unicorn/prefer-array-some': 'error',
@@ -156,7 +148,6 @@ export default defineConfig({
     'unicorn/relative-url-style': 'error',
     'unicorn/require-array-join-separator': 'error',
     'unicorn/require-module-attributes': 'error',
-    'unicorn/require-module-specifiers': 'error',
     'unicorn/require-number-to-fixed-digits-argument': 'error',
     'unicorn/switch-case-braces': 'error',
     'unicorn/switch-case-break-position': 'error',
@@ -186,8 +177,6 @@ export default defineConfig({
     'max-params': ['error', MAX_FUNCTION_PARAMS],
     'no-bitwise': 'error',
     'no-alert': 'error',
-    'no-extend-native': 'error',
-    'no-extra-bind': 'error',
     'no-implicit-coercion': 'error',
     'no-plusplus': [
       'error',
@@ -196,7 +185,6 @@ export default defineConfig({
       },
     ],
     'no-script-url': 'error',
-    'no-unneeded-ternary': 'error',
     'no-duplicate-imports': 'error',
     'typescript/ban-ts-comment': [
       'error',
@@ -222,18 +210,10 @@ export default defineConfig({
     'typescript/no-non-null-asserted-nullish-coalescing': 'error',
     'typescript/no-non-null-assertion': 'error',
     'typescript/no-require-imports': 'error',
-    'typescript/no-unnecessary-boolean-literal-compare': 'error',
     'typescript/no-unnecessary-condition': 'error',
-    'typescript/no-unnecessary-template-expression': 'error',
-    'typescript/no-unnecessary-type-arguments': 'error',
-    'typescript/no-unnecessary-type-assertion': 'error',
-    'typescript/no-unnecessary-type-constraint': 'error',
-    'typescript/no-unnecessary-type-conversion': 'error',
-    'typescript/no-unnecessary-type-parameters': 'error',
     'typescript/no-unsafe-argument': 'error',
     'typescript/no-unsafe-assignment': 'error',
     'typescript/no-unsafe-call': 'error',
-    'typescript/no-unsafe-enum-comparison': 'error',
     'typescript/no-unsafe-function-type': 'error',
     'typescript/no-unsafe-member-access': 'error',
     'typescript/no-unsafe-return': 'error',
