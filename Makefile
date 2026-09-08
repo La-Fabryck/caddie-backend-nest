@@ -55,7 +55,7 @@ doctor-test:
 	@$(STEP) lint npm run lint
 	@$(STEP) build npm run build
 	@$(STEP) e2e $(E2E_COMPOSE) --progress quiet exec -T test \
-		sh -c 'npm ci --prefer-offline --silent && NODE_NO_WARNINGS=1 npm run test:e2e'
+		sh -c 'npm ci --prefer-offline --silent && npm install --include=optional --no-save --silent && NODE_NO_WARNINGS=1 npm run test:e2e'
 
 # Postgres → migrate → API up (CMD npm start)
 e2e-up:

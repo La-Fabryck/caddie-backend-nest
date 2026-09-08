@@ -4,7 +4,10 @@ WORKDIR /app
 
 COPY package*.json .npmrc ./
 
-RUN npm ci --prefer-offline
+# npm ci alone can skip the host platform's optional native binding (npm/cli#4828).
+# Host lockfile is glibc; Alpine needs @rolldown/binding-linux-*-musl for Vitest.
+RUN npm ci --prefer-offline \
+	&& npm install --include=optional --no-save
 
 # Stage 2: API + exec Vitest (nest start — no dist / no start:prod)
 FROM node:26-alpine AS e2e
