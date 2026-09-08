@@ -3,5 +3,8 @@
   "tags": ["-lintignore"],
   "treatConfigHintsAsErrors": true,
   "treatTagHintsAsErrors": true,
-  "entry": ["src/main.ts", ".config/kysely.config.ts", ".config/kysely-codegen.config.ts", "migrations/*.ts"]
+  "entry": ["src/main.ts", ".config/kysely.config.ts", ".config/kysely-codegen.config.ts", "migrations/*.ts"],
+  "vitest": {
+    "config": ["vitest.config.ts", "vitest.config.e2e.ts"]
+  }
 }

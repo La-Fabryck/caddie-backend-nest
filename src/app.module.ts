@@ -23,7 +23,7 @@ declare module 'fastify' {
   imports: [
     ConfigModule.forRoot({
       load: [appConfiguration, databaseConfiguration, authConfiguration],
-      envFilePath: ['.env', '.env.development'],
+      ignoreEnvFile: true,
       cache: true,
       isGlobal: true,
     }),

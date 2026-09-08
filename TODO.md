@@ -7,21 +7,14 @@ HTTP API errors (validation vs business rules):
 
 Mandatory :
 
-- ~~Set up [Nest config](https://docs.nestjs.com/techniques/configuration) correctly, rework env variables and prefix~~
 - [Helmet](https://docs.nestjs.com/security/helmet) & accept only application/json
 
 Later'ish :
 
-- **Config / prod env** — In `ConfigModule.forRoot`, consider `skipEnvFile` when `NODE_ENV === 'production'` (or a dedicated flag such as `LOAD_DOTENV`) so production relies only on injected `process.env` (e.g. Docker Compose `env_file` / platform secrets) and does not look for `.env` on disk. Today the prod image does not ship `.env`, and compose injects vars; this would make that contract explicit in code.
 - Validate unique item name per shopping list
-- ~~JWT Refresh~~
-- ~~Integration Tests~~
 - Small cache for users
-- ~~Use Zod as validator (Nest 12 `StandardSchemaValidationPipe`)~~
-- ~~Migrate to [Kysely](https://kysely.dev/)~~
-- ~~Align Kysely query/error logs with the app logger~~ (Nest `Logger` via Kysely `log` callback; still pending pino)
 - CQRS architecture
-- Move Auth user from Fastify Request to [NestJS LocalStorage](https://docs.nestjs.com/recipes/async-local-storage
+- Move Auth user from Fastify Request to [NestJS LocalStorage](https://docs.nestjs.com/recipes/async-local-storage)
 
 Later :
 
