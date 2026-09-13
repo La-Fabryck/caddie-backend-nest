@@ -130,6 +130,29 @@ describe('ItemController (e2e)', () => {
       expect(payload.itemType?.label).toStrictEqual(itemType.label);
     });
 
+    it('OK - Creates an item with null itemTypeId', async () => {
+      await using creator = await resourceCreator(app, { list: { quantity: SINGLE } });
+      const storedList = creator.list;
+
+      const item: CreateItemDto = {
+        name: faker.food.ingredient(),
+        itemTypeId: null,
+      };
+
+      const result = await app.inject({
+        method: 'POST',
+        url: `/list/${storedList.id}/items`,
+        body: item,
+        cookies: creator.cookies,
+      });
+      expect(result.statusCode).toEqual(HttpStatus.CREATED);
+
+      const payload = JSON.parse(result.payload) as ItemResponse;
+      expect(payload.name).toEqual(item.name);
+      expect(payload.quantity).toEqual(SINGLE);
+      expect(payload.itemType).toBeNull();
+    });
+
     it('KO - Rejects item type from another user on create', async () => {
       await using creator = await resourceCreator(app, { list: { quantity: SINGLE } });
       await using outsider = await resourceCreator(app);
@@ -352,6 +375,26 @@ describe('ItemController (e2e)', () => {
       expect(payload.quantity).toEqual(quantity);
     });
 
+    it('KO - Rejects null quantity on update', async () => {
+      await using creator = await resourceCreator(app, { list: { quantity: SINGLE }, items: { quantity: SINGLE } });
+      const storedList = creator.list;
+      const storedItem = creator.item;
+
+      const result = await app.inject({
+        method: 'PATCH',
+        url: `/list/${storedList.id}/items/${storedItem.id}`,
+        body: { quantity: null },
+        cookies: creator.cookies,
+      });
+
+      expect(result.statusCode).toEqual(HttpStatus.BAD_REQUEST);
+
+      const payload = JSON.parse(result.payload) as ErrorInterface;
+      expect(payload).toStrictEqual({
+        quantity: [{ message: 'ITEM_QUANTITY' }],
+      });
+    });
+
     it('OK - Update item type', async () => {
       await using creator = await resourceCreator(app, { list: { quantity: SINGLE }, items: { quantity: SINGLE } });
       const storedList = creator.list;
@@ -379,6 +422,49 @@ describe('ItemController (e2e)', () => {
       const payload = JSON.parse(result.payload) as ItemResponse;
       expect(payload.itemType?.id).toStrictEqual(itemType.id);
       expect(payload.itemType?.label).toStrictEqual(itemType.label);
+    });
+
+    it('OK - Clears item type with null itemTypeId', async () => {
+      await using creator = await resourceCreator(app, { list: { quantity: SINGLE }, items: { quantity: SINGLE } });
+      const storedList = creator.list;
+      const storedItem = creator.item;
+
+      const typeResult = await app.inject({
+        method: 'POST',
+        url: '/item-types',
+        body: { label: faker.commerce.department() },
+        cookies: creator.cookies,
+      });
+      expect(typeResult.statusCode).toEqual(HttpStatus.CREATED);
+
+      const itemType = JSON.parse(typeResult.payload) as ItemTypeRow;
+
+      const attachResult = await app.inject({
+        method: 'PATCH',
+        url: `/list/${storedList.id}/items/${storedItem.id}`,
+        body: { itemTypeId: itemType.id } satisfies UpdateItemDto,
+        cookies: creator.cookies,
+      });
+      expect(attachResult.statusCode).toEqual(HttpStatus.OK);
+
+      const result = await app.inject({
+        method: 'PATCH',
+        url: `/list/${storedList.id}/items/${storedItem.id}`,
+        body: {
+          name: storedItem.name,
+          quantity: storedItem.quantity,
+          isInCart: false,
+          itemTypeId: null,
+        } satisfies UpdateItemDto,
+        cookies: creator.cookies,
+      });
+
+      expect(result.statusCode).toEqual(HttpStatus.OK);
+
+      const payload = JSON.parse(result.payload) as ItemResponse;
+      expect(payload.itemType).toBeNull();
+      expect(payload.quantity).toEqual(storedItem.quantity);
+      expect(payload.isInCart).toEqual(false);
     });
 
     it('KO - Rejects item type from another user', async () => {
