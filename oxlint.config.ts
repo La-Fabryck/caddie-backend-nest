@@ -9,7 +9,7 @@ const MAX_FUNCTION_PARAMS = 3;
  * @see docs/oxlint-migrate.md
  */
 export default defineConfig({
-  plugins: ['typescript', 'unicorn', 'import', 'node'],
+  plugins: ['typescript', 'unicorn', 'import', 'node', 'promise'],
   // Category bundles. `rules` only lists extras / options / offs — not category defaults.
   // e2e overrides mute `no-unsafe-type-assertion` for `JSON.parse(...) as T`.
   //
@@ -53,6 +53,14 @@ export default defineConfig({
     'node/no-new-require': 'error',
     'node/no-path-concat': 'error',
     'node/no-process-env': 'error',
+    'node/no-sync': 'error',
+    // promise correctness/suspicious covered by categories; extras below.
+    'promise/no-return-wrap': 'error',
+    'promise/param-names': 'error',
+    'promise/catch-or-return': 'error',
+    'promise/no-nesting': 'error',
+    'promise/avoid-new': 'error',
+    'promise/no-return-in-finally': 'error',
     'unicorn/empty-brace-spaces': 'error',
     'unicorn/number-literal-case': 'error',
     'no-nested-ternary': 'error',
@@ -265,6 +273,7 @@ export default defineConfig({
     'typescript/consistent-type-imports': 'off',
 
     // --- Not implemented in oxlint yet (uncomment when available) ---
+    // 'promise/no-native': 'off',
     // 'unicorn/expiring-todo-comments': 'error',
     // 'unicorn/import-style': 'error',
     // 'unicorn/isolated-functions': 'error',
