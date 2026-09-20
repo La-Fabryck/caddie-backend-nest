@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, NotFoundException, UnprocessableEntityException } from '@nestjs/common';
 import type { Insertable, Kysely, Updateable } from 'kysely';
 import type { DB, Item, ItemRow, ItemTypeRow, UserRow } from '@/database/database-types';
 import { DatabaseService } from '@/database/database.service';
@@ -6,6 +6,7 @@ import type { CreateItemDto } from '../dto/create-item.dto';
 import type { UpdateItemDto } from '../dto/update-item.dto';
 import { ItemTypeService } from '../item-type/item-type.service';
 import { ListService } from '../list/list.service';
+import { ITEM_NAME_NOT_UNIQUE } from '../messages/items';
 
 type CreateItem = {
   createItemPayload: CreateItemDto & Pick<Item, 'listId'>;
@@ -76,6 +77,36 @@ class ItemService {
     return this.toItemWithTypeRow(row);
   }
 
+  /** Case-insensitive: "Tomatoes" and "tomatoes" collide on the same list only. */
+  private async assertUniqueNameInList({
+    listId,
+    name,
+    excludeItemId,
+    database,
+  }: {
+    listId: string;
+    name: string;
+    excludeItemId?: string;
+    database: Kysely<DB>;
+  }): Promise<void> {
+    let query = database
+      .selectFrom('Item')
+      .where('listId', '=', listId)
+      .where((eb) => eb(eb.fn('lower', [eb.ref('name')]), '=', eb.fn('lower', [eb.val(name)])))
+      .select('id');
+
+    if (excludeItemId != null) {
+      query = query.where('id', '<>', excludeItemId);
+    }
+
+    const existing = await query.executeTakeFirst();
+    if (existing != null) {
+      throw new UnprocessableEntityException({
+        name: [{ message: ITEM_NAME_NOT_UNIQUE }],
+      });
+    }
+  }
+
   async create({ createItemPayload, user }: CreateItem): Promise<ItemWithTypeRow> {
     // verify that the lists is accessible by the user
     await this.listService.findOneById({
@@ -92,6 +123,11 @@ class ItemService {
     }
 
     return this.database.transaction().execute(async (trx) => {
+      await this.assertUniqueNameInList({
+        listId: createItemPayload.listId,
+        name: createItemPayload.name,
+        database: trx,
+      });
       await this.listService.updateDate(createItemPayload.listId, trx);
 
       const item: Insertable<Item> = {
@@ -154,6 +190,14 @@ class ItemService {
     }
 
     return this.database.transaction().execute(async (trx) => {
+      if (payload.name != null) {
+        await this.assertUniqueNameInList({
+          listId,
+          name: payload.name,
+          excludeItemId: itemId,
+          database: trx,
+        });
+      }
       await this.listService.updateDate(updateItemPayload.listId, trx);
 
       const item: Updateable<Item> = {

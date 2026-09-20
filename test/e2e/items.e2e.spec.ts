@@ -181,6 +181,80 @@ describe('ItemController (e2e)', () => {
       expect(result.statusCode).toEqual(HttpStatus.NOT_FOUND);
     });
 
+    it('KO - Rejects duplicate item name on the same list', async () => {
+      await using creator = await resourceCreator(app, { list: { quantity: SINGLE }, items: { quantity: SINGLE } });
+      const storedList = creator.list;
+      const existingName = creator.item.name;
+
+      const result = await app.inject({
+        method: 'POST',
+        url: `/list/${storedList.id}/items`,
+        body: { name: existingName } satisfies CreateItemDto,
+        cookies: creator.cookies,
+      });
+
+      expect(result.statusCode).toEqual(HttpStatus.UNPROCESSABLE_ENTITY);
+
+      const payload = JSON.parse(result.payload) as ErrorInterface;
+      expect(payload).toStrictEqual({
+        name: [{ message: 'ITEM_NAME_NOT_UNIQUE' }],
+      });
+    });
+
+    it('KO - Rejects duplicate item name case-insensitively', async () => {
+      await using creator = await resourceCreator(app, { list: { quantity: SINGLE } });
+      const storedList = creator.list;
+      const name = 'Tomatoes';
+
+      const first = await app.inject({
+        method: 'POST',
+        url: `/list/${storedList.id}/items`,
+        body: { name } satisfies CreateItemDto,
+        cookies: creator.cookies,
+      });
+      expect(first.statusCode).toEqual(HttpStatus.CREATED);
+
+      const result = await app.inject({
+        method: 'POST',
+        url: `/list/${storedList.id}/items`,
+        body: { name: name.toLowerCase() } satisfies CreateItemDto,
+        cookies: creator.cookies,
+      });
+
+      expect(result.statusCode).toEqual(HttpStatus.UNPROCESSABLE_ENTITY);
+
+      const payload = JSON.parse(result.payload) as ErrorInterface;
+      expect(payload).toStrictEqual({
+        name: [{ message: 'ITEM_NAME_NOT_UNIQUE' }],
+      });
+    });
+
+    it('OK - Allows the same item name on different lists', async () => {
+      const listCount = 2;
+      await using creator = await resourceCreator(app, { list: { quantity: listCount } });
+      const [firstList, secondList] = creator.lists;
+      if (firstList == null || secondList == null) {
+        throw new Error(`expected ${listCount} lists`);
+      }
+      const name = faker.food.ingredient();
+
+      const first = await app.inject({
+        method: 'POST',
+        url: `/list/${firstList.id}/items`,
+        body: { name } satisfies CreateItemDto,
+        cookies: creator.cookies,
+      });
+      expect(first.statusCode).toEqual(HttpStatus.CREATED);
+
+      const second = await app.inject({
+        method: 'POST',
+        url: `/list/${secondList.id}/items`,
+        body: { name } satisfies CreateItemDto,
+        cookies: creator.cookies,
+      });
+      expect(second.statusCode).toEqual(HttpStatus.CREATED);
+    });
+
     it('KO - Fails validation for quantity - Zero', async () => {
       await using creator = await resourceCreator(app);
 
@@ -327,6 +401,49 @@ describe('ItemController (e2e)', () => {
       expect(payload.name).toEqual(updatePayload.name);
       expect(payload.isInCart).toEqual(updatePayload.isInCart);
       expect(payload.quantity).toEqual(storedItem.quantity);
+    });
+
+    it('KO - Rejects renaming to another item name on the same list', async () => {
+      const itemCount = 2;
+      await using creator = await resourceCreator(app, { list: { quantity: SINGLE }, items: { quantity: itemCount } });
+      const storedList = creator.list;
+      const [firstItem, secondItem] = creator.items;
+      if (firstItem == null || secondItem == null) {
+        throw new Error(`expected ${itemCount} items`);
+      }
+
+      const result = await app.inject({
+        method: 'PATCH',
+        url: `/list/${storedList.id}/items/${firstItem.id}`,
+        body: { name: secondItem.name } satisfies UpdateItemDto,
+        cookies: creator.cookies,
+      });
+
+      expect(result.statusCode).toEqual(HttpStatus.UNPROCESSABLE_ENTITY);
+
+      const payload = JSON.parse(result.payload) as ErrorInterface;
+      expect(payload).toStrictEqual({
+        name: [{ message: 'ITEM_NAME_NOT_UNIQUE' }],
+      });
+    });
+
+    it('OK - Allows updating an item without changing its name', async () => {
+      await using creator = await resourceCreator(app, { list: { quantity: SINGLE }, items: { quantity: SINGLE } });
+      const storedList = creator.list;
+      const storedItem = creator.item;
+
+      const result = await app.inject({
+        method: 'PATCH',
+        url: `/list/${storedList.id}/items/${storedItem.id}`,
+        body: { name: storedItem.name, isInCart: true } satisfies UpdateItemDto,
+        cookies: creator.cookies,
+      });
+
+      expect(result.statusCode).toEqual(HttpStatus.OK);
+
+      const payload = JSON.parse(result.payload) as ItemRow;
+      expect(payload.name).toEqual(storedItem.name);
+      expect(payload.isInCart).toEqual(true);
     });
 
     it('KO - User not authenticated', async () => {

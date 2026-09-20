@@ -7,7 +7,6 @@ HTTP API errors (validation vs business rules):
 
 Later'ish :
 
-- Validate unique item name per shopping list
 - Small cache for users
 - CQRS architecture
 - Move Auth user from Fastify Request to [NestJS LocalStorage](https://docs.nestjs.com/recipes/async-local-storage)
