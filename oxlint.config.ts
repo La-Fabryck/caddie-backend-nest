@@ -9,7 +9,7 @@ const MAX_FUNCTION_PARAMS = 3;
  * @see docs/oxlint-migrate.md
  */
 export default defineConfig({
-  plugins: ['typescript', 'unicorn', 'import', 'node', 'promise'],
+  plugins: ['typescript', 'unicorn', 'import', 'node', 'promise', 'vitest'],
   // Category bundles. `rules` only lists extras / options / offs — not category defaults.
   // e2e overrides mute `no-unsafe-type-assertion` for `JSON.parse(...) as T`.
   //
@@ -343,7 +343,7 @@ export default defineConfig({
     },
     // e2e inject payloads: `JSON.parse(...) as T` is intentional; keep the rule in src/
     {
-      files: ['test/**/*.e2e-spec.ts'],
+      files: ['test/**/*.e2e.spec.ts'],
       rules: {
         'typescript/no-unsafe-type-assertion': 'off',
       },

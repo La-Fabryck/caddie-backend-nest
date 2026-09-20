@@ -26,7 +26,7 @@ For a single spec or watch mode, use dev Postgres and Jest on the host:
 
 1. `docker compose up -d`
 2. `npm run db:migrate:latest` (do not use `caddie_app` as the test DB)
-3. `npm run test:e2e` or `npm run test:e2e -- test/e2e/user.e2e-spec.ts`
+3. `npm run test:e2e` or `npm run test:e2e -- test/e2e/user.e2e.spec.ts`
 
 Use the **Debug: Caddie** launch configuration for the app (local Node).
 
