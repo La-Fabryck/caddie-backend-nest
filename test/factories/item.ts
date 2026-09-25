@@ -12,10 +12,7 @@ function createItem(listId: string, overrides: Partial<CreateItemDto> = {}): Cre
 
 function createManyItems(listId: string, count: number): CreateItem['createItemPayload'][] {
   // Suffix keeps names unique within a list once Item_listId_name_key is enforced.
-  return Array.from({ length: count }, (_, index) =>
-    // oxlint-disable-next-line no-magic-numbers
-    createItem(listId, { name: `${faker.food.ingredient()}-${index}-${faker.string.alphanumeric(4)}` }),
-  );
+  return Array.from({ length: count }, (_, index) => createItem(listId, { name: `${faker.food.ingredient()}-${index}` }));
 }
 
 export { createManyItems };
