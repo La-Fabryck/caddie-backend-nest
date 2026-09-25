@@ -76,6 +76,11 @@ describe('UserController (e2e)', () => {
       body: creator.user,
     });
 
-    expect(result.statusCode).toEqual(HttpStatus.FORBIDDEN);
+    expect(result.statusCode).toEqual(HttpStatus.UNPROCESSABLE_ENTITY);
+
+    const response = JSON.parse(result.payload) as ErrorInterface;
+    expect(response).toStrictEqual({
+      email: [{ message: 'USER_EMAIL_NOT_UNIQUE' }],
+    });
   });
 });

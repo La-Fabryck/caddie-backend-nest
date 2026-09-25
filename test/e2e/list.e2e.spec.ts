@@ -54,6 +54,9 @@ describe('ListController (e2e)', () => {
       });
 
       expect(result.statusCode).toEqual(HttpStatus.UNAUTHORIZED);
+
+      const payload = JSON.parse(result.payload) as ErrorInterface;
+      expect(payload).toStrictEqual({ root: [{ message: 'INVALID_TOKEN' }] });
     });
 
     it('KO - Fails validation', async () => {

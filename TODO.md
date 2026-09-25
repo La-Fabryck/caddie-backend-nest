@@ -1,10 +1,5 @@
 Tech :
 
-HTTP API errors (validation vs business rules):
-
-- **400 Bad Request** — Simple validation: malformed payload, missing fields, wrong types, format checks (email shape, etc.).
-- **422 Unprocessable Entity** — Business rules: syntactically valid request that conflicts with application state or policy (e.g. email already registered, unique name per list violated).
-
 Later'ish :
 
 - Small cache for users

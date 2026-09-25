@@ -53,6 +53,58 @@ describe('ItemTypeController (e2e)', () => {
         label: [{ message: 'ITEM_TYPE_LABEL' }],
       });
     });
+
+    it('KO - Rejects duplicate label', async () => {
+      await using creator = await resourceCreator(app);
+      const label = faker.commerce.department();
+
+      const first = await app.inject({
+        method: 'POST',
+        url: '/item-types',
+        body: { label },
+        cookies: creator.cookies,
+      });
+      expect(first.statusCode).toEqual(HttpStatus.CREATED);
+
+      const result = await app.inject({
+        method: 'POST',
+        url: '/item-types',
+        body: { label },
+        cookies: creator.cookies,
+      });
+
+      expect(result.statusCode).toEqual(HttpStatus.UNPROCESSABLE_ENTITY);
+      const payload = JSON.parse(result.payload) as ErrorInterface;
+      expect(payload).toStrictEqual({
+        label: [{ message: 'ITEM_TYPE_LABEL_NOT_UNIQUE' }],
+      });
+    });
+
+    it('KO - Rejects duplicate label case-insensitively', async () => {
+      await using creator = await resourceCreator(app);
+      const label = 'Produce';
+
+      const first = await app.inject({
+        method: 'POST',
+        url: '/item-types',
+        body: { label },
+        cookies: creator.cookies,
+      });
+      expect(first.statusCode).toEqual(HttpStatus.CREATED);
+
+      const result = await app.inject({
+        method: 'POST',
+        url: '/item-types',
+        body: { label: label.toLowerCase() },
+        cookies: creator.cookies,
+      });
+
+      expect(result.statusCode).toEqual(HttpStatus.UNPROCESSABLE_ENTITY);
+      const payload = JSON.parse(result.payload) as ErrorInterface;
+      expect(payload).toStrictEqual({
+        label: [{ message: 'ITEM_TYPE_LABEL_NOT_UNIQUE' }],
+      });
+    });
   });
 
   describe('/item-types (GET)', () => {
@@ -90,6 +142,40 @@ describe('ItemTypeController (e2e)', () => {
   });
 
   describe('/item-types/:id (PATCH, DELETE)', () => {
+    it('KO - Rejects duplicate label on update', async () => {
+      await using creator = await resourceCreator(app);
+
+      const first = await app.inject({
+        method: 'POST',
+        url: '/item-types',
+        body: { label: 'Dairy' },
+        cookies: creator.cookies,
+      });
+      expect(first.statusCode).toEqual(HttpStatus.CREATED);
+
+      const second = await app.inject({
+        method: 'POST',
+        url: '/item-types',
+        body: { label: 'Bakery' },
+        cookies: creator.cookies,
+      });
+      expect(second.statusCode).toEqual(HttpStatus.CREATED);
+      const secondType = JSON.parse(second.payload) as ItemTypeRow;
+
+      const result = await app.inject({
+        method: 'PATCH',
+        url: `/item-types/${secondType.id}`,
+        body: { label: 'Dairy' },
+        cookies: creator.cookies,
+      });
+
+      expect(result.statusCode).toEqual(HttpStatus.UNPROCESSABLE_ENTITY);
+      const payload = JSON.parse(result.payload) as ErrorInterface;
+      expect(payload).toStrictEqual({
+        label: [{ message: 'ITEM_TYPE_LABEL_NOT_UNIQUE' }],
+      });
+    });
+
     it('KO - Cannot update another user type', async () => {
       await using creator = await resourceCreator(app);
       await using outsider = await resourceCreator(app);

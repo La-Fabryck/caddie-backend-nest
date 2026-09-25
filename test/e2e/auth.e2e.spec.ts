@@ -126,9 +126,21 @@ describe('AuthenticationController (e2e)', () => {
       body: createUser(),
     });
 
-    expect(result.statusCode).toEqual(HttpStatus.FORBIDDEN);
+    expect(result.statusCode).toEqual(HttpStatus.UNAUTHORIZED);
 
     const response = JSON.parse(result.body) as ErrorInterface;
     expect(response).toStrictEqual({ root: [{ message: 'INVALID_LOGIN' }] });
+  });
+
+  it('/authentication/refresh (POST) - KO - Missing refresh cookie', async () => {
+    const result = await app.inject({
+      method: 'POST',
+      url: '/authentication/refresh',
+    });
+
+    expect(result.statusCode).toEqual(HttpStatus.UNAUTHORIZED);
+
+    const response = JSON.parse(result.body) as ErrorInterface;
+    expect(response).toStrictEqual({ root: [{ message: 'INVALID_TOKEN' }] });
   });
 });

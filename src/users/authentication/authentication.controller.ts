@@ -5,6 +5,7 @@ import type { FastifyReply, FastifyRequest } from 'fastify';
 import type { AuthConfig } from '@/config/auth.config';
 import { msDurationToSeconds } from '@/lib/zod/z-ms-duration';
 import { type LoginDto, loginSchema } from '../dto/login.dto';
+import { invalidTokenError } from '../utils/auth-error-bodies';
 import { AuthenticationService } from './authentication.service';
 
 @Controller('authentication')
@@ -39,7 +40,7 @@ export class AuthenticationController {
     const refreshToken = request.cookies[this.auth.refreshCookieName];
 
     if (refreshToken == null) {
-      throw new UnauthorizedException();
+      throw new UnauthorizedException(invalidTokenError);
     }
 
     const tokens = await this.authentificationService.refresh(refreshToken);

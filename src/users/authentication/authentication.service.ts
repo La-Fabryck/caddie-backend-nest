@@ -1,12 +1,11 @@
-import { ForbiddenException, Injectable, Logger, UnauthorizedException } from '@nestjs/common';
+import { Injectable, Logger, UnauthorizedException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { JwtService, type JwtSignOptions, TokenExpiredError } from '@nestjs/jwt';
 import { compare } from 'bcrypt';
-import type { ErrorInterface } from '@/app.configurator';
 import type { AuthConfig } from '@/config/auth.config';
 import type { LoginDto } from '../dto/login.dto';
-import { INVALID_LOGIN } from '../messages/authentication';
 import { UsersService } from '../users/users.service';
+import { invalidLoginError, invalidTokenError } from '../utils/auth-error-bodies';
 import { formatErrorForLog } from '../utils/format-error-for-log';
 
 /** Registered claims we use: https://datatracker.ietf.org/doc/html/rfc7519#section-4.1 */
@@ -30,20 +29,15 @@ export class AuthenticationService {
     this.auth = configService.getOrThrow<AuthConfig>('auth');
   }
 
-  //TODO: message key
-  private defaultError: ErrorInterface = {
-    root: [{ message: INVALID_LOGIN }],
-  };
-
   async login(loginDto: LoginDto): Promise<AuthTokens> {
     const user = await this.usersService.findOneByEmail(loginDto.email);
     if (user == null) {
-      throw new ForbiddenException(this.defaultError);
+      throw new UnauthorizedException(invalidLoginError);
     }
 
     const isPasswordValid = await compare(loginDto.password, user.password);
     if (!isPasswordValid) {
-      throw new ForbiddenException(this.defaultError);
+      throw new UnauthorizedException(invalidLoginError);
     }
 
     const payload = { sub: user.id };
@@ -67,7 +61,7 @@ export class AuthenticationService {
         this.logger.error(`Refresh token verification failed: ${formatErrorForLog(error)}`);
       }
 
-      throw new UnauthorizedException();
+      throw new UnauthorizedException(invalidTokenError);
     }
 
     return {

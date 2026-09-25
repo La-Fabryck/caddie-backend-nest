@@ -1,9 +1,10 @@
-import { ForbiddenException, Injectable, NotImplementedException, UnauthorizedException } from '@nestjs/common';
+import { Injectable, NotFoundException, NotImplementedException, UnprocessableEntityException } from '@nestjs/common';
 import { genSalt, hash } from 'bcrypt';
 import type { UserRow } from '@/database/database-types';
 import { DatabaseService } from '@/database/database.service';
 import type { CreateUserDto } from '../dto/create-user.dto';
 import type { UpdateUserDto } from '../dto/update-user.dto';
+import { USER_EMAIL_NOT_UNIQUE } from '../messages/user';
 
 @Injectable()
 export class UsersService {
@@ -12,8 +13,9 @@ export class UsersService {
   async create(createUserDto: CreateUserDto): Promise<UserRow> {
     const existing = await this.findOneByEmail(createUserDto.email);
     if (existing != null) {
-      //FIXME: Should we return forbidden or bad request?
-      throw new ForbiddenException();
+      throw new UnprocessableEntityException({
+        email: [{ message: USER_EMAIL_NOT_UNIQUE }],
+      });
     }
 
     const salt = await genSalt();
@@ -42,11 +44,16 @@ export class UsersService {
     return user ?? null;
   }
 
-  async findOne(id: string): Promise<UserRow> {
+  async findOneById(id: string): Promise<UserRow | null> {
     const user = await this.database.selectFrom('User').where('id', '=', id).selectAll().executeTakeFirst();
+    return user ?? null;
+  }
+
+  async findOne(id: string): Promise<UserRow> {
+    const user = await this.findOneById(id);
 
     if (user == null) {
-      throw new UnauthorizedException();
+      throw new NotFoundException();
     }
 
     return user;

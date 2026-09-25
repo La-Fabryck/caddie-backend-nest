@@ -4,7 +4,9 @@ import { JwtService, TokenExpiredError } from '@nestjs/jwt';
 import type { FastifyRequest } from 'fastify';
 import type { AuthConfig } from '@/config/auth.config';
 import type { JwtPayload } from '../authentication/authentication.service';
+import { invalidTokenError } from '../utils/auth-error-bodies';
 import { formatErrorForLog } from '../utils/format-error-for-log';
+
 @Injectable()
 export class AuthenticationGuard implements CanActivate {
   private readonly logger = new Logger(AuthenticationGuard.name);
@@ -24,7 +26,7 @@ export class AuthenticationGuard implements CanActivate {
     const token = request.cookies[cookieKey] ?? null;
     if (token == null) {
       this.logger.warn('Access token cookie is missing');
-      throw new UnauthorizedException();
+      throw new UnauthorizedException(invalidTokenError);
     }
 
     try {
@@ -44,7 +46,7 @@ export class AuthenticationGuard implements CanActivate {
         this.logger.error(`Access token verification failed: ${formatErrorForLog(error)}`);
       }
 
-      throw new UnauthorizedException();
+      throw new UnauthorizedException(invalidTokenError);
     }
   }
 }
