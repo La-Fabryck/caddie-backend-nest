@@ -7,7 +7,7 @@ import { SubscribersService } from '../subscriber/subscribers.service';
 
 export type CreateList = CreateListDto & { user: UserRow };
 
-type UpdateListPayload = Pick<ListRow, 'id'> & Partial<Pick<ListRow, 'title'>>;
+type UpdateListPayload = Pick<ListRow, 'id'> & Partial<Pick<ListRow, 'title' | 'isArchived'>>;
 type UpdateList = { payload: UpdateListPayload; user: UserRow };
 
 type RemoveList = { id: string; user: UserRow };

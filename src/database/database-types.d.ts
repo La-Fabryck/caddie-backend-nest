@@ -30,6 +30,7 @@ export interface ItemType {
 export interface List {
   createdAt: Generated<Date>;
   id: Generated<string>;
+  isArchived: Generated<boolean>;
   title: string;
   updatedAt: Generated<Date>;
 }

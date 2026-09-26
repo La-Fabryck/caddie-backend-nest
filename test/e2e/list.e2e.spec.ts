@@ -41,6 +41,7 @@ describe('ListController (e2e)', () => {
 
       const payload = JSON.parse(result.payload) as ListWithSubs;
       expect(payload.title).toEqual(list.title);
+      expect(payload.isArchived).toBe(false);
       expect(payload.subscribers.some((subscriber) => subscriber.name)).toBeTruthy();
 
       await app.get(ListService).remove({ id: payload.id, user: creator.user });
@@ -96,6 +97,7 @@ describe('ListController (e2e)', () => {
         const storedList = creator.lists.find((list) => list.id === expectedList.id);
         expect(storedList).not.toBeNull();
         expect(expectedList.title).toEqual(storedList?.title);
+        expect(expectedList.isArchived).toBe(false);
       }
     });
 
@@ -124,6 +126,7 @@ describe('ListController (e2e)', () => {
 
       const payload = JSON.parse(result.payload) as ListRow;
       expect(payload.title).toEqual(storedList.title);
+      expect(payload.isArchived).toBe(false);
     });
 
     it('KO - Requires to be authenticated', async () => {
@@ -168,6 +171,31 @@ describe('ListController (e2e)', () => {
 
       const payload = JSON.parse(result.payload) as ListRow;
       expect(payload.title).toEqual(updatePayload.title);
+    });
+
+    it('OK - Archive and unarchive a list', async () => {
+      await using creator = await resourceCreator(app, { list: { quantity: SINGLE } });
+      const storedList = creator.list;
+
+      const archiveResult = await app.inject({
+        method: 'PATCH',
+        url: `/list/${storedList.id}`,
+        body: { isArchived: true } satisfies UpdateListDto,
+        cookies: creator.cookies,
+      });
+
+      expect(archiveResult.statusCode).toEqual(HttpStatus.OK);
+      expect((JSON.parse(archiveResult.payload) as ListRow).isArchived).toBe(true);
+
+      const unarchiveResult = await app.inject({
+        method: 'PATCH',
+        url: `/list/${storedList.id}`,
+        body: { isArchived: false } satisfies UpdateListDto,
+        cookies: creator.cookies,
+      });
+
+      expect(unarchiveResult.statusCode).toEqual(HttpStatus.OK);
+      expect((JSON.parse(unarchiveResult.payload) as ListRow).isArchived).toBe(false);
     });
 
     it('KO - User not authenticated', async () => {
