@@ -4,6 +4,7 @@ import type { NestFastifyApplication } from '@nestjs/platform-fastify';
 import type { ErrorInterface } from '@/app.configurator';
 import type { ListRow } from '@/database/database-types';
 import { type CreateListDto, LIST_TITLE_MAX_LENGTH } from '@/shopping/dto/create-list.dto';
+import { DEFAULT_LIST_LIMIT } from '@/shopping/dto/list-pagination.dto';
 import type { UpdateListDto } from '@/shopping/dto/update-list.dto';
 import { ListService, type ListWithSubs } from '@/shopping/list/list.service';
 import { resourceCreator } from 'test/creator/resource-creator';
@@ -91,14 +92,48 @@ describe('ListController (e2e)', () => {
 
       expect(result.statusCode).toEqual(HttpStatus.OK);
 
-      const payload = JSON.parse(result.payload) as ListRow[];
-      expect(payload).not.toHaveLength(0);
-      for (const expectedList of payload) {
+      const payload = JSON.parse(result.payload) as { items: ListRow[]; total: number; limit: number; offset: number };
+      expect(payload.limit).toBe(DEFAULT_LIST_LIMIT);
+      expect(payload.offset).toBe(0);
+      expect(payload.total).toBeGreaterThanOrEqual(SINGLE);
+      expect(payload.items).not.toHaveLength(0);
+      for (const expectedList of payload.items) {
         const storedList = creator.lists.find((list) => list.id === expectedList.id);
         expect(storedList).not.toBeNull();
         expect(expectedList.title).toEqual(storedList?.title);
         expect(expectedList.isArchived).toBe(false);
       }
+    });
+
+    it('OK - Paginates lists', async () => {
+      const pageSize = 10;
+      const extraItems = 2;
+      await using creator = await resourceCreator(app, { list: { quantity: pageSize + extraItems } });
+
+      const firstPage = await app.inject({
+        method: 'GET',
+        url: `/list?limit=${pageSize}&offset=0`,
+        cookies: creator.cookies,
+      });
+      expect(firstPage.statusCode).toEqual(HttpStatus.OK);
+
+      const firstPayload = JSON.parse(firstPage.payload) as { items: ListRow[]; total: number; limit: number; offset: number };
+      expect(firstPayload.limit).toBe(pageSize);
+      expect(firstPayload.offset).toBe(0);
+      expect(firstPayload.total).toBeGreaterThanOrEqual(pageSize + extraItems);
+      expect(firstPayload.items).toHaveLength(pageSize);
+
+      const secondPage = await app.inject({
+        method: 'GET',
+        url: `/list?limit=${pageSize}&offset=${pageSize}`,
+        cookies: creator.cookies,
+      });
+      expect(secondPage.statusCode).toEqual(HttpStatus.OK);
+
+      const secondPayload = JSON.parse(secondPage.payload) as { items: ListRow[]; total: number; limit: number; offset: number };
+      expect(secondPayload.items.length).toBeGreaterThanOrEqual(extraItems);
+      const firstPageIds = new Set(firstPayload.items.map((list) => list.id));
+      expect(secondPayload.items.every((list) => !firstPageIds.has(list.id))).toBe(true);
     });
 
     it('KO - User not authenticated', async () => {
@@ -235,8 +270,8 @@ describe('ListController (e2e)', () => {
       expect(result.statusCode).toEqual(HttpStatus.OK);
 
       const listService = app.get(ListService);
-      const remainingLists = await listService.findListsBySubscriber({ user: creator.user });
-      expect(remainingLists).toHaveLength(0);
+      const remainingLists = await listService.findListsBySubscriber({ user: creator.user, limit: 10, offset: 0 });
+      expect(remainingLists.items).toHaveLength(0);
     });
 
     it('KO - User not authenticated', async () => {

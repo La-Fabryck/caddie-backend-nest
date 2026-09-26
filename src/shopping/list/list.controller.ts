@@ -1,9 +1,10 @@
-import { Body, Controller, Delete, Get, Param, ParseUUIDPipe, Patch, Post, UseGuards, UseInterceptors } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, ParseUUIDPipe, Patch, Post, Query, UseGuards, UseInterceptors } from '@nestjs/common';
 import type { ListRow, UserRow } from '@/database/database-types';
 import { CurrentUser } from '@/users/decorators/current-user';
 import { AuthenticationGuard } from '@/users/guards/authentication.guard';
 import { AuthenticationInterceptor } from '@/users/interceptors/authentication.interceptor';
 import { type CreateListDto, createListSchema } from '../dto/create-list.dto';
+import { type ListPaginationDto, listPaginationSchema } from '../dto/list-pagination.dto';
 import { type UpdateListDto, updateListSchema } from '../dto/update-list.dto';
 import { ListService, type ListWithSubs } from './list.service';
 
@@ -25,8 +26,11 @@ export class ListController {
   @UseGuards(AuthenticationGuard)
   @UseInterceptors(AuthenticationInterceptor)
   @Get()
-  async findAllByAuthor(@CurrentUser() user: UserRow): Promise<ListRow[]> {
-    return this.listService.findListsBySubscriber({ user });
+  async findAllByAuthor(
+    @CurrentUser() user: UserRow,
+    @Query({ schema: listPaginationSchema }) pagination: ListPaginationDto,
+  ): Promise<{ items: ListRow[]; total: number; limit: number; offset: number }> {
+    return this.listService.findListsBySubscriber({ user, ...pagination });
   }
 
   @UseGuards(AuthenticationGuard)

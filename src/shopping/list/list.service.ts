@@ -58,13 +58,30 @@ export class ListService {
     });
   }
 
-  async findListsBySubscriber({ user }: { user: UserRow }): Promise<ListRow[]> {
-    const subscriptions = await this.subscribersService.findAllByUser({ user });
+  async findListsBySubscriber({
+    user,
+    limit,
+    offset,
+  }: {
+    user: UserRow;
+    limit: number;
+    offset: number;
+  }): Promise<{ items: ListRow[]; total: number; limit: number; offset: number }> {
+    const baseQuery = this.database
+      .selectFrom('List')
+      .innerJoin('Subscriber', 'Subscriber.listId', 'List.id')
+      .where('Subscriber.userId', '=', user.id);
 
-    const listIds = subscriptions.map((sub) => sub.listId);
-    if (listIds.length === 0) return [];
+    const { count } = await baseQuery.select((eb) => eb.fn.countAll<string>().as('count')).executeTakeFirstOrThrow();
+    const total = Number(count);
 
-    return this.database.selectFrom('List').where('id', 'in', listIds).orderBy('updatedAt', 'desc').selectAll().execute();
+    if (total === 0) {
+      return { items: [], total: 0, limit, offset };
+    }
+
+    const items = await baseQuery.orderBy('List.updatedAt', 'desc').limit(limit).offset(offset).selectAll('List').execute();
+
+    return { items, total, limit, offset };
   }
 
   /**
