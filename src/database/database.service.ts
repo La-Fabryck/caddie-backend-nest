@@ -30,8 +30,10 @@ export class DatabaseService extends Kysely<DB> implements OnModuleDestroy {
         if (event.level === 'error') {
           const stack = event.error instanceof Error ? event.error.stack : undefined;
           logger.error(`Query failed (${duration}): ${event.query.sql}`, stack);
+          logger.error(event.query.parameters);
         } else {
           logger.log(`Query (${duration}): ${event.query.sql}`);
+          logger.log(event.query.parameters);
         }
       },
     });
