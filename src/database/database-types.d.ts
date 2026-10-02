@@ -9,6 +9,7 @@ import type { Generated, Selectable } from 'kysely';
 export type ItemRow = Selectable<Item>;
 export type ItemTypeRow = Selectable<ItemType>;
 export type ListRow = Selectable<List>;
+export type ShareLinkRow = Selectable<ShareLink>;
 export type SubscriberRow = Selectable<Subscriber>;
 export type UserRow = Selectable<User>;
 
@@ -28,11 +29,20 @@ export interface ItemType {
 }
 
 export interface List {
-  createdAt: Generated<Date>;
   id: Generated<string>;
+  createdAt: Generated<Date>;
   isArchived: Generated<boolean>;
   title: string;
   updatedAt: Generated<Date>;
+}
+
+export interface ShareLink {
+  id: Generated<string>;
+  createdAt: Generated<Date>;
+  createdByUserId: string;
+  expiresAt: Date;
+  listId: string;
+  token: string;
 }
 
 export interface Subscriber {
@@ -43,8 +53,8 @@ export interface Subscriber {
 }
 
 export interface User {
-  email: string;
   id: Generated<string>;
+  email: string;
   name: string;
   password: string;
 }
@@ -53,6 +63,7 @@ export interface DB {
   Item: Item;
   ItemType: ItemType;
   List: List;
+  ShareLink: ShareLink;
   Subscriber: Subscriber;
   User: User;
 }

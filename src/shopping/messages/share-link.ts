@@ -1,0 +1,3 @@
+const SHARE_LINK_TOKEN = 'SHARE_LINK_TOKEN';
+
+export { SHARE_LINK_TOKEN };

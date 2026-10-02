@@ -54,6 +54,7 @@ export class ListService {
     await this.database.transaction().execute(async (trx) => {
       await trx.deleteFrom('Item').where('listId', '=', id).execute();
       await trx.deleteFrom('Subscriber').where('listId', '=', id).execute();
+      // ShareLink rows cascade when List is deleted (FK onDelete cascade).
       await trx.deleteFrom('List').where('id', '=', id).execute();
     });
   }
