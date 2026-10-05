@@ -1,5 +1,8 @@
+# Keep in sync with .node-version (strip leading v)
+ARG NODE_VERSION=26.10.0
+
 # Stage 1: Production deps
-FROM node:26-alpine AS deps
+FROM node:${NODE_VERSION}-alpine AS deps
 WORKDIR /app
 
 COPY package*.json .npmrc ./
@@ -7,7 +10,7 @@ COPY package*.json .npmrc ./
 RUN npm ci --prefer-offline
 
 # Stage 2: Build
-FROM node:26-alpine AS builder
+FROM node:${NODE_VERSION}-alpine AS builder
 WORKDIR /app
 
 COPY --from=deps /app/node_modules ./node_modules
@@ -20,7 +23,7 @@ RUN npm run build \
     && npm cache clean --force
 
 # Stage 3: Runtime
-FROM node:26-alpine AS runner
+FROM node:${NODE_VERSION}-alpine AS runner
 WORKDIR /app
 
 # Copy built files and production node_modules
