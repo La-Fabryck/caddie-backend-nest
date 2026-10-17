@@ -1,13 +1,13 @@
-import { createParamDecorator, type ExecutionContext } from '@nestjs/common';
-import type { FastifyRequest } from 'fastify';
+import { createParamDecorator } from '@nestjs/common';
 import type { UserRow } from '@/database/database-types';
+import { authStorage } from '../authentication/auth-storage';
 
-export const CurrentUser = createParamDecorator((_data: null, context: ExecutionContext): UserRow => {
-  const request: FastifyRequest = context.switchToHttp().getRequest();
+export const CurrentUser = createParamDecorator((): UserRow => {
+  const user = authStorage.getStore()?.user;
 
-  if (request.user == null) {
+  if (user == null) {
     throw new Error('Use CurrentUserInterceptor to fetch the user beforehand');
   }
 
-  return request.user;
+  return user;
 });

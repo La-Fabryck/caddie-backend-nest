@@ -3,6 +3,7 @@ import { ConfigService } from '@nestjs/config';
 import { JwtService, TokenExpiredError } from '@nestjs/jwt';
 import type { FastifyRequest } from 'fastify';
 import type { AuthConfig } from '@/config/auth.config';
+import { authStorage } from '../authentication/auth-storage';
 import type { JwtPayload } from '../authentication/authentication.service';
 import { invalidTokenError } from '../utils/auth-error-bodies';
 import { formatErrorForLog } from '../utils/format-error-for-log';
@@ -29,14 +30,11 @@ export class AuthenticationGuard implements CanActivate {
       throw new UnauthorizedException(invalidTokenError);
     }
 
+    let payload: JwtPayload;
     try {
-      const payload = await this.jwtService.verifyAsync<JwtPayload>(token, {
+      payload = await this.jwtService.verifyAsync<JwtPayload>(token, {
         secret: this.auth.accessTokenSecret,
       });
-
-      request.userId = payload.sub;
-
-      return true;
     } catch (error: unknown) {
       if (error instanceof TokenExpiredError) {
         this.logger.debug(`Access token expired at ${formatErrorForLog(error.expiredAt)}`);
@@ -48,5 +46,13 @@ export class AuthenticationGuard implements CanActivate {
 
       throw new UnauthorizedException(invalidTokenError);
     }
+
+    const store = authStorage.getStore();
+    if (store == null) {
+      throw new Error('Auth storage was not entered for this request');
+    }
+    store.userId = payload.sub;
+
+    return true;
   }
 }

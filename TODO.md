@@ -4,7 +4,6 @@ Later'ish :
 
 - Small cache for users
 - CQRS architecture
-- Move Auth user from Fastify Request to [NestJS LocalStorage](https://docs.nestjs.com/recipes/async-local-storage)
 
 Later :
 

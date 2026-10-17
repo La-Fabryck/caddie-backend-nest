@@ -2,7 +2,7 @@
 
 Findings as of 15 October 2026. This is a record for a later change, not a task list.
 
-`@nestjs/platform-node` is not published. Do not start the adapter migration, and do not build against the draft pull request, until the package ships in a Nest minor release. One other change can land before that: moving the authenticated user off the Fastify request.
+`@nestjs/platform-node` is not published. Do not start the adapter migration, and do not build against the draft pull request, until the package ships in a Nest minor release.
 
 ## Leaving Fastify
 
@@ -36,7 +36,9 @@ Writes go through `reply.cookie()`, `reply.clearCookie()`, and `CookieSerializeO
 
 ### Request fields
 
-`src/app.module.ts` augments `FastifyRequest` with `userId` and `user`. The guard, `AuthenticationInterceptor`, and `CurrentUser` all read that augmented type. See [Async local storage](#async-local-storage) for where those fields should go.
+The authenticated user is not on the Fastify request. `src/users/authentication/auth-storage.ts` keeps `userId` and `user` in one Node `AsyncLocalStorage`. `AppModule` enters an empty store for `*path`. The guard writes `userId` after it verifies the access token. `AuthenticationInterceptor` writes `user`. `CurrentUser` reads `user`. Shopping controllers only receive `@CurrentUser()`.
+
+The guard still types the request as `FastifyRequest` to read `request.cookies`. That read moves with the cookie change above. There is no request augmentation for `userId` or `user`.
 
 ### E2E
 
@@ -53,11 +55,3 @@ Only `test/e2e/auth.e2e.spec.ts` and `resource-creator` depend on `light-my-requ
 `configureApp` calls [`app.useSecurityHeaders()`](https://docs.nestjs.com/security/helmet) with no options. Nest writes Helmet 8's default headers itself, on the Fastify adapter's `onRequest` hook. Nothing in the tests checks those headers.
 
 That call is already adapter-neutral, so the platform-node switch does not need another headers change.
-
-## Async local storage
-
-`TODO.md` already calls for moving the auth user off the Fastify request onto [Nest async local storage](https://docs.nestjs.com/recipes/async-local-storage).
-
-Do that before the adapter switch. The `declare module 'fastify'` block, and the `FastifyRequest` types in the guard, interceptor, and `CurrentUser` decorator, exist only to hang `userId` and `user` on the request. If that state lives in async local storage first, the adapter change does not need a new request augmentation to replace it.
-
-This can also land while the app is still on Fastify. It does not depend on `@nestjs/platform-node`.

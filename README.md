@@ -61,7 +61,7 @@ make ci-e2e
 - Docker cleanup and dev reset: [`docs/operations/docker-clean-reset.md`](docs/operations/docker-clean-reset.md)
 - Production startup simulation: [`docs/operations/production-simulation.md`](docs/operations/production-simulation.md)
 - Dependency and Fastify compatibility: [`docs/development/dependencies.md`](docs/development/dependencies.md)
-- HTTP adapter notes (platform-node, security headers, async local storage): [`docs/development/platform-node.md`](docs/development/platform-node.md)
+- HTTP adapter notes: [`docs/development/platform-node.md`](docs/development/platform-node.md)
 - Testing and debugger usage: [`docs/development/testing.md`](docs/development/testing.md)
 - Authentication tokens (access + refresh cookies): [`docs/authentication-tokens.md`](docs/authentication-tokens.md)
 - Oxlint migration notes: [`docs/oxlint-migrate.md`](docs/oxlint-migrate.md)

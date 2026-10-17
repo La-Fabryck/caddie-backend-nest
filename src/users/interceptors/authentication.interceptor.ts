@@ -1,6 +1,6 @@
 import { type CallHandler, type ExecutionContext, Injectable, type NestInterceptor, UnauthorizedException } from '@nestjs/common';
-import type { FastifyRequest } from 'fastify';
 import type { Observable } from 'rxjs';
+import { authStorage } from '../authentication/auth-storage';
 import { UsersService } from '../users/users.service';
 import { invalidTokenError } from '../utils/auth-error-bodies';
 
@@ -8,16 +8,16 @@ import { invalidTokenError } from '../utils/auth-error-bodies';
 export class AuthenticationInterceptor implements NestInterceptor {
   constructor(private readonly usersService: UsersService) {}
 
-  async intercept(context: ExecutionContext, next: CallHandler): Promise<Observable<unknown>> {
-    const request: FastifyRequest = context.switchToHttp().getRequest();
-    const { userId } = request;
+  async intercept(_context: ExecutionContext, next: CallHandler): Promise<Observable<unknown>> {
+    const store = authStorage.getStore();
+    const userId = store?.userId;
 
-    if (typeof userId === 'string') {
+    if (store != null && typeof userId === 'string') {
       const user = await this.usersService.findOneById(userId);
       if (user == null) {
         throw new UnauthorizedException(invalidTokenError);
       }
-      request.user = user;
+      store.user = user;
     }
 
     return next.handle();
