@@ -2,7 +2,7 @@
 
 Findings as of 15 October 2026. This is a record for a later change, not a task list.
 
-`@nestjs/platform-node` is not published. Do not start the adapter migration, and do not build against the draft pull request, until the package ships in a Nest minor release. Two other changes can land before that: security headers, then moving the authenticated user off the Fastify request.
+`@nestjs/platform-node` is not published. Do not start the adapter migration, and do not build against the draft pull request, until the package ships in a Nest minor release. One other change can land before that: moving the authenticated user off the Fastify request.
 
 ## Leaving Fastify
 
@@ -17,8 +17,8 @@ const app = await NestFactory.create(AppModule, new NodeAdapter());
 That is not this app. `app.listen({ port, host })` in `src/main.ts` is fine on `node:http`. Everything else that assumes Fastify has to move with the adapter:
 
 - `FastifyAdapter` and `NestFastifyApplication` in `src/main.ts` and `test/support/create-app.e2e.ts`
-- `app.register()` for `@fastify/helmet` and `@fastify/cookie` in `src/app.configurator.ts` (`NodeAdapter` has no plugin `register`)
-- Direct dependencies `fastify`, `@nestjs/platform-fastify`, `@fastify/cookie`, `@fastify/helmet`, and the dev dependency `light-my-request`
+- `app.register()` for `@fastify/cookie` in `src/app.configurator.ts` (`NodeAdapter` has no plugin `register`)
+- Direct dependencies `fastify`, `@nestjs/platform-fastify`, `@fastify/cookie`, and the dev dependency `light-my-request`
 - `make sync-fastify`, `make versions`, and `ncu --reject fastify` in the Makefile, plus [`dependencies.md`](dependencies.md)
 
 Shopping controllers, Zod pipes, and Kysely do not import Fastify. They stay as they are.
@@ -50,11 +50,9 @@ Only `test/e2e/auth.e2e.spec.ts` and `resource-creator` depend on `light-my-requ
 
 ## Security headers
 
-`configureApp` registers `@fastify/helmet` with no options, so the app gets Helmet's defaults. Nothing in the tests checks those headers.
+`configureApp` calls [`app.useSecurityHeaders()`](https://docs.nestjs.com/security/helmet) with no options. Nest writes Helmet 8's default headers itself, on the Fastify adapter's `onRequest` hook. Nothing in the tests checks those headers.
 
-Nest 12.1, which this repo is on, can set the same defaults with [`app.useSecurityHeaders()`](https://docs.nestjs.com/security/helmet). It matches Helmet 8, works on the Fastify adapter as well as Express, and needs no extra package.
-
-Dropping `@fastify/helmet` for `useSecurityHeaders()` does not wait on `@nestjs/platform-node`. Do that first, while the app is still on Fastify.
+That call is already adapter-neutral, so the platform-node switch does not need another headers change.
 
 ## Async local storage
 

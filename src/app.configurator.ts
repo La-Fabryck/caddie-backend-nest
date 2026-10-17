@@ -1,5 +1,4 @@
 import { fastifyCookie } from '@fastify/cookie';
-import helmet from '@fastify/helmet';
 import { BadRequestException, StandardSchemaValidationPipe } from '@nestjs/common';
 import type { NestFastifyApplication } from '@nestjs/platform-fastify';
 
@@ -18,7 +17,7 @@ function issuePathKey(path: readonly (PropertyKey | { key: PropertyKey })[] | un
 }
 
 async function configureApp(app: NestFastifyApplication): Promise<void> {
-  await app.register(helmet);
+  app.useSecurityHeaders();
   await app.register(fastifyCookie);
 
   app.useGlobalPipes(
