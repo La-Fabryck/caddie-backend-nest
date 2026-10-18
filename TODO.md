@@ -2,7 +2,6 @@ Tech :
 
 Later'ish :
 
-- Small cache for users
 - CQRS architecture
 
 Later :
