@@ -55,6 +55,16 @@ E2e runs in an Alpine test container (see [`docker/app/e2e/`](docker/app/e2e/)):
 make ci-e2e
 ```
 
+## Version
+
+`npm version` bumps `package.json` and `package-lock.json`, commits, and tags. Existing tags are bare versions (`0.1.0` through `0.6.0`), so the prefix stays empty. `--allow-same-version` still runs when that version is already set. Replace `0.6.0` with the version to release:
+
+```bash
+npm version 0.6.0 --allow-same-version --tag-version-prefix=""
+```
+
+The working tree must be clean.
+
 ## Additional guides
 
 - Database dump and restore: [`docs/operations/database-dump.md`](docs/operations/database-dump.md)
