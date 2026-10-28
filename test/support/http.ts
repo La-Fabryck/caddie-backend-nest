@@ -10,17 +10,20 @@ type ParsedSetCookie = {
   maxAge?: number;
 };
 
+/** `Cookie` request header. Values are already decoded; do not encode them again. */
 function cookieHeader(cookies: Record<string, string>): string {
   return Object.entries(cookies)
     .map(([name, value]) => `${name}=${value}`)
     .join('; ');
 }
 
+/** Split on the first `=`. The remainder can contain `=` (`Max-Age=900`, a token). */
 function splitPair(value: string): [string, string] {
   const [key = '', ...rest] = value.split('=');
   return [key, rest.join('=')];
 }
 
+/** Nest percent-encodes cookie values. A bad `%` sequence stays raw. */
 function decodeCookieValue(value: string): string {
   if (!value.includes('%')) {
     return value;
@@ -32,6 +35,10 @@ function decodeCookieValue(value: string): string {
   }
 }
 
+/**
+ * One `Set-Cookie` attribute. `HttpOnly` and `Secure` are flags.
+ * `SameSite` is kept as sent (`Strict`), which is what the auth spec compares.
+ */
 function applyCookieAttribute(cookie: ParsedSetCookie, attribute: string): void {
   const [rawKey, rawValue] = splitPair(attribute);
   const key = rawKey.toLowerCase();
@@ -76,6 +83,10 @@ function parseSetCookie(header: string): ParsedSetCookie {
   return cookie;
 }
 
+/**
+ * Supertest types `set-cookie` loosely. At runtime it is one header string,
+ * or one string per cookie. Do not join them: a comma would split a value.
+ */
 function setCookieValues(header: unknown): string[] {
   if (typeof header === 'string') {
     return [header];
