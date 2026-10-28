@@ -1,4 +1,4 @@
-.PHONY: update update-dependencies update-lockfile install start ci-e2e e2e-up ci-e2e-down doctor-test sloc sloc-details reset-dev help
+.PHONY: update update-dependencies update-lockfile sync-cookie install start ci-e2e e2e-up ci-e2e-down doctor-test sloc sloc-details reset-dev help
 
 MAKEFLAGS += --no-print-directory
 
@@ -15,12 +15,13 @@ update:
 
 # Doctor: build once, stack up; each upgrade = lint + typecheck + build (host) + npm ci + exec test:e2e
 update-dependencies:
-	@echo "Doctor upgrade (lint + e2e gate)..."
+	@echo "Doctor upgrade (lint + e2e gate, cookie synced from platform-node)..."
 	@echo "Building e2e image and starting Docker stack..."
 	@$(E2E_COMPOSE) --progress quiet build test
 	@$(MAKE) e2e-up
-	@(npx --yes npm-check-updates --upgrade --interactive --doctor --doctorTest "make doctor-test" --format group; \
+	@(npx --yes npm-check-updates --upgrade --interactive --reject '/^(cookie|@types\/cookie)$$/' --doctor --doctorTest "make doctor-test" --format group; \
 		r=$$?; $(E2E_COMPOSE) --progress quiet down; exit $$r)
+	@$(MAKE) sync-cookie
 
 # Refresh lockfile only (package.json ranges), doctor gate, restore lock on failure
 update-lockfile:
@@ -31,6 +32,7 @@ update-lockfile:
 	@$(MAKE) e2e-up
 	@( \
 		npm install --package-lock-only --no-fund --no-audit && \
+		$(MAKE) sync-cookie && \
 		npm ci --prefer-offline --no-fund --no-audit && \
 		$(MAKE) doctor-test; \
 		r=$$?; \
@@ -59,6 +61,17 @@ e2e-up:
 	@$(E2E_COMPOSE) --progress quiet up -d postgres --wait
 	@$(STEP) migrate $(E2E_COMPOSE) --progress quiet run --rm --no-deps -T test npm run db:migrate:latest
 	@$(E2E_COMPOSE) --progress quiet up -d test --wait
+
+# Pin cookie to the version required by the platform-node range in package.json.
+# ncu ignores cookie; this follows Nest. cookie 2.x drops parse, so typecheck fails until readRequestCookie changes.
+sync-cookie:
+	@spec=$$(node -p "JSON.parse(require('node:fs').readFileSync('package.json','utf8')).dependencies['@nestjs/platform-node']"); \
+	version=$$(npm view "@nestjs/platform-node@$$spec" dependencies.cookie); \
+	test -n "$$version" && \
+	echo "Syncing cookie to: $$version" && \
+	npm install --save-exact --no-fund --no-audit --silent "cookie@$$version" && \
+	$(STEP) typecheck npm run typecheck && \
+	echo "cookie synced to: $$version"
 
 # Install dependencies
 install:
@@ -108,6 +121,7 @@ help:
 	@echo "  update-dependencies  - Doctor upgrade with lint + e2e gate; revert breaking bumps"
 	@echo "  update-lockfile      - Refresh lockfile only, doctor gate, restore lock on failure"
 	@echo "  doctor-test          - Single doctor gate step (typecheck/lint/build/e2e)"
+	@echo "  sync-cookie          - Pin cookie to the version @nestjs/platform-node depends on"
 	@echo "  start                - Postgres (Docker), then npm run start:dev on host"
 	@echo "  ci-e2e               - Build e2e image and run tests in Docker (one-shot)"
 	@echo "  ci-e2e-down          - Stop e2e stack"

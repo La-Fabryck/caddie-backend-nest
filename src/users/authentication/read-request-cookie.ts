@@ -1,10 +1,10 @@
-//TODO: Look at `parse` from the `cookie` package. This read stays in the guard, because `@Cookies()` only binds route parameters.
+import { parse } from 'cookie';
 
 type CookieHeader = string | string[] | undefined;
 
 /**
- * First value for `name` in a `Cookie` header. Percent-decodes, matching `@Cookies()`.
- * Pair shape is `name=value` with optional surrounding spaces. First match wins.
+ * First value for `name` in a `Cookie` header.
+ * `cookie.parse` matches `@Cookies()`: first pair wins, percent-decoded.
  */
 function readRequestCookie(header: CookieHeader, name: string): string | undefined {
   if (header == null) {
@@ -12,22 +12,7 @@ function readRequestCookie(header: CookieHeader, name: string): string | undefin
   }
 
   const source = Array.isArray(header) ? header.join('; ') : header;
-  const prefix = `${name}=`;
-  for (const part of source.split(';')) {
-    const token = part.trim();
-    if (!token.startsWith(prefix)) {
-      continue;
-    }
-
-    const raw = token.slice(prefix.length);
-    try {
-      return decodeURIComponent(raw);
-    } catch {
-      return raw;
-    }
-  }
-
-  return undefined;
+  return parse(source)[name];
 }
 
 export { readRequestCookie };

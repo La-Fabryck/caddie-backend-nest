@@ -1,12 +1,15 @@
 import { faker } from '@faker-js/faker';
 import { HttpStatus } from '@nestjs/common';
+import type { NestNodeApplication } from '@nestjs/platform-node';
+import request from 'supertest';
 import type { ErrorInterface } from '@/app.configurator';
 import type { ItemTypeRow } from '@/database/database-types';
 import { resourceCreator } from 'test/creator/resource-creator';
-import { createAppE2E, type E2EApplication } from 'test/support/create-app.e2e';
+import { createAppE2E } from 'test/support/create-app.e2e';
+import { cookieHeader } from 'test/support/http';
 
 describe('ItemTypeController (e2e)', () => {
-  let app: E2EApplication;
+  let app: NestNodeApplication;
 
   beforeAll(async () => {
     app = await createAppE2E();
@@ -21,15 +24,10 @@ describe('ItemTypeController (e2e)', () => {
       await using creator = await resourceCreator(app);
       const label = faker.commerce.department();
 
-      const result = await app.inject({
-        method: 'POST',
-        url: '/item-types',
-        body: { label },
-        cookies: creator.cookies,
-      });
+      const result = await request(app.getHttpServer()).post('/item-types').set('Cookie', cookieHeader(creator.cookies)).send({ label });
 
-      expect(result.statusCode).toEqual(HttpStatus.CREATED);
-      const payload = JSON.parse(result.payload) as ItemTypeRow;
+      expect(result.status).toEqual(HttpStatus.CREATED);
+      const payload = JSON.parse(result.text) as ItemTypeRow;
       expect(payload.id).toBeTruthy();
       expect(payload.label).toEqual(label);
       expect(payload.userId).toEqual(creator.user.id);
@@ -38,15 +36,10 @@ describe('ItemTypeController (e2e)', () => {
     it('KO - Fails validation', async () => {
       await using creator = await resourceCreator(app);
 
-      const result = await app.inject({
-        method: 'POST',
-        url: '/item-types',
-        body: {},
-        cookies: creator.cookies,
-      });
+      const result = await request(app.getHttpServer()).post('/item-types').set('Cookie', cookieHeader(creator.cookies)).send({});
 
-      expect(result.statusCode).toEqual(HttpStatus.BAD_REQUEST);
-      const payload = JSON.parse(result.payload) as ErrorInterface;
+      expect(result.status).toEqual(HttpStatus.BAD_REQUEST);
+      const payload = JSON.parse(result.text) as ErrorInterface;
       expect(payload).toStrictEqual({
         label: [{ message: 'ITEM_TYPE_LABEL' }],
       });
@@ -56,23 +49,13 @@ describe('ItemTypeController (e2e)', () => {
       await using creator = await resourceCreator(app);
       const label = faker.commerce.department();
 
-      const first = await app.inject({
-        method: 'POST',
-        url: '/item-types',
-        body: { label },
-        cookies: creator.cookies,
-      });
-      expect(first.statusCode).toEqual(HttpStatus.CREATED);
+      const first = await request(app.getHttpServer()).post('/item-types').set('Cookie', cookieHeader(creator.cookies)).send({ label });
+      expect(first.status).toEqual(HttpStatus.CREATED);
 
-      const result = await app.inject({
-        method: 'POST',
-        url: '/item-types',
-        body: { label },
-        cookies: creator.cookies,
-      });
+      const result = await request(app.getHttpServer()).post('/item-types').set('Cookie', cookieHeader(creator.cookies)).send({ label });
 
-      expect(result.statusCode).toEqual(HttpStatus.UNPROCESSABLE_ENTITY);
-      const payload = JSON.parse(result.payload) as ErrorInterface;
+      expect(result.status).toEqual(HttpStatus.UNPROCESSABLE_ENTITY);
+      const payload = JSON.parse(result.text) as ErrorInterface;
       expect(payload).toStrictEqual({
         label: [{ message: 'ITEM_TYPE_LABEL_NOT_UNIQUE' }],
       });
@@ -82,23 +65,16 @@ describe('ItemTypeController (e2e)', () => {
       await using creator = await resourceCreator(app);
       const label = 'Produce';
 
-      const first = await app.inject({
-        method: 'POST',
-        url: '/item-types',
-        body: { label },
-        cookies: creator.cookies,
-      });
-      expect(first.statusCode).toEqual(HttpStatus.CREATED);
+      const first = await request(app.getHttpServer()).post('/item-types').set('Cookie', cookieHeader(creator.cookies)).send({ label });
+      expect(first.status).toEqual(HttpStatus.CREATED);
 
-      const result = await app.inject({
-        method: 'POST',
-        url: '/item-types',
-        body: { label: label.toLowerCase() },
-        cookies: creator.cookies,
-      });
+      const result = await request(app.getHttpServer())
+        .post('/item-types')
+        .set('Cookie', cookieHeader(creator.cookies))
+        .send({ label: label.toLowerCase() });
 
-      expect(result.statusCode).toEqual(HttpStatus.UNPROCESSABLE_ENTITY);
-      const payload = JSON.parse(result.payload) as ErrorInterface;
+      expect(result.status).toEqual(HttpStatus.UNPROCESSABLE_ENTITY);
+      const payload = JSON.parse(result.text) as ErrorInterface;
       expect(payload).toStrictEqual({
         label: [{ message: 'ITEM_TYPE_LABEL_NOT_UNIQUE' }],
       });
@@ -110,27 +86,19 @@ describe('ItemTypeController (e2e)', () => {
       await using creator = await resourceCreator(app);
       await using outsider = await resourceCreator(app);
 
-      await app.inject({
-        method: 'POST',
-        url: '/item-types',
-        body: { label: faker.commerce.department() },
-        cookies: creator.cookies,
-      });
-      await app.inject({
-        method: 'POST',
-        url: '/item-types',
-        body: { label: faker.commerce.department() },
-        cookies: outsider.cookies,
-      });
+      await request(app.getHttpServer())
+        .post('/item-types')
+        .set('Cookie', cookieHeader(creator.cookies))
+        .send({ label: faker.commerce.department() });
+      await request(app.getHttpServer())
+        .post('/item-types')
+        .set('Cookie', cookieHeader(outsider.cookies))
+        .send({ label: faker.commerce.department() });
 
-      const result = await app.inject({
-        method: 'GET',
-        url: '/item-types',
-        cookies: creator.cookies,
-      });
+      const result = await request(app.getHttpServer()).get('/item-types').set('Cookie', cookieHeader(creator.cookies));
 
-      expect(result.statusCode).toEqual(HttpStatus.OK);
-      const payload = JSON.parse(result.payload) as ItemTypeRow[];
+      expect(result.status).toEqual(HttpStatus.OK);
+      const payload = JSON.parse(result.text) as ItemTypeRow[];
 
       const single = 1;
       expect(payload.length).toBe(single);
@@ -143,32 +111,26 @@ describe('ItemTypeController (e2e)', () => {
     it('KO - Rejects duplicate label on update', async () => {
       await using creator = await resourceCreator(app);
 
-      const first = await app.inject({
-        method: 'POST',
-        url: '/item-types',
-        body: { label: 'Dairy' },
-        cookies: creator.cookies,
-      });
-      expect(first.statusCode).toEqual(HttpStatus.CREATED);
+      const first = await request(app.getHttpServer())
+        .post('/item-types')
+        .set('Cookie', cookieHeader(creator.cookies))
+        .send({ label: 'Dairy' });
+      expect(first.status).toEqual(HttpStatus.CREATED);
 
-      const second = await app.inject({
-        method: 'POST',
-        url: '/item-types',
-        body: { label: 'Bakery' },
-        cookies: creator.cookies,
-      });
-      expect(second.statusCode).toEqual(HttpStatus.CREATED);
-      const secondType = JSON.parse(second.payload) as ItemTypeRow;
+      const second = await request(app.getHttpServer())
+        .post('/item-types')
+        .set('Cookie', cookieHeader(creator.cookies))
+        .send({ label: 'Bakery' });
+      expect(second.status).toEqual(HttpStatus.CREATED);
+      const secondType = JSON.parse(second.text) as ItemTypeRow;
 
-      const result = await app.inject({
-        method: 'PATCH',
-        url: `/item-types/${secondType.id}`,
-        body: { label: 'Dairy' },
-        cookies: creator.cookies,
-      });
+      const result = await request(app.getHttpServer())
+        .patch(`/item-types/${secondType.id}`)
+        .set('Cookie', cookieHeader(creator.cookies))
+        .send({ label: 'Dairy' });
 
-      expect(result.statusCode).toEqual(HttpStatus.UNPROCESSABLE_ENTITY);
-      const payload = JSON.parse(result.payload) as ErrorInterface;
+      expect(result.status).toEqual(HttpStatus.UNPROCESSABLE_ENTITY);
+      const payload = JSON.parse(result.text) as ErrorInterface;
       expect(payload).toStrictEqual({
         label: [{ message: 'ITEM_TYPE_LABEL_NOT_UNIQUE' }],
       });
@@ -178,43 +140,35 @@ describe('ItemTypeController (e2e)', () => {
       await using creator = await resourceCreator(app);
       await using outsider = await resourceCreator(app);
 
-      const createResult = await app.inject({
-        method: 'POST',
-        url: '/item-types',
-        body: { label: faker.commerce.department() },
-        cookies: outsider.cookies,
-      });
-      const outsiderType = JSON.parse(createResult.payload) as ItemTypeRow;
+      const createResult = await request(app.getHttpServer())
+        .post('/item-types')
+        .set('Cookie', cookieHeader(outsider.cookies))
+        .send({ label: faker.commerce.department() });
+      const outsiderType = JSON.parse(createResult.text) as ItemTypeRow;
 
-      const result = await app.inject({
-        method: 'PATCH',
-        url: `/item-types/${outsiderType.id}`,
-        body: { label: faker.commerce.department() },
-        cookies: creator.cookies,
-      });
+      const result = await request(app.getHttpServer())
+        .patch(`/item-types/${outsiderType.id}`)
+        .set('Cookie', cookieHeader(creator.cookies))
+        .send({ label: faker.commerce.department() });
 
-      expect(result.statusCode).toEqual(HttpStatus.NOT_FOUND);
+      expect(result.status).toEqual(HttpStatus.NOT_FOUND);
     });
 
     it('KO - Cannot delete another user type', async () => {
       await using creator = await resourceCreator(app);
       await using outsider = await resourceCreator(app);
 
-      const createResult = await app.inject({
-        method: 'POST',
-        url: '/item-types',
-        body: { label: faker.commerce.department() },
-        cookies: outsider.cookies,
-      });
-      const outsiderType = JSON.parse(createResult.payload) as ItemTypeRow;
+      const createResult = await request(app.getHttpServer())
+        .post('/item-types')
+        .set('Cookie', cookieHeader(outsider.cookies))
+        .send({ label: faker.commerce.department() });
+      const outsiderType = JSON.parse(createResult.text) as ItemTypeRow;
 
-      const result = await app.inject({
-        method: 'DELETE',
-        url: `/item-types/${outsiderType.id}`,
-        cookies: creator.cookies,
-      });
+      const result = await request(app.getHttpServer())
+        .delete(`/item-types/${outsiderType.id}`)
+        .set('Cookie', cookieHeader(creator.cookies));
 
-      expect(result.statusCode).toEqual(HttpStatus.NOT_FOUND);
+      expect(result.status).toEqual(HttpStatus.NOT_FOUND);
     });
   });
 });

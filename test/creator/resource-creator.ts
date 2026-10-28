@@ -1,3 +1,5 @@
+import type { NestNodeApplication } from '@nestjs/platform-node';
+import request from 'supertest';
 import type { ItemRow, UserRow } from '@/database/database-types';
 import { ItemService } from '@/shopping/item/item.service';
 import { ListService, type ListWithSubs } from '@/shopping/list/list.service';
@@ -5,7 +7,7 @@ import { UsersService } from '@/users/users/users.service';
 import { createManyItems } from 'test/factories/item';
 import { createManyLists } from 'test/factories/list';
 import { createUser } from '../factories/user';
-import type { E2EApplication, InjectResult } from '../support/inject-e2e';
+import { setCookies } from '../support/http';
 
 type ScenarioOptions = {
   quantity: number;
@@ -39,16 +41,6 @@ type ResourceCreator = {
 
 const scenarioDefaults: ScenarioOptions = { quantity: 0, remove: true };
 
-function stringifyCookieArray(cookies: InjectResult['cookies']): ResourceCreator['cookies'] {
-  const cookiesObject: Record<string, string> = {};
-
-  for (const cookie of cookies) {
-    cookiesObject[cookie.name] = cookie.value;
-  }
-
-  return cookiesObject;
-}
-
 /** First element or throw — keeps call sites typed without tuple generics. */
 function only<T>(values: readonly T[], label: string): T {
   const value = values[0];
@@ -65,7 +57,7 @@ function only<T>(values: readonly T[], label: string): T {
  * when iterating or looking up by id.
  */
 async function resourceCreator(
-  app: E2EApplication,
+  app: NestNodeApplication,
   {
     loginUser = true,
     list: { quantity: listsQuantity = 0, remove: removeLists = true } = scenarioDefaults,
@@ -82,13 +74,8 @@ async function resourceCreator(
 
   let cookies: ResourceCreator['cookies'] = {};
   if (loginUser) {
-    const { cookies: userAuth } = await app.inject({
-      method: 'POST',
-      url: '/authentication/login',
-      body: userPayload,
-    });
-
-    cookies = stringifyCookieArray(userAuth);
+    const login = await request(app.getHttpServer()).post('/authentication/login').send(userPayload);
+    cookies = Object.fromEntries(setCookies(login).map((cookie) => [cookie.name, cookie.value]));
   }
 
   const listService = app.get(ListService);

@@ -1,4 +1,4 @@
-import { parseSetCookie } from './inject-e2e';
+import { parseSetCookie } from './http';
 
 const MAX_AGE_SECONDS = 900;
 
