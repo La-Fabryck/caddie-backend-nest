@@ -1,7 +1,6 @@
 import { HttpStatus } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
-import type { NestFastifyApplication } from '@nestjs/platform-fastify';
 import type { ErrorInterface } from '@/app.configurator';
 import type { AuthConfig } from '@/config/auth.config';
 import { msDurationToSeconds } from '@/lib/zod/z-ms-duration';
@@ -9,14 +8,13 @@ import type { JwtPayload } from '@/users/authentication/authentication.service';
 import type { LoginDto } from '@/users/dto/login.dto';
 import { resourceCreator } from 'test/creator/resource-creator';
 import { createUser } from 'test/factories/user';
-import { createAppE2E } from 'test/support/create-app.e2e';
+import { createAppE2E, type E2EApplication } from 'test/support/create-app.e2e';
 
 describe('AuthenticationController (e2e)', () => {
-  let app: NestFastifyApplication;
+  let app: E2EApplication;
 
   beforeAll(async () => {
     app = await createAppE2E();
-    await app.getHttpAdapter().getInstance().ready();
   });
 
   afterAll(async () => {

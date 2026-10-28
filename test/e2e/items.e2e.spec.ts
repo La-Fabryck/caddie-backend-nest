@@ -1,6 +1,5 @@
 import { faker } from '@faker-js/faker';
 import { HttpStatus } from '@nestjs/common';
-import type { NestFastifyApplication } from '@nestjs/platform-fastify';
 import type { ErrorInterface } from '@/app.configurator';
 import type { ItemRow, ItemTypeRow } from '@/database/database-types';
 import type { CreateItemDto } from '@/shopping/dto/create-item.dto';
@@ -8,16 +7,15 @@ import type { UpdateItemDto } from '@/shopping/dto/update-item.dto';
 import { ItemService } from '@/shopping/item/item.service';
 import { resourceCreator } from 'test/creator/resource-creator';
 import { SINGLE } from 'test/support/constants';
-import { createAppE2E } from 'test/support/create-app.e2e';
+import { createAppE2E, type E2EApplication } from 'test/support/create-app.e2e';
 
 type ItemResponse = ItemRow & { itemType: Omit<ItemTypeRow, 'userId'> | null };
 
 describe('ItemController (e2e)', () => {
-  let app: NestFastifyApplication;
+  let app: E2EApplication;
 
   beforeAll(async () => {
     app = await createAppE2E();
-    await app.getHttpAdapter().getInstance().ready();
   });
 
   afterAll(async () => {

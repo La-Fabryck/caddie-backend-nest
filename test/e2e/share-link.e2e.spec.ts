@@ -1,6 +1,5 @@
 import { faker } from '@faker-js/faker';
 import { HttpStatus } from '@nestjs/common';
-import type { NestFastifyApplication } from '@nestjs/platform-fastify';
 import type { ErrorInterface } from '@/app.configurator';
 import type { ListRow, SubscriberRow } from '@/database/database-types';
 import { DatabaseService } from '@/database/database.service';
@@ -8,17 +7,16 @@ import type { ShareLinkResponse } from '@/shopping/dto/share-link-response.dto';
 import { ListService } from '@/shopping/list/list.service';
 import { resourceCreator } from 'test/creator/resource-creator';
 import { SINGLE } from 'test/support/constants';
-import { createAppE2E } from 'test/support/create-app.e2e';
+import { createAppE2E, type E2EApplication } from 'test/support/create-app.e2e';
 
 const INVALID_TOKEN_LENGTH = 40;
 const ONE_HOUR_MS = 3_600_000;
 
 describe('ShareLink / subscription (e2e)', () => {
-  let app: NestFastifyApplication;
+  let app: E2EApplication;
 
   beforeAll(async () => {
     app = await createAppE2E();
-    await app.getHttpAdapter().getInstance().ready();
   });
 
   afterAll(async () => {

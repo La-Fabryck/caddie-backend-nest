@@ -1,5 +1,3 @@
-import type { NestFastifyApplication } from '@nestjs/platform-fastify';
-import type { InjectOptions, Response } from 'light-my-request';
 import type { ItemRow, UserRow } from '@/database/database-types';
 import { ItemService } from '@/shopping/item/item.service';
 import { ListService, type ListWithSubs } from '@/shopping/list/list.service';
@@ -7,6 +5,7 @@ import { UsersService } from '@/users/users/users.service';
 import { createManyItems } from 'test/factories/item';
 import { createManyLists } from 'test/factories/list';
 import { createUser } from '../factories/user';
+import type { E2EApplication, InjectResult } from '../support/inject-e2e';
 
 type ScenarioOptions = {
   quantity: number;
@@ -34,13 +33,13 @@ type ResourceCreator = {
    * First created item. Throws if none exist — use after `items: { quantity: n }`.
    */
   item: ItemRow;
-  cookies: NonNullable<InjectOptions['cookies']>;
+  cookies: Record<string, string>;
   [Symbol.asyncDispose]: () => Promise<void>;
 };
 
 const scenarioDefaults: ScenarioOptions = { quantity: 0, remove: true };
 
-function stringifyCookieArray(cookies: Response['cookies']): ResourceCreator['cookies'] {
+function stringifyCookieArray(cookies: InjectResult['cookies']): ResourceCreator['cookies'] {
   const cookiesObject: Record<string, string> = {};
 
   for (const cookie of cookies) {
@@ -66,7 +65,7 @@ function only<T>(values: readonly T[], label: string): T {
  * when iterating or looking up by id.
  */
 async function resourceCreator(
-  app: NestFastifyApplication,
+  app: E2EApplication,
   {
     loginUser = true,
     list: { quantity: listsQuantity = 0, remove: removeLists = true } = scenarioDefaults,

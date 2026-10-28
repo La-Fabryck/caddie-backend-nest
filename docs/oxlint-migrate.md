@@ -12,7 +12,7 @@ Pre-commit ([Lefthook](https://github.com/evilmartians/lefthook)) ([`lefthook.ym
 
 Atomic scripts in `package.json`: `check:knip` / `check:oxfmt` / `check:oxlint` (read-only), `fix:oxfmt` / `fix:oxlint` (write + `--fix`). Top-level `npm run lint` / `npm run format` run the oxfmt/oxlint check/fix pair on `.`.
 
-Full-repo checks stay on `npm run lint` (Makefile `ncu-doctor-test`, `sync-fastify`, CI, etc.). Hooks install via lefthook’s postinstall on `npm ci` / `npm install` (`allowScripts.lefthook`: `true`).
+Full-repo checks stay on `npm run lint` (Makefile `doctor-test`, CI, etc.). Hooks install via lefthook’s postinstall on `npm ci` / `npm install` (`allowScripts.lefthook`: `true`).
 
 ## Configuration
 

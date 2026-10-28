@@ -1,17 +1,15 @@
 import { faker } from '@faker-js/faker';
 import { HttpStatus } from '@nestjs/common';
-import type { NestFastifyApplication } from '@nestjs/platform-fastify';
 import type { ErrorInterface } from '@/app.configurator';
 import type { ItemTypeRow } from '@/database/database-types';
 import { resourceCreator } from 'test/creator/resource-creator';
-import { createAppE2E } from 'test/support/create-app.e2e';
+import { createAppE2E, type E2EApplication } from 'test/support/create-app.e2e';
 
 describe('ItemTypeController (e2e)', () => {
-  let app: NestFastifyApplication;
+  let app: E2EApplication;
 
   beforeAll(async () => {
     app = await createAppE2E();
-    await app.getHttpAdapter().getInstance().ready();
   });
 
   afterAll(async () => {
