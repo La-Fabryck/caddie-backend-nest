@@ -1,8 +1,7 @@
-.PHONY: update update-dependencies update-lockfile sync-fastify install versions start ci-e2e e2e-up ci-e2e-down doctor-test sloc sloc-details reset-dev help
+.PHONY: update update-dependencies update-lockfile sync-cookie install start ci-e2e e2e-up ci-e2e-down doctor-test sloc sloc-details reset-dev help
 
 MAKEFLAGS += --no-print-directory
 
-NEST_FASTIFY_VERSION := $(shell npm info @nestjs/platform-fastify dependencies.fastify)
 E2E_ENV_FILE := $(if $(wildcard .env),--env-file .env,)
 E2E_COMPOSE := docker compose -p caddie-e2e $(E2E_ENV_FILE) -f docker/app/e2e/compose.yml
 
@@ -16,13 +15,12 @@ update:
 
 # Doctor: build once, stack up; each upgrade = lint + typecheck + build (host) + npm ci + exec test:e2e
 update-dependencies:
-	@echo "Doctor upgrade (lint + e2e gate, Fastify excluded)..."
+	@echo "Doctor upgrade (lint + e2e gate, cookie excluded)..."
 	@echo "Building e2e image and starting Docker stack..."
 	@$(E2E_COMPOSE) --progress quiet build test
 	@$(MAKE) e2e-up
-	@(npx --yes npm-check-updates --upgrade --interactive --reject fastify --doctor --doctorTest "make doctor-test" --format group; \
+	@(npx --yes npm-check-updates --upgrade --interactive --reject '/^(cookie|@types\/cookie)$$/' --doctor --doctorTest "make doctor-test" --format group; \
 		r=$$?; $(E2E_COMPOSE) --progress quiet down; exit $$r)
-	@$(MAKE) sync-fastify
 
 # Refresh lockfile only (package.json ranges), doctor gate, restore lock on failure
 update-lockfile:
@@ -33,7 +31,7 @@ update-lockfile:
 	@$(MAKE) e2e-up
 	@( \
 		npm install --package-lock-only --no-fund --no-audit && \
-		$(MAKE) sync-fastify && \
+		$(MAKE) sync-cookie && \
 		npm ci --prefer-offline --no-fund --no-audit && \
 		$(MAKE) doctor-test; \
 		r=$$?; \
@@ -63,13 +61,17 @@ e2e-up:
 	@$(STEP) migrate $(E2E_COMPOSE) --progress quiet run --rm --no-deps -T test npm run db:migrate:latest
 	@$(E2E_COMPOSE) --progress quiet up -d test --wait
 
-# Pin Fastify to @nestjs/platform-fastify, then lint and typecheck
-sync-fastify:
-	@echo "Syncing Fastify to: $(NEST_FASTIFY_VERSION)"
-	@npm install --no-fund --no-audit --silent fastify@$(NEST_FASTIFY_VERSION)
-	@$(STEP) typecheck npm run typecheck
-	@$(STEP) lint npm run lint
-	@echo "Fastify synced to: $(NEST_FASTIFY_VERSION)"
+# Pin cookie to the version required by the locked @nestjs/platform-node.
+# ncu ignores cookie. The lockfile wins over the package.json range, so a newer
+# 12.x on the registry cannot move cookie before this repo takes that release.
+# cookie 2.x drops parse, so typecheck fails until readRequestCookie changes.
+sync-cookie:
+	@version=$$(node -e 'const lock=JSON.parse(require("node:fs").readFileSync("package-lock.json","utf8")); const platform=lock.packages["node_modules/@nestjs/platform-node"]; const cookie=platform&&platform.dependencies&&platform.dependencies.cookie; if(!cookie){console.error("locked @nestjs/platform-node has no cookie dependency"); process.exit(1)} process.stdout.write(String(cookie))'); \
+	test -n "$$version" && \
+	echo "Syncing cookie to: $$version" && \
+	npm install --save-exact --no-fund --no-audit --silent "cookie@$$version" && \
+	$(STEP) typecheck npm run typecheck && \
+	echo "cookie synced to: $$version"
 
 # Install dependencies
 install:
@@ -80,11 +82,6 @@ install:
 	npm ci --prefer-offline
 	@echo "Build e2e test image"
 	$(E2E_COMPOSE) build test
-
-# Check current versions
-versions:
-	@echo "NestJS requires Fastify: $(NEST_FASTIFY_VERSION)"
-	npm list fastify @nestjs/platform-fastify fastify-plugin
 
 # Postgres (Docker) + Nest on host
 start:
@@ -124,8 +121,7 @@ help:
 	@echo "  update-dependencies  - Doctor upgrade with lint + e2e gate; revert breaking bumps"
 	@echo "  update-lockfile      - Refresh lockfile only, doctor gate, restore lock on failure"
 	@echo "  doctor-test          - Single doctor gate step (typecheck/lint/build/e2e)"
-	@echo "  sync-fastify         - Just sync Fastify version without other updates"
-	@echo "  versions             - Show current Fastify package versions"
+	@echo "  sync-cookie          - Pin cookie to the version locked platform-node depends on"
 	@echo "  start                - Postgres (Docker), then npm run start:dev on host"
 	@echo "  ci-e2e               - Build e2e image and run tests in Docker (one-shot)"
 	@echo "  ci-e2e-down          - Stop e2e stack"

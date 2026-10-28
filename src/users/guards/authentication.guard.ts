@@ -1,10 +1,10 @@
 import { type CanActivate, type ExecutionContext, Injectable, Logger, UnauthorizedException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { JwtService, TokenExpiredError } from '@nestjs/jwt';
-import type { FastifyRequest } from 'fastify';
 import type { AuthConfig } from '@/config/auth.config';
 import { authStorage } from '../authentication/auth-storage';
 import type { JwtPayload } from '../authentication/authentication.service';
+import { readRequestCookie } from '../authentication/read-request-cookie';
 import { invalidTokenError } from '../utils/auth-error-bodies';
 import { formatErrorForLog } from '../utils/format-error-for-log';
 
@@ -21,10 +21,8 @@ export class AuthenticationGuard implements CanActivate {
   }
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
-    const request: FastifyRequest = context.switchToHttp().getRequest();
-    const cookieKey = this.auth.accessCookieName;
-
-    const token = request.cookies[cookieKey] ?? null;
+    const request = context.switchToHttp().getRequest<{ headers: { cookie?: string | string[] } }>();
+    const token = readRequestCookie(request.headers.cookie, this.auth.accessCookieName) ?? null;
     if (token == null) {
       this.logger.warn('Access token cookie is missing');
       throw new UnauthorizedException(invalidTokenError);

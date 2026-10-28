@@ -1,6 +1,4 @@
-import { fastifyCookie } from '@fastify/cookie';
-import { BadRequestException, StandardSchemaValidationPipe } from '@nestjs/common';
-import type { NestFastifyApplication } from '@nestjs/platform-fastify';
+import { BadRequestException, type INestApplication, StandardSchemaValidationPipe } from '@nestjs/common';
 
 type ErrorInterfaceBody = { message: string };
 export type ErrorInterface = Record<string, ErrorInterfaceBody[]>;
@@ -16,9 +14,8 @@ function issuePathKey(path: readonly (PropertyKey | { key: PropertyKey })[] | un
   return path.map((segment) => String(typeof segment === 'object' ? segment.key : segment)).join('.');
 }
 
-async function configureApp(app: NestFastifyApplication): Promise<void> {
+function configureApp(app: INestApplication): void {
   app.useSecurityHeaders();
-  await app.register(fastifyCookie);
 
   app.useGlobalPipes(
     new StandardSchemaValidationPipe({

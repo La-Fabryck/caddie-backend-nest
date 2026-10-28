@@ -1,7 +1,17 @@
-import type { CookieSerializeOptions } from '@fastify/cookie';
-import { Body, Controller, Get, HttpCode, HttpStatus, Post, Req, Res, UnauthorizedException } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Cookies,
+  type CookieSerializeOptions,
+  Get,
+  HttpCode,
+  HttpStatus,
+  Post,
+  Res,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import type { FastifyReply, FastifyRequest } from 'fastify';
+import { HttpAdapterHost } from '@nestjs/core';
 import type { AuthConfig } from '@/config/auth.config';
 import { msDurationToSeconds } from '@/lib/zod/z-ms-duration';
 import { type LoginDto, loginSchema } from '../dto/login.dto';
@@ -17,6 +27,7 @@ export class AuthenticationController {
   constructor(
     configService: ConfigService,
     private readonly authentificationService: AuthenticationService,
+    private readonly httpAdapterHost: HttpAdapterHost,
   ) {
     this.auth = configService.getOrThrow<AuthConfig>('auth');
     this.accessCookieOptions = this.sessionCookieOptions(msDurationToSeconds(this.auth.accessTokenTtl));
@@ -25,41 +36,41 @@ export class AuthenticationController {
 
   @HttpCode(HttpStatus.OK)
   @Post('login')
-  async login(@Body({ schema: loginSchema }) loginDto: LoginDto, @Res() reply: FastifyReply): Promise<FastifyReply> {
+  async login(@Body({ schema: loginSchema }) loginDto: LoginDto, @Res({ passthrough: true }) response: unknown): Promise<void> {
     const { accessToken, refreshToken } = await this.authentificationService.login(loginDto);
-
-    return reply
-      .cookie(this.auth.accessCookieName, accessToken, this.accessCookieOptions)
-      .cookie(this.auth.refreshCookieName, refreshToken, this.refreshCookieOptions)
-      .send();
+    this.setSessionCookies(response, accessToken, refreshToken);
   }
 
   @HttpCode(HttpStatus.OK)
   @Post('refresh')
-  async refresh(@Req() request: FastifyRequest, @Res() reply: FastifyReply): Promise<FastifyReply> {
-    const refreshToken = request.cookies[this.auth.refreshCookieName];
+  async refresh(@Cookies() cookies: Record<string, string>, @Res({ passthrough: true }) response: unknown): Promise<void> {
+    const refreshToken = cookies[this.auth.refreshCookieName];
 
     if (refreshToken == null) {
       throw new UnauthorizedException(invalidTokenError);
     }
 
     const tokens = await this.authentificationService.refresh(refreshToken);
-
-    return reply
-      .cookie(this.auth.accessCookieName, tokens.accessToken, this.accessCookieOptions)
-      .cookie(this.auth.refreshCookieName, tokens.refreshToken, this.refreshCookieOptions)
-      .send();
+    this.setSessionCookies(response, tokens.accessToken, tokens.refreshToken);
   }
 
   @Get('logout')
-  async logout(@Res({ passthrough: true }) reply: FastifyReply): Promise<FastifyReply> {
-    return reply.clearCookie(this.auth.accessCookieName).clearCookie(this.auth.refreshCookieName).send();
+  logout(@Res({ passthrough: true }) response: unknown): void {
+    const { httpAdapter } = this.httpAdapterHost;
+    httpAdapter.clearCookie(response, this.auth.accessCookieName, { path: '/' });
+    httpAdapter.clearCookie(response, this.auth.refreshCookieName, { path: '/' });
+  }
+
+  private setSessionCookies(response: unknown, accessToken: string, refreshToken: string): void {
+    const { httpAdapter } = this.httpAdapterHost;
+    httpAdapter.setCookie(response, this.auth.accessCookieName, accessToken, this.accessCookieOptions);
+    httpAdapter.setCookie(response, this.auth.refreshCookieName, refreshToken, this.refreshCookieOptions);
   }
 
   private sessionCookieOptions(maxAge: number): CookieSerializeOptions {
     return {
       httpOnly: true,
-      sameSite: true,
+      sameSite: 'strict',
       secure: true,
       path: '/',
       maxAge,

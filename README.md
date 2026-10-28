@@ -70,7 +70,7 @@ The working tree must be clean.
 - Database dump and restore: [`docs/operations/database-dump.md`](docs/operations/database-dump.md)
 - Docker cleanup and dev reset: [`docs/operations/docker-clean-reset.md`](docs/operations/docker-clean-reset.md)
 - Production startup simulation: [`docs/operations/production-simulation.md`](docs/operations/production-simulation.md)
-- Dependency and Fastify compatibility: [`docs/development/dependencies.md`](docs/development/dependencies.md)
+- Dependency updates: [`docs/development/dependencies.md`](docs/development/dependencies.md)
 - HTTP adapter notes: [`docs/development/platform-node.md`](docs/development/platform-node.md)
 - Testing and debugger usage: [`docs/development/testing.md`](docs/development/testing.md)
 - Authentication tokens (access + refresh cookies): [`docs/authentication-tokens.md`](docs/authentication-tokens.md)

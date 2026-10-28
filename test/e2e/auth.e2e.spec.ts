@@ -1,7 +1,8 @@
 import { HttpStatus } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
-import type { NestFastifyApplication } from '@nestjs/platform-fastify';
+import type { NestNodeApplication } from '@nestjs/platform-node';
+import request from 'supertest';
 import type { ErrorInterface } from '@/app.configurator';
 import type { AuthConfig } from '@/config/auth.config';
 import { msDurationToSeconds } from '@/lib/zod/z-ms-duration';
@@ -10,13 +11,13 @@ import type { LoginDto } from '@/users/dto/login.dto';
 import { resourceCreator } from 'test/creator/resource-creator';
 import { createUser } from 'test/factories/user';
 import { createAppE2E } from 'test/support/create-app.e2e';
+import { cookieHeader, setCookies } from 'test/support/http';
 
 describe('AuthenticationController (e2e)', () => {
-  let app: NestFastifyApplication;
+  let app: NestNodeApplication;
 
   beforeAll(async () => {
     app = await createAppE2E();
-    await app.getHttpAdapter().getInstance().ready();
   });
 
   afterAll(async () => {
@@ -27,18 +28,14 @@ describe('AuthenticationController (e2e)', () => {
     await using creator = await resourceCreator(app, { loginUser: false });
     const login: LoginDto = creator.user;
 
-    const result = await app.inject({
-      method: 'POST',
-      url: '/authentication/login',
-      body: login,
-    });
+    const result = await request(app.getHttpServer()).post('/authentication/login').send(login);
 
-    expect(result.statusCode).toEqual(HttpStatus.OK);
+    expect(result.status).toEqual(HttpStatus.OK);
 
-    expect(result.payload).toBeFalsy();
+    expect(result.text).toBeFalsy();
 
     const auth = app.get(ConfigService).getOrThrow<AuthConfig>('auth');
-    const accessCookie = result.cookies.find((cookie) => cookie.name === 'SESSION_ID');
+    const accessCookie = setCookies(result).find((cookie) => cookie.name === 'SESSION_ID');
     expect(accessCookie).not.toBeFalsy();
     expect(accessCookie?.httpOnly).toBe(true);
     expect(accessCookie?.sameSite).toBe('Strict');
@@ -46,7 +43,7 @@ describe('AuthenticationController (e2e)', () => {
     expect(accessCookie?.['path']).toBe('/');
     expect(accessCookie?.maxAge).toBe(msDurationToSeconds(auth.accessTokenTtl));
 
-    const refreshCookie = result.cookies.find((cookie) => cookie.name === 'SESSION_REFRESH_ID');
+    const refreshCookie = setCookies(result).find((cookie) => cookie.name === 'SESSION_REFRESH_ID');
     expect(refreshCookie).not.toBeFalsy();
     expect(refreshCookie?.httpOnly).toBe(true);
     expect(refreshCookie?.sameSite).toBe('Strict');
@@ -63,31 +60,28 @@ describe('AuthenticationController (e2e)', () => {
     await using creator = await resourceCreator(app, { loginUser: false });
     const login: LoginDto = creator.user;
 
-    const loginResult = await app.inject({
-      method: 'POST',
-      url: '/authentication/login',
-      body: login,
-    });
+    const loginResult = await request(app.getHttpServer()).post('/authentication/login').send(login);
 
-    const loginAccessCookie = loginResult.cookies.find((cookie) => cookie.name === 'SESSION_ID');
-    const refreshCookie = loginResult.cookies.find((cookie) => cookie.name === 'SESSION_REFRESH_ID');
+    const loginAccessCookie = setCookies(loginResult).find((cookie) => cookie.name === 'SESSION_ID');
+    const refreshCookie = setCookies(loginResult).find((cookie) => cookie.name === 'SESSION_REFRESH_ID');
     expect(loginAccessCookie).not.toBeFalsy();
     expect(refreshCookie).not.toBeFalsy();
 
     const refreshTokenBefore = refreshCookie?.value ?? '';
 
-    const result = await app.inject({
-      method: 'POST',
-      url: '/authentication/refresh',
-      cookies: {
-        SESSION_REFRESH_ID: refreshTokenBefore,
-      },
-    });
+    const result = await request(app.getHttpServer())
+      .post('/authentication/refresh')
+      .set(
+        'Cookie',
+        cookieHeader({
+          SESSION_REFRESH_ID: refreshTokenBefore,
+        }),
+      );
 
-    expect(result.statusCode).toEqual(HttpStatus.OK);
+    expect(result.status).toEqual(HttpStatus.OK);
 
-    const accessCookieAfter = result.cookies.find((cookie) => cookie.name === 'SESSION_ID');
-    const refreshCookieAfter = result.cookies.find((cookie) => cookie.name === 'SESSION_REFRESH_ID');
+    const accessCookieAfter = setCookies(result).find((cookie) => cookie.name === 'SESSION_ID');
+    const refreshCookieAfter = setCookies(result).find((cookie) => cookie.name === 'SESSION_REFRESH_ID');
     expect(accessCookieAfter).not.toBeFalsy();
     expect(refreshCookieAfter).not.toBeFalsy();
 
@@ -107,40 +101,29 @@ describe('AuthenticationController (e2e)', () => {
   });
 
   it('/authentication/login (POST) - KO - Fails validation', async () => {
-    const result = await app.inject({
-      method: 'POST',
-      url: '/authentication/login',
-      body: {},
-    });
+    const result = await request(app.getHttpServer()).post('/authentication/login').send({});
 
-    expect(result.statusCode).toEqual(HttpStatus.BAD_REQUEST);
+    expect(result.status).toEqual(HttpStatus.BAD_REQUEST);
 
-    const response = JSON.parse(result.body) as ErrorInterface;
+    const response = JSON.parse(result.text) as ErrorInterface;
     expect(response).toStrictEqual({ email: [{ message: 'INVALID_EMAIL' }], password: [{ message: 'INVALID_PASSWORD' }] });
   });
 
   it('/authentication/login (POST) - KO - User does not exists', async () => {
-    const result = await app.inject({
-      method: 'POST',
-      url: '/authentication/login',
-      body: createUser(),
-    });
+    const result = await request(app.getHttpServer()).post('/authentication/login').send(createUser());
 
-    expect(result.statusCode).toEqual(HttpStatus.UNAUTHORIZED);
+    expect(result.status).toEqual(HttpStatus.UNAUTHORIZED);
 
-    const response = JSON.parse(result.body) as ErrorInterface;
+    const response = JSON.parse(result.text) as ErrorInterface;
     expect(response).toStrictEqual({ root: [{ message: 'INVALID_LOGIN' }] });
   });
 
   it('/authentication/refresh (POST) - KO - Missing refresh cookie', async () => {
-    const result = await app.inject({
-      method: 'POST',
-      url: '/authentication/refresh',
-    });
+    const result = await request(app.getHttpServer()).post('/authentication/refresh');
 
-    expect(result.statusCode).toEqual(HttpStatus.UNAUTHORIZED);
+    expect(result.status).toEqual(HttpStatus.UNAUTHORIZED);
 
-    const response = JSON.parse(result.body) as ErrorInterface;
+    const response = JSON.parse(result.text) as ErrorInterface;
     expect(response).toStrictEqual({ root: [{ message: 'INVALID_TOKEN' }] });
   });
 });

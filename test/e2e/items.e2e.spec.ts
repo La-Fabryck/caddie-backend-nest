@@ -1,6 +1,7 @@
 import { faker } from '@faker-js/faker';
 import { HttpStatus } from '@nestjs/common';
-import type { NestFastifyApplication } from '@nestjs/platform-fastify';
+import type { NestNodeApplication } from '@nestjs/platform-node';
+import request from 'supertest';
 import type { ErrorInterface } from '@/app.configurator';
 import type { ItemRow, ItemTypeRow } from '@/database/database-types';
 import type { CreateItemDto } from '@/shopping/dto/create-item.dto';
@@ -9,15 +10,15 @@ import { ItemService } from '@/shopping/item/item.service';
 import { resourceCreator } from 'test/creator/resource-creator';
 import { SINGLE } from 'test/support/constants';
 import { createAppE2E } from 'test/support/create-app.e2e';
+import { cookieHeader } from 'test/support/http';
 
 type ItemResponse = ItemRow & { itemType: Omit<ItemTypeRow, 'userId'> | null };
 
 describe('ItemController (e2e)', () => {
-  let app: NestFastifyApplication;
+  let app: NestNodeApplication;
 
   beforeAll(async () => {
     app = await createAppE2E();
-    await app.getHttpAdapter().getInstance().ready();
   });
 
   afterAll(async () => {
@@ -33,15 +34,13 @@ describe('ItemController (e2e)', () => {
         name: faker.food.ingredient(),
       };
 
-      const result = await app.inject({
-        method: 'POST',
-        url: `/list/${storedList.id}/items`,
-        body: item,
-        cookies: creator.cookies,
-      });
-      expect(result.statusCode).toEqual(HttpStatus.CREATED);
+      const result = await request(app.getHttpServer())
+        .post(`/list/${storedList.id}/items`)
+        .set('Cookie', cookieHeader(creator.cookies))
+        .send(item);
+      expect(result.status).toEqual(HttpStatus.CREATED);
 
-      const payload = JSON.parse(result.payload) as ItemRow;
+      const payload = JSON.parse(result.text) as ItemRow;
       expect(payload.name).toEqual(item.name);
       expect(payload.isInCart).toEqual(false);
       expect(payload.listId).toEqual(storedList.id);
@@ -50,27 +49,21 @@ describe('ItemController (e2e)', () => {
     });
 
     it('KO - User not authenticated', async () => {
-      const result = await app.inject({
-        method: 'POST',
-        url: `/list/${faker.string.uuid()}/items`,
-        body: {},
-      });
+      const result = await request(app.getHttpServer()).post(`/list/${faker.string.uuid()}/items`).send({});
 
-      expect(result.statusCode).toEqual(HttpStatus.UNAUTHORIZED);
+      expect(result.status).toEqual(HttpStatus.UNAUTHORIZED);
     });
 
     it('KO - Fails validation', async () => {
       await using creator = await resourceCreator(app);
 
-      const result = await app.inject({
-        method: 'POST',
-        url: `/list/${faker.string.uuid()}/items`,
-        body: {},
-        cookies: creator.cookies,
-      });
-      expect(result.statusCode).toEqual(HttpStatus.BAD_REQUEST);
+      const result = await request(app.getHttpServer())
+        .post(`/list/${faker.string.uuid()}/items`)
+        .set('Cookie', cookieHeader(creator.cookies))
+        .send({});
+      expect(result.status).toEqual(HttpStatus.BAD_REQUEST);
 
-      const payload = JSON.parse(result.payload) as ErrorInterface;
+      const payload = JSON.parse(result.text) as ErrorInterface;
       expect(payload).toStrictEqual({
         name: [{ message: 'ITEM_NAME' }],
       });
@@ -86,15 +79,13 @@ describe('ItemController (e2e)', () => {
         quantity,
       };
 
-      const result = await app.inject({
-        method: 'POST',
-        url: `/list/${storedList.id}/items`,
-        body: item,
-        cookies: creator.cookies,
-      });
-      expect(result.statusCode).toEqual(HttpStatus.CREATED);
+      const result = await request(app.getHttpServer())
+        .post(`/list/${storedList.id}/items`)
+        .set('Cookie', cookieHeader(creator.cookies))
+        .send(item);
+      expect(result.status).toEqual(HttpStatus.CREATED);
 
-      const payload = JSON.parse(result.payload) as ItemRow;
+      const payload = JSON.parse(result.text) as ItemRow;
       expect(payload.quantity).toEqual(quantity);
       expect(payload.name).toEqual(item.name);
       expect(payload.isInCart).toEqual(false);
@@ -104,28 +95,24 @@ describe('ItemController (e2e)', () => {
       await using creator = await resourceCreator(app, { list: { quantity: SINGLE } });
       const storedList = creator.list;
 
-      const typeResult = await app.inject({
-        method: 'POST',
-        url: '/item-types',
-        body: { label: faker.commerce.department() },
-        cookies: creator.cookies,
-      });
-      expect(typeResult.statusCode).toEqual(HttpStatus.CREATED);
+      const typeResult = await request(app.getHttpServer())
+        .post('/item-types')
+        .set('Cookie', cookieHeader(creator.cookies))
+        .send({ label: faker.commerce.department() });
+      expect(typeResult.status).toEqual(HttpStatus.CREATED);
 
-      const itemType = JSON.parse(typeResult.payload) as ItemTypeRow;
+      const itemType = JSON.parse(typeResult.text) as ItemTypeRow;
 
-      const result = await app.inject({
-        method: 'POST',
-        url: `/list/${storedList.id}/items`,
-        body: {
+      const result = await request(app.getHttpServer())
+        .post(`/list/${storedList.id}/items`)
+        .set('Cookie', cookieHeader(creator.cookies))
+        .send({
           name: faker.food.ingredient(),
           itemTypeId: itemType.id,
-        } satisfies CreateItemDto,
-        cookies: creator.cookies,
-      });
-      expect(result.statusCode).toEqual(HttpStatus.CREATED);
+        } satisfies CreateItemDto);
+      expect(result.status).toEqual(HttpStatus.CREATED);
 
-      const payload = JSON.parse(result.payload) as ItemResponse;
+      const payload = JSON.parse(result.text) as ItemResponse;
       expect(payload.itemType?.id).toStrictEqual(itemType.id);
       expect(payload.itemType?.label).toStrictEqual(itemType.label);
     });
@@ -139,15 +126,13 @@ describe('ItemController (e2e)', () => {
         itemTypeId: null,
       };
 
-      const result = await app.inject({
-        method: 'POST',
-        url: `/list/${storedList.id}/items`,
-        body: item,
-        cookies: creator.cookies,
-      });
-      expect(result.statusCode).toEqual(HttpStatus.CREATED);
+      const result = await request(app.getHttpServer())
+        .post(`/list/${storedList.id}/items`)
+        .set('Cookie', cookieHeader(creator.cookies))
+        .send(item);
+      expect(result.status).toEqual(HttpStatus.CREATED);
 
-      const payload = JSON.parse(result.payload) as ItemResponse;
+      const payload = JSON.parse(result.text) as ItemResponse;
       expect(payload.name).toEqual(item.name);
       expect(payload.quantity).toEqual(SINGLE);
       expect(payload.itemType).toBeNull();
@@ -158,27 +143,23 @@ describe('ItemController (e2e)', () => {
       await using outsider = await resourceCreator(app);
       const storedList = creator.list;
 
-      const typeResult = await app.inject({
-        method: 'POST',
-        url: '/item-types',
-        body: { label: faker.commerce.department() },
-        cookies: outsider.cookies,
-      });
-      expect(typeResult.statusCode).toEqual(HttpStatus.CREATED);
+      const typeResult = await request(app.getHttpServer())
+        .post('/item-types')
+        .set('Cookie', cookieHeader(outsider.cookies))
+        .send({ label: faker.commerce.department() });
+      expect(typeResult.status).toEqual(HttpStatus.CREATED);
 
-      const outsiderType = JSON.parse(typeResult.payload) as ItemTypeRow;
+      const outsiderType = JSON.parse(typeResult.text) as ItemTypeRow;
 
-      const result = await app.inject({
-        method: 'POST',
-        url: `/list/${storedList.id}/items`,
-        body: {
+      const result = await request(app.getHttpServer())
+        .post(`/list/${storedList.id}/items`)
+        .set('Cookie', cookieHeader(creator.cookies))
+        .send({
           name: faker.food.ingredient(),
           itemTypeId: outsiderType.id,
-        } satisfies CreateItemDto,
-        cookies: creator.cookies,
-      });
+        } satisfies CreateItemDto);
 
-      expect(result.statusCode).toEqual(HttpStatus.NOT_FOUND);
+      expect(result.status).toEqual(HttpStatus.NOT_FOUND);
     });
 
     it('KO - Rejects duplicate item name on the same list', async () => {
@@ -186,16 +167,14 @@ describe('ItemController (e2e)', () => {
       const storedList = creator.list;
       const existingName = creator.item.name;
 
-      const result = await app.inject({
-        method: 'POST',
-        url: `/list/${storedList.id}/items`,
-        body: { name: existingName } satisfies CreateItemDto,
-        cookies: creator.cookies,
-      });
+      const result = await request(app.getHttpServer())
+        .post(`/list/${storedList.id}/items`)
+        .set('Cookie', cookieHeader(creator.cookies))
+        .send({ name: existingName } satisfies CreateItemDto);
 
-      expect(result.statusCode).toEqual(HttpStatus.UNPROCESSABLE_ENTITY);
+      expect(result.status).toEqual(HttpStatus.UNPROCESSABLE_ENTITY);
 
-      const payload = JSON.parse(result.payload) as ErrorInterface;
+      const payload = JSON.parse(result.text) as ErrorInterface;
       expect(payload).toStrictEqual({
         name: [{ message: 'ITEM_NAME_NOT_UNIQUE' }],
       });
@@ -206,24 +185,20 @@ describe('ItemController (e2e)', () => {
       const storedList = creator.list;
       const name = 'Tomatoes';
 
-      const first = await app.inject({
-        method: 'POST',
-        url: `/list/${storedList.id}/items`,
-        body: { name } satisfies CreateItemDto,
-        cookies: creator.cookies,
-      });
-      expect(first.statusCode).toEqual(HttpStatus.CREATED);
+      const first = await request(app.getHttpServer())
+        .post(`/list/${storedList.id}/items`)
+        .set('Cookie', cookieHeader(creator.cookies))
+        .send({ name } satisfies CreateItemDto);
+      expect(first.status).toEqual(HttpStatus.CREATED);
 
-      const result = await app.inject({
-        method: 'POST',
-        url: `/list/${storedList.id}/items`,
-        body: { name: name.toLowerCase() } satisfies CreateItemDto,
-        cookies: creator.cookies,
-      });
+      const result = await request(app.getHttpServer())
+        .post(`/list/${storedList.id}/items`)
+        .set('Cookie', cookieHeader(creator.cookies))
+        .send({ name: name.toLowerCase() } satisfies CreateItemDto);
 
-      expect(result.statusCode).toEqual(HttpStatus.UNPROCESSABLE_ENTITY);
+      expect(result.status).toEqual(HttpStatus.UNPROCESSABLE_ENTITY);
 
-      const payload = JSON.parse(result.payload) as ErrorInterface;
+      const payload = JSON.parse(result.text) as ErrorInterface;
       expect(payload).toStrictEqual({
         name: [{ message: 'ITEM_NAME_NOT_UNIQUE' }],
       });
@@ -238,38 +213,32 @@ describe('ItemController (e2e)', () => {
       }
       const name = faker.food.ingredient();
 
-      const first = await app.inject({
-        method: 'POST',
-        url: `/list/${firstList.id}/items`,
-        body: { name } satisfies CreateItemDto,
-        cookies: creator.cookies,
-      });
-      expect(first.statusCode).toEqual(HttpStatus.CREATED);
+      const first = await request(app.getHttpServer())
+        .post(`/list/${firstList.id}/items`)
+        .set('Cookie', cookieHeader(creator.cookies))
+        .send({ name } satisfies CreateItemDto);
+      expect(first.status).toEqual(HttpStatus.CREATED);
 
-      const second = await app.inject({
-        method: 'POST',
-        url: `/list/${secondList.id}/items`,
-        body: { name } satisfies CreateItemDto,
-        cookies: creator.cookies,
-      });
-      expect(second.statusCode).toEqual(HttpStatus.CREATED);
+      const second = await request(app.getHttpServer())
+        .post(`/list/${secondList.id}/items`)
+        .set('Cookie', cookieHeader(creator.cookies))
+        .send({ name } satisfies CreateItemDto);
+      expect(second.status).toEqual(HttpStatus.CREATED);
     });
 
     it('KO - Fails validation for quantity - Zero', async () => {
       await using creator = await resourceCreator(app);
 
-      const result = await app.inject({
-        method: 'POST',
-        url: `/list/${faker.string.uuid()}/items`,
-        body: {
+      const result = await request(app.getHttpServer())
+        .post(`/list/${faker.string.uuid()}/items`)
+        .set('Cookie', cookieHeader(creator.cookies))
+        .send({
           name: faker.food.ingredient(),
           quantity: 0,
-        },
-        cookies: creator.cookies,
-      });
-      expect(result.statusCode).toEqual(HttpStatus.BAD_REQUEST);
+        });
+      expect(result.status).toEqual(HttpStatus.BAD_REQUEST);
 
-      const payload = JSON.parse(result.payload) as ErrorInterface;
+      const payload = JSON.parse(result.text) as ErrorInterface;
       expect(payload).toStrictEqual({
         quantity: [{ message: 'ITEM_QUANTITY' }],
       });
@@ -278,18 +247,16 @@ describe('ItemController (e2e)', () => {
     it('KO - Fails validation for quantity - Float', async () => {
       await using creator = await resourceCreator(app);
 
-      const result = await app.inject({
-        method: 'POST',
-        url: `/list/${faker.string.uuid()}/items`,
-        body: {
+      const result = await request(app.getHttpServer())
+        .post(`/list/${faker.string.uuid()}/items`)
+        .set('Cookie', cookieHeader(creator.cookies))
+        .send({
           name: faker.food.ingredient(),
           quantity: 1.5,
-        },
-        cookies: creator.cookies,
-      });
-      expect(result.statusCode).toEqual(HttpStatus.BAD_REQUEST);
+        });
+      expect(result.status).toEqual(HttpStatus.BAD_REQUEST);
 
-      const payload = JSON.parse(result.payload) as ErrorInterface;
+      const payload = JSON.parse(result.text) as ErrorInterface;
       expect(payload).toStrictEqual({
         quantity: [{ message: 'ITEM_QUANTITY' }],
       });
@@ -304,15 +271,11 @@ describe('ItemController (e2e)', () => {
       });
       const storedList = creator.list;
 
-      const result = await app.inject({
-        method: 'GET',
-        url: `/list/${storedList.id}/items`,
-        cookies: creator.cookies,
-      });
+      const result = await request(app.getHttpServer()).get(`/list/${storedList.id}/items`).set('Cookie', cookieHeader(creator.cookies));
 
-      expect(result.statusCode).toEqual(HttpStatus.OK);
+      expect(result.status).toEqual(HttpStatus.OK);
 
-      const payload = JSON.parse(result.payload) as ItemRow[];
+      const payload = JSON.parse(result.text) as ItemRow[];
       expect(payload).not.toHaveLength(0);
       for (const expectedItems of payload) {
         const storedItems = creator.items.find((storedItem) => storedItem.id === expectedItems.id);
@@ -323,12 +286,9 @@ describe('ItemController (e2e)', () => {
     });
 
     it('KO - User not authenticated', async () => {
-      const result = await app.inject({
-        method: 'GET',
-        url: `/list/${faker.string.uuid()}/items`,
-      });
+      const result = await request(app.getHttpServer()).get(`/list/${faker.string.uuid()}/items`);
 
-      expect(result.statusCode).toEqual(HttpStatus.UNAUTHORIZED);
+      expect(result.status).toEqual(HttpStatus.UNAUTHORIZED);
     });
   });
 
@@ -338,15 +298,13 @@ describe('ItemController (e2e)', () => {
       const storedList = creator.list;
       const storedItem = creator.item;
 
-      const result = await app.inject({
-        method: 'GET',
-        url: `/list/${storedList.id}/items/${storedItem.id}`,
-        cookies: creator.cookies,
-      });
+      const result = await request(app.getHttpServer())
+        .get(`/list/${storedList.id}/items/${storedItem.id}`)
+        .set('Cookie', cookieHeader(creator.cookies));
 
-      expect(result.statusCode).toEqual(HttpStatus.OK);
+      expect(result.status).toEqual(HttpStatus.OK);
 
-      const payload = JSON.parse(result.payload) as ItemRow;
+      const payload = JSON.parse(result.text) as ItemRow;
       expect(payload.listId).toEqual(storedItem.listId);
       expect(payload.id).toEqual(storedItem.id);
       expect(payload.name).toEqual(storedItem.name);
@@ -355,25 +313,20 @@ describe('ItemController (e2e)', () => {
     });
 
     it('KO - Requires to be authenticated', async () => {
-      const result = await app.inject({
-        method: 'GET',
-        url: `/list/${faker.string.uuid()}/items/${faker.string.uuid()}`,
-      });
+      const result = await request(app.getHttpServer()).get(`/list/${faker.string.uuid()}/items/${faker.string.uuid()}`);
 
-      expect(result.statusCode).toEqual(HttpStatus.UNAUTHORIZED);
+      expect(result.status).toEqual(HttpStatus.UNAUTHORIZED);
     });
 
     it('KO - Returns Not Found for non-existent resource', async () => {
       await using creator = await resourceCreator(app, { list: { quantity: SINGLE } });
       const storedList = creator.list;
 
-      const result = await app.inject({
-        method: 'GET',
-        url: `/list/${storedList.id}/items/${faker.string.uuid()}`,
-        cookies: creator.cookies,
-      });
+      const result = await request(app.getHttpServer())
+        .get(`/list/${storedList.id}/items/${faker.string.uuid()}`)
+        .set('Cookie', cookieHeader(creator.cookies));
 
-      expect(result.statusCode).toEqual(HttpStatus.NOT_FOUND);
+      expect(result.status).toEqual(HttpStatus.NOT_FOUND);
     });
   });
 
@@ -388,16 +341,14 @@ describe('ItemController (e2e)', () => {
         isInCart: faker.datatype.boolean(),
       };
 
-      const result = await app.inject({
-        method: 'PATCH',
-        url: `/list/${storedList.id}/items/${storedItem.id}`,
-        body: updatePayload,
-        cookies: creator.cookies,
-      });
+      const result = await request(app.getHttpServer())
+        .patch(`/list/${storedList.id}/items/${storedItem.id}`)
+        .set('Cookie', cookieHeader(creator.cookies))
+        .send(updatePayload);
 
-      expect(result.statusCode).toEqual(HttpStatus.OK);
+      expect(result.status).toEqual(HttpStatus.OK);
 
-      const payload = JSON.parse(result.payload) as ItemRow;
+      const payload = JSON.parse(result.text) as ItemRow;
       expect(payload.name).toEqual(updatePayload.name);
       expect(payload.isInCart).toEqual(updatePayload.isInCart);
       expect(payload.quantity).toEqual(storedItem.quantity);
@@ -412,16 +363,14 @@ describe('ItemController (e2e)', () => {
         throw new Error(`expected ${itemCount} items`);
       }
 
-      const result = await app.inject({
-        method: 'PATCH',
-        url: `/list/${storedList.id}/items/${firstItem.id}`,
-        body: { name: secondItem.name } satisfies UpdateItemDto,
-        cookies: creator.cookies,
-      });
+      const result = await request(app.getHttpServer())
+        .patch(`/list/${storedList.id}/items/${firstItem.id}`)
+        .set('Cookie', cookieHeader(creator.cookies))
+        .send({ name: secondItem.name } satisfies UpdateItemDto);
 
-      expect(result.statusCode).toEqual(HttpStatus.UNPROCESSABLE_ENTITY);
+      expect(result.status).toEqual(HttpStatus.UNPROCESSABLE_ENTITY);
 
-      const payload = JSON.parse(result.payload) as ErrorInterface;
+      const payload = JSON.parse(result.text) as ErrorInterface;
       expect(payload).toStrictEqual({
         name: [{ message: 'ITEM_NAME_NOT_UNIQUE' }],
       });
@@ -432,41 +381,33 @@ describe('ItemController (e2e)', () => {
       const storedList = creator.list;
       const storedItem = creator.item;
 
-      const result = await app.inject({
-        method: 'PATCH',
-        url: `/list/${storedList.id}/items/${storedItem.id}`,
-        body: { name: storedItem.name, isInCart: true } satisfies UpdateItemDto,
-        cookies: creator.cookies,
-      });
+      const result = await request(app.getHttpServer())
+        .patch(`/list/${storedList.id}/items/${storedItem.id}`)
+        .set('Cookie', cookieHeader(creator.cookies))
+        .send({ name: storedItem.name, isInCart: true } satisfies UpdateItemDto);
 
-      expect(result.statusCode).toEqual(HttpStatus.OK);
+      expect(result.status).toEqual(HttpStatus.OK);
 
-      const payload = JSON.parse(result.payload) as ItemRow;
+      const payload = JSON.parse(result.text) as ItemRow;
       expect(payload.name).toEqual(storedItem.name);
       expect(payload.isInCart).toEqual(true);
     });
 
     it('KO - User not authenticated', async () => {
-      const result = await app.inject({
-        method: 'PATCH',
-        url: `/list/${faker.string.uuid()}/items/${faker.string.uuid()}`,
-        body: {},
-      });
+      const result = await request(app.getHttpServer()).patch(`/list/${faker.string.uuid()}/items/${faker.string.uuid()}`).send({});
 
-      expect(result.statusCode).toEqual(HttpStatus.UNAUTHORIZED);
+      expect(result.status).toEqual(HttpStatus.UNAUTHORIZED);
     });
 
     it('KO - Returns Not Found for non-existent resource', async () => {
       await using creator = await resourceCreator(app, { list: { quantity: SINGLE } });
       const storedList = creator.list;
 
-      const result = await app.inject({
-        method: 'PATCH',
-        url: `/list/${storedList.id}/items/${faker.string.uuid()}`,
-        cookies: creator.cookies,
-      });
+      const result = await request(app.getHttpServer())
+        .patch(`/list/${storedList.id}/items/${faker.string.uuid()}`)
+        .set('Cookie', cookieHeader(creator.cookies));
 
-      expect(result.statusCode).toEqual(HttpStatus.NOT_FOUND);
+      expect(result.status).toEqual(HttpStatus.NOT_FOUND);
     });
 
     it('OK - Update quantity', async () => {
@@ -479,16 +420,14 @@ describe('ItemController (e2e)', () => {
         quantity,
       };
 
-      const result = await app.inject({
-        method: 'PATCH',
-        url: `/list/${storedList.id}/items/${storedItem.id}`,
-        body: updatePayload,
-        cookies: creator.cookies,
-      });
+      const result = await request(app.getHttpServer())
+        .patch(`/list/${storedList.id}/items/${storedItem.id}`)
+        .set('Cookie', cookieHeader(creator.cookies))
+        .send(updatePayload);
 
-      expect(result.statusCode).toEqual(HttpStatus.OK);
+      expect(result.status).toEqual(HttpStatus.OK);
 
-      const payload = JSON.parse(result.payload) as ItemRow;
+      const payload = JSON.parse(result.text) as ItemRow;
       expect(payload.quantity).toEqual(quantity);
     });
 
@@ -497,16 +436,14 @@ describe('ItemController (e2e)', () => {
       const storedList = creator.list;
       const storedItem = creator.item;
 
-      const result = await app.inject({
-        method: 'PATCH',
-        url: `/list/${storedList.id}/items/${storedItem.id}`,
-        body: { quantity: null },
-        cookies: creator.cookies,
-      });
+      const result = await request(app.getHttpServer())
+        .patch(`/list/${storedList.id}/items/${storedItem.id}`)
+        .set('Cookie', cookieHeader(creator.cookies))
+        .send({ quantity: null });
 
-      expect(result.statusCode).toEqual(HttpStatus.BAD_REQUEST);
+      expect(result.status).toEqual(HttpStatus.BAD_REQUEST);
 
-      const payload = JSON.parse(result.payload) as ErrorInterface;
+      const payload = JSON.parse(result.text) as ErrorInterface;
       expect(payload).toStrictEqual({
         quantity: [{ message: 'ITEM_QUANTITY' }],
       });
@@ -517,26 +454,22 @@ describe('ItemController (e2e)', () => {
       const storedList = creator.list;
       const storedItem = creator.item;
 
-      const typeResult = await app.inject({
-        method: 'POST',
-        url: '/item-types',
-        body: { label: faker.commerce.department() },
-        cookies: creator.cookies,
-      });
-      expect(typeResult.statusCode).toEqual(HttpStatus.CREATED);
+      const typeResult = await request(app.getHttpServer())
+        .post('/item-types')
+        .set('Cookie', cookieHeader(creator.cookies))
+        .send({ label: faker.commerce.department() });
+      expect(typeResult.status).toEqual(HttpStatus.CREATED);
 
-      const itemType = JSON.parse(typeResult.payload) as ItemTypeRow;
+      const itemType = JSON.parse(typeResult.text) as ItemTypeRow;
 
-      const result = await app.inject({
-        method: 'PATCH',
-        url: `/list/${storedList.id}/items/${storedItem.id}`,
-        body: { itemTypeId: itemType.id } satisfies UpdateItemDto,
-        cookies: creator.cookies,
-      });
+      const result = await request(app.getHttpServer())
+        .patch(`/list/${storedList.id}/items/${storedItem.id}`)
+        .set('Cookie', cookieHeader(creator.cookies))
+        .send({ itemTypeId: itemType.id } satisfies UpdateItemDto);
 
-      expect(result.statusCode).toEqual(HttpStatus.OK);
+      expect(result.status).toEqual(HttpStatus.OK);
 
-      const payload = JSON.parse(result.payload) as ItemResponse;
+      const payload = JSON.parse(result.text) as ItemResponse;
       expect(payload.itemType?.id).toStrictEqual(itemType.id);
       expect(payload.itemType?.label).toStrictEqual(itemType.label);
     });
@@ -546,39 +479,33 @@ describe('ItemController (e2e)', () => {
       const storedList = creator.list;
       const storedItem = creator.item;
 
-      const typeResult = await app.inject({
-        method: 'POST',
-        url: '/item-types',
-        body: { label: faker.commerce.department() },
-        cookies: creator.cookies,
-      });
-      expect(typeResult.statusCode).toEqual(HttpStatus.CREATED);
+      const typeResult = await request(app.getHttpServer())
+        .post('/item-types')
+        .set('Cookie', cookieHeader(creator.cookies))
+        .send({ label: faker.commerce.department() });
+      expect(typeResult.status).toEqual(HttpStatus.CREATED);
 
-      const itemType = JSON.parse(typeResult.payload) as ItemTypeRow;
+      const itemType = JSON.parse(typeResult.text) as ItemTypeRow;
 
-      const attachResult = await app.inject({
-        method: 'PATCH',
-        url: `/list/${storedList.id}/items/${storedItem.id}`,
-        body: { itemTypeId: itemType.id } satisfies UpdateItemDto,
-        cookies: creator.cookies,
-      });
-      expect(attachResult.statusCode).toEqual(HttpStatus.OK);
+      const attachResult = await request(app.getHttpServer())
+        .patch(`/list/${storedList.id}/items/${storedItem.id}`)
+        .set('Cookie', cookieHeader(creator.cookies))
+        .send({ itemTypeId: itemType.id } satisfies UpdateItemDto);
+      expect(attachResult.status).toEqual(HttpStatus.OK);
 
-      const result = await app.inject({
-        method: 'PATCH',
-        url: `/list/${storedList.id}/items/${storedItem.id}`,
-        body: {
+      const result = await request(app.getHttpServer())
+        .patch(`/list/${storedList.id}/items/${storedItem.id}`)
+        .set('Cookie', cookieHeader(creator.cookies))
+        .send({
           name: storedItem.name,
           quantity: storedItem.quantity,
           isInCart: false,
           itemTypeId: null,
-        } satisfies UpdateItemDto,
-        cookies: creator.cookies,
-      });
+        } satisfies UpdateItemDto);
 
-      expect(result.statusCode).toEqual(HttpStatus.OK);
+      expect(result.status).toEqual(HttpStatus.OK);
 
-      const payload = JSON.parse(result.payload) as ItemResponse;
+      const payload = JSON.parse(result.text) as ItemResponse;
       expect(payload.itemType).toBeNull();
       expect(payload.quantity).toEqual(storedItem.quantity);
       expect(payload.isInCart).toEqual(false);
@@ -590,24 +517,20 @@ describe('ItemController (e2e)', () => {
       const targetList = creator.list;
       const storedItem = creator.item;
 
-      const typeResult = await app.inject({
-        method: 'POST',
-        url: '/item-types',
-        body: { label: faker.commerce.department() },
-        cookies: outsider.cookies,
-      });
-      expect(typeResult.statusCode).toEqual(HttpStatus.CREATED);
+      const typeResult = await request(app.getHttpServer())
+        .post('/item-types')
+        .set('Cookie', cookieHeader(outsider.cookies))
+        .send({ label: faker.commerce.department() });
+      expect(typeResult.status).toEqual(HttpStatus.CREATED);
 
-      const itemType = JSON.parse(typeResult.payload) as ItemTypeRow;
+      const itemType = JSON.parse(typeResult.text) as ItemTypeRow;
 
-      const result = await app.inject({
-        method: 'PATCH',
-        url: `/list/${targetList.id}/items/${storedItem.id}`,
-        body: { itemTypeId: itemType.id } satisfies UpdateItemDto,
-        cookies: creator.cookies,
-      });
+      const result = await request(app.getHttpServer())
+        .patch(`/list/${targetList.id}/items/${storedItem.id}`)
+        .set('Cookie', cookieHeader(creator.cookies))
+        .send({ itemTypeId: itemType.id } satisfies UpdateItemDto);
 
-      expect(result.statusCode).toEqual(HttpStatus.NOT_FOUND);
+      expect(result.status).toEqual(HttpStatus.NOT_FOUND);
     });
   });
 
@@ -617,13 +540,11 @@ describe('ItemController (e2e)', () => {
       const storedList = creator.list;
       const storedItem = creator.item;
 
-      const result = await app.inject({
-        method: 'DELETE',
-        url: `/list/${storedList.id}/items/${storedItem.id}`,
-        cookies: creator.cookies,
-      });
+      const result = await request(app.getHttpServer())
+        .delete(`/list/${storedList.id}/items/${storedItem.id}`)
+        .set('Cookie', cookieHeader(creator.cookies));
 
-      expect(result.statusCode).toEqual(HttpStatus.OK);
+      expect(result.status).toEqual(HttpStatus.OK);
 
       const itemService = app.get(ItemService);
       const remainingItems = await itemService.findAllWithTypeByListId({ listId: storedList.id, user: creator.user });
@@ -631,25 +552,20 @@ describe('ItemController (e2e)', () => {
     });
 
     it('KO - User not authenticated', async () => {
-      const result = await app.inject({
-        method: 'DELETE',
-        url: `/list/${faker.string.uuid()}/items/${faker.string.uuid()}`,
-      });
+      const result = await request(app.getHttpServer()).delete(`/list/${faker.string.uuid()}/items/${faker.string.uuid()}`);
 
-      expect(result.statusCode).toEqual(HttpStatus.UNAUTHORIZED);
+      expect(result.status).toEqual(HttpStatus.UNAUTHORIZED);
     });
 
     it('KO - Returns Not Found for non-existent resource', async () => {
       await using creator = await resourceCreator(app, { list: { quantity: SINGLE } });
       const storedList = creator.list;
 
-      const result = await app.inject({
-        method: 'DELETE',
-        url: `/list/${storedList.id}/items/${faker.string.uuid()}`,
-        cookies: creator.cookies,
-      });
+      const result = await request(app.getHttpServer())
+        .delete(`/list/${storedList.id}/items/${faker.string.uuid()}`)
+        .set('Cookie', cookieHeader(creator.cookies));
 
-      expect(result.statusCode).toEqual(HttpStatus.NOT_FOUND);
+      expect(result.status).toEqual(HttpStatus.NOT_FOUND);
     });
   });
 });

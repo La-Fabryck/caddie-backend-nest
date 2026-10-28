@@ -1,5 +1,9 @@
 Tech :
 
+## Logout
+
+`GET /authentication/logout` clears the access cookie and the refresh cookie. No e2e calls that route. The Svelte app does not call it either. Check the clear and the client flow together before you treat logout as done.
+
 Later'ish :
 
 - CQRS architecture
