@@ -99,14 +99,14 @@ async function resourceCreator(
     user: { ...user, password: userPayload.password },
     lists,
     items,
-    get list() {
+    get list(): ListWithSubs {
       return only(lists, 'list');
     },
-    get item() {
+    get item(): ItemRow {
       return only(items, 'item');
     },
     cookies,
-    [Symbol.asyncDispose]: async () => {
+    [Symbol.asyncDispose]: async (): Promise<void> => {
       if (removeItems && itemsQuantity) {
         await Promise.all(items.map(async (item) => itemService.remove(item.listId, item.id, user)));
       }

@@ -11,6 +11,7 @@ function issuePathKey(path: readonly (PropertyKey | { key: PropertyKey })[] | un
   if (path == null || path.length === 0) {
     return 'root';
   }
+
   return path.map((segment) => String(typeof segment === 'object' ? segment.key : segment)).join('.');
 }
 
@@ -30,4 +31,5 @@ function configureApp(app: INestApplication): void {
     }),
   );
 }
+
 export { configureApp };
